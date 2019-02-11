@@ -1,4 +1,9 @@
-from __main__ import db
+from __main__ import app
+from flask_sqlalchemy import SQLAlchemy
+
+
+db = SQLAlchemy(app.app)
+db.create_all()
 
 
 class Learner(db.Model):

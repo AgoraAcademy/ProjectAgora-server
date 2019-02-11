@@ -3,7 +3,6 @@
 import connexion
 from flask_cors import CORS
 from swagger_server import encoder
-from flask_sqlalchemy import SQLAlchemy
 import os
 
 
@@ -12,7 +11,10 @@ def main():
     app.app.json_encoder = encoder.JSONEncoder
     CORS(app.app)
     app.add_api('swagger.yaml', arguments={'title': 'ProjectAgora'})
-    db = SQLAlchemy(app)
+    try:
+        app.app.config['SQLALCHEMY_DATABASE_URI'] = os.environ["SQLALCHEMY_DATABASE_URI"]
+    except Exception as e:
+        return {"error": e, "message": "failed to initialize sqlalchemy db."}
     app.run(port=8080)
 
 
