@@ -1,0 +1,985 @@
+---
+swagger: "2.0"
+info:
+  description: "Optional multiline or single-line description in [CommonMark](http://commonmark.org/help/)\
+    \ or HTML."
+  version: "0.0.1"
+  title: "ProjectAgora"
+host: "127.0.0.1:8080"
+basePath: "/v1"
+schemes:
+- "https"
+consumes:
+- "application/json"
+produces:
+- "application/json"
+security:
+- APIKeyHeader: []
+paths:
+  /oauth2:
+    get:
+      tags:
+      - "Authentication"
+      summary: "OAUTH2回调接口"
+      operationId: "oauth2_get"
+      parameters:
+      - name: "code"
+        in: "query"
+        description: "Code"
+        required: true
+        type: "string"
+      - name: "state"
+        in: "query"
+        description: "state"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "获取当前Token信息成功"
+          schema:
+            type: "object"
+            properties:
+              access_token:
+                type: "string"
+              expires_in:
+                type: "number"
+              refresh_token:
+                type: "string"
+              openid:
+                type: "string"
+              scope:
+                type: "string"
+              unionid:
+                type: "string"
+        401:
+          description: "无法获取当前Token信息"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+      x-swagger-router-controller: "swagger_server.controllers.authentication_controller"
+  /learner:
+    get:
+      tags:
+      - "Learner"
+      summary: "返回所有的Leaner详细信息"
+      description: "返回所有的Leaner详细信息"
+      operationId: "learner_get"
+      parameters: []
+      responses:
+        200:
+          description: "A JSON array of user names"
+          schema:
+            $ref: "#/definitions/Learner"
+        401:
+          description: "API key is missing or invalid"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+      x-swagger-router-controller: "swagger_server.controllers.learner_controller"
+    head:
+      tags:
+      - "Learner"
+      summary: "返回所有Learner的关键信息"
+      operationId: "learner_head"
+      parameters: []
+      responses:
+        200:
+          description: "成功"
+          schema:
+            type: "object"
+            properties:
+              id:
+                type: "integer"
+                example: 1
+              name:
+                type: "string"
+                example: "John Appleseed"
+        401:
+          description: "API key is missing or invalid"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+      x-swagger-router-controller: "swagger_server.controllers.learner_controller"
+    post:
+      tags:
+      - "Learner"
+      summary: "创建一个Learner"
+      operationId: "learner_post"
+      parameters:
+      - in: "body"
+        name: "login"
+        required: true
+        schema:
+          $ref: "#/definitions/Learner"
+      responses:
+        201:
+          description: "创建成功"
+          schema:
+            type: "object"
+            properties:
+              id:
+                type: "integer"
+            description: "成功创建的Learner的ID"
+        401:
+          description: "API key is missing or invalid"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+      x-swagger-router-controller: "swagger_server.controllers.learner_controller"
+  /learner/{learnerId}:
+    get:
+      tags:
+      - "Learner"
+      summary: "返回一个Learner的详细信息"
+      operationId: "learner_learner_id_get"
+      parameters:
+      - name: "learnerId"
+        in: "path"
+        required: true
+        type: "integer"
+        minimum: 1
+        format: "int64"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/Learner"
+        401:
+          description: "API key is missing or invalid"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+      x-swagger-router-controller: "swagger_server.controllers.learner_controller"
+  /learner/{learnerId}/project:
+    get:
+      tags:
+      - "Learner"
+      - "Projects"
+      summary: "返回一个Learner相关的课程"
+      operationId: "learner_learner_id_project_get"
+      parameters:
+      - name: "learnerId"
+        in: "path"
+        required: true
+        type: "integer"
+        minimum: 1
+        format: "int64"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Project"
+      x-swagger-router-controller: "swagger_server.controllers.learner_controller"
+  /learner/{learnerId}/creditHour:
+    get:
+      tags:
+      - "Learner"
+      - "CreditHour"
+      summary: "返回一个Learner相关的学时记录"
+      operationId: "learner_learner_id_credit_hour_get"
+      parameters:
+      - name: "learnerId"
+        in: "path"
+        required: true
+        type: "integer"
+        minimum: 1
+        format: "int64"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/CreditHourEntry"
+      x-swagger-router-controller: "swagger_server.controllers.learner_controller"
+securityDefinitions:
+  APIKeyHeader:
+    type: "apiKey"
+    name: "api_key"
+    in: "header"
+definitions:
+  Error:
+    properties:
+      code:
+        type: "integer"
+        example: 401
+      message:
+        type: "string"
+    description: "错误"
+  TokenStatus:
+    properties:
+      learnerID:
+        type: "string"
+      token:
+        type: "string"
+      expireBy:
+        type: "string"
+      refreshed:
+        type: "boolean"
+    description: "Token信息"
+  LoginRequest:
+    properties:
+      username:
+        type: "string"
+      password:
+        type: "string"
+    description: "登陆请求"
+  Learner:
+    required:
+    - "isMentor"
+    properties:
+      id:
+        type: "integer"
+        description: "ID"
+      givenName:
+        type: "string"
+        description: "名"
+      familyName:
+        type: "string"
+        description: "姓"
+      nickname:
+        type: "string"
+        description: "昵称"
+      isMentor:
+        type: "boolean"
+        description: "是否导师"
+      gender:
+        type: "string"
+        description: "性别"
+      ethnicity:
+        type: "string"
+        description: "民族"
+      birthday:
+        type: "string"
+        description: "生日"
+      age:
+        type: "number"
+        description: "年龄（应当是计算字段）"
+      status:
+        type: "string"
+        description: "目前状态，包括在读、在读（游学）、在读（试读）、毕业、导师等；考虑是否需要更换成integer"
+      mainPersonalIdType:
+        type: "string"
+        description: "证件类型"
+      mainPersonalId:
+        type: "string"
+        description: "证件号码"
+      dateOfRegistration:
+        type: "string"
+        description: "加入时间"
+      reasonOfRegistration:
+        type: "string"
+        description: "加入原因"
+      previousStatus:
+        type: "string"
+        description: "加入前状态"
+      dateOfLeave:
+        type: "string"
+        description: "离开时间"
+      reasonOfLeave:
+        type: "string"
+        description: "离开原因"
+      destinationOfLeave:
+        type: "string"
+        description: "下阶段目的地"
+      mentorship:
+        type: "array"
+        description: "导师关系"
+        items:
+          $ref: "#/definitions/Learner_mentorship"
+      salaryCard:
+        type: "string"
+        description: "工资卡号"
+      custodianInfo:
+        type: "array"
+        description: "监护人信息"
+        items:
+          $ref: "#/definitions/Learner_custodianInfo"
+      emergentContact:
+        type: "array"
+        description: "紧急联系人"
+        items:
+          $ref: "#/definitions/Learner_emergentContact"
+      contactInfo:
+        $ref: "#/definitions/Learner_contactInfo"
+      medicalInfo:
+        $ref: "#/definitions/Learner_medicalInfo"
+      notes:
+        type: "array"
+        description: "备注"
+        items:
+          type: "string"
+    description: "学习者"
+    example:
+      birthday: "birthday"
+      mentorship:
+      - mentorName: "mentorName"
+        mentorType: "mentorType"
+        mentorID: 1
+      - mentorName: "mentorName"
+        mentorType: "mentorType"
+        mentorID: 1
+      salaryCard: "salaryCard"
+      notes:
+      - "notes"
+      - "notes"
+      gender: "gender"
+      ethnicity: "ethnicity"
+      contactInfo:
+        QQ: "QQ"
+        phoneNumber: "phoneNumber"
+        weChat: "weChat"
+        mailAddress: "mailAddress"
+        email: "email"
+      reasonOfLeave: "reasonOfLeave"
+      dateOfRegistration: "dateOfRegistration"
+      medicalInfo:
+        regularMedication:
+        - nameOfMedication: "nameOfMedication"
+          instructionOfMedication: "instructionOfMedication"
+        - nameOfMedication: "nameOfMedication"
+          instructionOfMedication: "instructionOfMedication"
+        foodAlergy:
+          fishAllergy: true
+          otherFoodAllergy:
+          - "otherFoodAllergy"
+          - "otherFoodAllergy"
+          eggAllergy: true
+          wheatAllergy: true
+          soyBeanAllergy: true
+          nutAllergy: true
+          lactoseIntolerance: true
+          shellAllergy: true
+          peanutAllergy: true
+        generalHealthStatus: 5
+        lastPhysicalExam: 5.63737665663332876420099637471139430999755859375
+        medicationAllergy:
+          antibioticsAllergy: true
+          otherMedicationAllergy:
+          - "otherMedicationAllergy"
+          - "otherMedicationAllergy"
+          anestheticAllergy: true
+          sulfonamidesAllergy: true
+          painkillerAllergy: true
+          vaccineAllergy: true
+        bloodType: "bloodType"
+        previousDiagnosis:
+        - nameOfDiagnosis: "nameOfDiagnosis"
+          hospitalOfDiagnosis: "hospitalOfDiagnosis"
+        - nameOfDiagnosis: "nameOfDiagnosis"
+          hospitalOfDiagnosis: "hospitalOfDiagnosis"
+      emergentContact:
+      - number: "number"
+        name: "name"
+      - number: "number"
+        name: "name"
+      reasonOfRegistration: "reasonOfRegistration"
+      mainPersonalId: "mainPersonalId"
+      familyName: "familyName"
+      nickname: "nickname"
+      custodianInfo:
+      - name: "name"
+        relationship: "relationship"
+      - name: "name"
+        relationship: "relationship"
+      id: 0
+      destinationOfLeave: "destinationOfLeave"
+      givenName: "givenName"
+      dateOfLeave: "dateOfLeave"
+      mainPersonalIdType: "mainPersonalIdType"
+      isMentor: true
+      age: 6.02745618307040320615897144307382404804229736328125
+      status: "status"
+      previousStatus: "previousStatus"
+  Project:
+    required:
+    - "createdBy"
+    - "createdTime"
+    - "name"
+    - "relatedCourseId"
+    properties:
+      id:
+        type: "integer"
+        description: "项目ID"
+      name:
+        type: "string"
+        description: "项目名称"
+      createdTime:
+        type: "string"
+        description: "创建时间"
+      createdByID:
+        type: "integer"
+        description: "创建人ID"
+      createdBy:
+        type: "string"
+        description: "创建人（姓名）"
+      relatedCourseId:
+        type: "integer"
+        description: "关联的课程ID；自由项目的课程ID为0"
+      relatedCourse:
+        type: "string"
+        description: "关联的课程"
+      projectTerm:
+        type: "string"
+        description: "项目开始学期"
+      projectTermLength:
+        type: "integer"
+        description: "持续时间（以学期为单位）"
+      projectStartDate:
+        type: "string"
+        description: "项目开始时间"
+      averageIntendedCreditHourPerWeek:
+        type: "integer"
+        description: "预期周均学时"
+      totalIntendedCreditHour:
+        type: "integer"
+        description: "预期总学时"
+      projectMentorID:
+        type: "integer"
+        description: "项目导师ID"
+      projectMentor:
+        type: "string"
+        description: "项目导师"
+      averageGuidingHourPerWeek:
+        type: "integer"
+        description: "导师周均指导时间"
+      projectMeta:
+        $ref: "#/definitions/Project_projectMeta"
+      projectApprovalInfo:
+        $ref: "#/definitions/Project_projectApprovalInfo"
+      content:
+        type: "array"
+        description: "项目记录的条目"
+        items:
+          $ref: "#/definitions/Project_content"
+      conclusionInfo:
+        $ref: "#/definitions/Project_conclusionInfo"
+    description: "项目"
+    example:
+      conclusionInfo:
+        MentorEvaluation: "MentorEvaluation"
+        selfEvaluation: "selfEvaluation"
+      totalIntendedCreditHour: 2
+      relatedCourseId: 1
+      relatedCourse: "relatedCourse"
+      projectMeta:
+        projectGoal: "projectGoal"
+        projectIntro: "projectIntro"
+        evaluationSchema: "evaluationSchema"
+        projectPlan: "projectPlan"
+        instructionPlan: "instructionPlan"
+      projectMentorID: 7
+      projectMentor: "projectMentor"
+      projectApprovalInfo:
+        ApprovalCommitteeOfAcademics:
+          result: "result"
+          advice: "advice"
+        ApprovalMentor:
+          result: "result"
+          advice: "advice"
+      content:
+      - itemStartDate: "itemStartDate"
+        itemContent: "itemContent"
+        itemTitle: "itemTitle"
+        itemRecord: "itemRecord"
+        itemComment: "itemComment"
+        itemEndDate: "itemEndDate"
+      - itemStartDate: "itemStartDate"
+        itemContent: "itemContent"
+        itemTitle: "itemTitle"
+        itemRecord: "itemRecord"
+        itemComment: "itemComment"
+        itemEndDate: "itemEndDate"
+      averageGuidingHourPerWeek: 9
+      createdBy: "createdBy"
+      projectTermLength: 5
+      projectStartDate: "projectStartDate"
+      name: "name"
+      createdTime: "createdTime"
+      id: 0
+      averageIntendedCreditHourPerWeek: 5
+      createdByID: 6
+      projectTerm: "projectTerm"
+  Course:
+    properties:
+      id:
+        type: "integer"
+        description: "课程ID"
+      name:
+        type: "string"
+        description: "课程名称"
+      createdTime:
+        type: "string"
+        description: "创建时间"
+      createdByID:
+        type: "integer"
+        description: "创建人"
+      createdBy:
+        type: "integer"
+        description: "创建人"
+      creditHour:
+        type: "number"
+        description: "学时设置"
+      courseTimeShift:
+        type: "string"
+        description: "上课时间"
+      courseLengthInWeeks:
+        type: "integer"
+        description: "上课周数"
+      formAndEvaluation:
+        type: "string"
+        description: "课程形式与评价方式"
+      goalOfcourse:
+        type: "string"
+        description: "课程目的"
+      objectivesOfInstruction:
+        type: "string"
+        description: "教学目标"
+      planOfInstruction:
+        type: "string"
+        description: "教学安排"
+      miscellaneousNote:
+        type: "string"
+        description: "其他注意事项"
+      instructions:
+        type: "array"
+        description: "课程引导内容"
+        items:
+          $ref: "#/definitions/Course_instructions"
+    description: "课程"
+  CreditHourEntry:
+    properties:
+      value:
+        type: "number"
+        description: "学时授予值(按分钟记)"
+      grantTo:
+        type: "integer"
+        description: "学时获得者ID"
+      grantBy:
+        type: "integer"
+        description: "学时申请者ID(若是课程学时则为课程导师申请)"
+      grantFor:
+        type: "integer"
+        description: "学时相关项目ID(若无相关项目，则为0)"
+      grantNote:
+        type: "string"
+        description: "学时授予备注"
+      grade:
+        type: "integer"
+        description: "学时相关绩点（若不属于绩点学时，则为-1）"
+      applicationId:
+        type: "integer"
+        description: "学时相关申请(若不存在申请环节，则为0)"
+    description: "学时授予记录"
+    example:
+      grantTo: 6
+      grantFor: 5
+      grantBy: 1
+      grade: 5
+      grantNote: "grantNote"
+      applicationId: 2
+      value: 0.80082819046101150206595775671303272247314453125
+  CreditHourApplication:
+    properties:
+      value:
+        type: "number"
+        description: "所申请的学时值（按分钟记）"
+      applicantId:
+        type: "integer"
+        description: "申请人ID"
+      applicaitonDescription:
+        type: "string"
+        description: "申请内容详述"
+      status:
+        type: "string"
+        description: "申请结果状态"
+      entryId:
+        type: "array"
+        description: "关联的学时授予记录（在审核批准前为0）"
+        items:
+          type: "integer"
+    description: "由学生发起的学时认证申请"
+  inline_response_200:
+    properties:
+      access_token:
+        type: "string"
+      expires_in:
+        type: "number"
+      refresh_token:
+        type: "string"
+      openid:
+        type: "string"
+      scope:
+        type: "string"
+      unionid:
+        type: "string"
+    example:
+      access_token: "access_token"
+      refresh_token: "refresh_token"
+      unionid: "unionid"
+      openid: "openid"
+      scope: "scope"
+      expires_in: 0.80082819046101150206595775671303272247314453125
+  inline_response_200_1:
+    properties:
+      id:
+        type: "integer"
+        example: 1
+      name:
+        type: "string"
+        example: "John Appleseed"
+    example:
+      name: "John Appleseed"
+      id: 1
+  inline_response_201:
+    properties:
+      id:
+        type: "integer"
+    description: "成功创建的Learner的ID"
+    example:
+      id: 0
+  Learner_mentorship:
+    properties:
+      mentorType:
+        type: "string"
+        description: "导师类型,  分有负责导师mentorResponsible,协同导师mentorSupportive, 家校沟通导师\
+          mentorCommunicative)"
+      mentorID:
+        type: "integer"
+        description: "导师ID"
+      mentorName:
+        type: "string"
+        description: "导师名称"
+    example:
+      mentorName: "mentorName"
+      mentorType: "mentorType"
+      mentorID: 1
+  Learner_custodianInfo:
+    properties:
+      name:
+        type: "string"
+        description: "姓名"
+      relationship:
+        type: "string"
+        description: "关系"
+    example:
+      name: "name"
+      relationship: "relationship"
+  Learner_emergentContact:
+    properties:
+      name:
+        type: "string"
+        description: "紧急联系人姓名"
+      number:
+        type: "string"
+        description: "紧急联系人电话"
+    example:
+      number: "number"
+      name: "name"
+  Learner_contactInfo:
+    properties:
+      phoneNumber:
+        type: "string"
+        description: "电话号码"
+      weChat:
+        type: "string"
+        description: "微信"
+      QQ:
+        type: "string"
+        description: "QQ"
+      mailAddress:
+        type: "string"
+        description: "收件地址（用以寄送书面文件）"
+      email:
+        type: "string"
+        description: "电子邮箱"
+    description: "联系信息"
+    example:
+      QQ: "QQ"
+      phoneNumber: "phoneNumber"
+      weChat: "weChat"
+      mailAddress: "mailAddress"
+      email: "email"
+  Learner_medicalInfo_previousDiagnosis:
+    properties:
+      nameOfDiagnosis:
+        type: "string"
+        description: "疾病名称"
+      hospitalOfDiagnosis:
+        type: "string"
+        description: "诊断医院"
+    example:
+      nameOfDiagnosis: "nameOfDiagnosis"
+      hospitalOfDiagnosis: "hospitalOfDiagnosis"
+  Learner_medicalInfo_regularMedication:
+    properties:
+      nameOfMedication:
+        type: "string"
+        description: "药品名"
+      instructionOfMedication:
+        type: "string"
+        description: "用药医嘱"
+    example:
+      nameOfMedication: "nameOfMedication"
+      instructionOfMedication: "instructionOfMedication"
+  Learner_medicalInfo_foodAlergy:
+    properties:
+      lactoseIntolerance:
+        type: "boolean"
+        description: "奶类过敏（乳糖不耐受）"
+      eggAllergy:
+        type: "boolean"
+        description: "禽蛋类过敏"
+      fishAllergy:
+        type: "boolean"
+        description: "鱼类过敏"
+      shellAllergy:
+        type: "boolean"
+        description: "甲壳类（虾蟹、贝类水产等）"
+      peanutAllergy:
+        type: "boolean"
+        description: "花生过敏"
+      soyBeanAllergy:
+        type: "boolean"
+        description: "大豆过敏"
+      nutAllergy:
+        type: "boolean"
+        description: "坚果类过敏"
+      wheatAllergy:
+        type: "boolean"
+        description: "小麦过敏"
+      otherFoodAllergy:
+        type: "array"
+        description: "其他食物过敏"
+        items:
+          type: "string"
+    description: "食物过敏"
+    example:
+      fishAllergy: true
+      otherFoodAllergy:
+      - "otherFoodAllergy"
+      - "otherFoodAllergy"
+      eggAllergy: true
+      wheatAllergy: true
+      soyBeanAllergy: true
+      nutAllergy: true
+      lactoseIntolerance: true
+      shellAllergy: true
+      peanutAllergy: true
+  Learner_medicalInfo_medicationAllergy:
+    properties:
+      antibioticsAllergy:
+        type: "boolean"
+        description: "抗生素过敏（青霉素、氨基苄青霉素、链霉素、卡那霉素）"
+      sulfonamidesAllergy:
+        type: "boolean"
+        description: "磺胺类药物过敏（磺胺噻唑、磺胺嘧啶、长效磺胺、复方新诺明等）"
+      painkillerAllergy:
+        type: "boolean"
+        description: "解热镇痛药（阿司匹林、去痛片）"
+      anestheticAllergy:
+        type: "boolean"
+        description: "麻醉用药（普鲁卡因）"
+      vaccineAllergy:
+        type: "boolean"
+        description: "疫苗类药物"
+      otherMedicationAllergy:
+        type: "array"
+        description: "其他药物过敏"
+        items:
+          type: "string"
+    description: "药物过敏"
+    example:
+      antibioticsAllergy: true
+      otherMedicationAllergy:
+      - "otherMedicationAllergy"
+      - "otherMedicationAllergy"
+      anestheticAllergy: true
+      sulfonamidesAllergy: true
+      painkillerAllergy: true
+      vaccineAllergy: true
+  Learner_medicalInfo:
+    properties:
+      generalHealthStatus:
+        type: "integer"
+        description: "整体健康状况；0 - 很好（基本不生病，从不住院）； 1 - 一般（偶尔生病住院）； 2 - 欠佳（每个季度都曾生病住院\
+          ）"
+      bloodType:
+        type: "string"
+        description: "血型"
+      lastPhysicalExam:
+        type: "number"
+        description: "最近一次体检时间(以年为单位)"
+      previousDiagnosis:
+        type: "array"
+        description: "既往疾病"
+        items:
+          $ref: "#/definitions/Learner_medicalInfo_previousDiagnosis"
+      regularMedication:
+        type: "array"
+        description: "长期用药"
+        items:
+          $ref: "#/definitions/Learner_medicalInfo_regularMedication"
+      foodAlergy:
+        $ref: "#/definitions/Learner_medicalInfo_foodAlergy"
+      medicationAllergy:
+        $ref: "#/definitions/Learner_medicalInfo_medicationAllergy"
+    description: "医疗记录"
+    example:
+      regularMedication:
+      - nameOfMedication: "nameOfMedication"
+        instructionOfMedication: "instructionOfMedication"
+      - nameOfMedication: "nameOfMedication"
+        instructionOfMedication: "instructionOfMedication"
+      foodAlergy:
+        fishAllergy: true
+        otherFoodAllergy:
+        - "otherFoodAllergy"
+        - "otherFoodAllergy"
+        eggAllergy: true
+        wheatAllergy: true
+        soyBeanAllergy: true
+        nutAllergy: true
+        lactoseIntolerance: true
+        shellAllergy: true
+        peanutAllergy: true
+      generalHealthStatus: 5
+      lastPhysicalExam: 5.63737665663332876420099637471139430999755859375
+      medicationAllergy:
+        antibioticsAllergy: true
+        otherMedicationAllergy:
+        - "otherMedicationAllergy"
+        - "otherMedicationAllergy"
+        anestheticAllergy: true
+        sulfonamidesAllergy: true
+        painkillerAllergy: true
+        vaccineAllergy: true
+      bloodType: "bloodType"
+      previousDiagnosis:
+      - nameOfDiagnosis: "nameOfDiagnosis"
+        hospitalOfDiagnosis: "hospitalOfDiagnosis"
+      - nameOfDiagnosis: "nameOfDiagnosis"
+        hospitalOfDiagnosis: "hospitalOfDiagnosis"
+  Project_projectMeta:
+    properties:
+      projectIntro:
+        type: "string"
+        description: "项目简介"
+      projectGoal:
+        type: "string"
+        description: "项目目标"
+      evaluationSchema:
+        type: "string"
+        description: "项目评价标准"
+      projectPlan:
+        type: "string"
+        description: "项目计划"
+      instructionPlan:
+        type: "string"
+        description: "项目指导规划"
+    description: "项目元信息"
+    example:
+      projectGoal: "projectGoal"
+      projectIntro: "projectIntro"
+      evaluationSchema: "evaluationSchema"
+      projectPlan: "projectPlan"
+      instructionPlan: "instructionPlan"
+  Project_projectApprovalInfo_ApprovalCommitteeOfAcademics:
+    properties:
+      result:
+        type: "string"
+        description: "学术委员会审核结果"
+      advice:
+        type: "string"
+        description: "学术委员会审核建议"
+    description: "学术委员会审核"
+    example:
+      result: "result"
+      advice: "advice"
+  Project_projectApprovalInfo_ApprovalMentor:
+    properties:
+      result:
+        type: "string"
+        description: "导师审核结果"
+      advice:
+        type: "string"
+        description: "导师审核建议"
+    description: "导师审核"
+    example:
+      result: "result"
+      advice: "advice"
+  Project_projectApprovalInfo:
+    properties:
+      ApprovalCommitteeOfAcademics:
+        $ref: "#/definitions/Project_projectApprovalInfo_ApprovalCommitteeOfAcademics"
+      ApprovalMentor:
+        $ref: "#/definitions/Project_projectApprovalInfo_ApprovalMentor"
+    description: "项目审核信息"
+    example:
+      ApprovalCommitteeOfAcademics:
+        result: "result"
+        advice: "advice"
+      ApprovalMentor:
+        result: "result"
+        advice: "advice"
+  Project_content:
+    properties:
+      itemTitle:
+        type: "string"
+        description: "条目标题"
+      itemStartDate:
+        type: "string"
+        description: "条目开始时间; 若存在关联课程，该条为空"
+      itemEndDate:
+        type: "string"
+        description: "条目结束时间; 若存在关联课程，该条为空"
+      itemContent:
+        type: "string"
+        description: "条目内容；若存在关联课程，该条为空"
+      itemRecord:
+        type: "string"
+        description: "条目记录"
+      itemComment:
+        type: "string"
+        description: "条目评语"
+    example:
+      itemStartDate: "itemStartDate"
+      itemContent: "itemContent"
+      itemTitle: "itemTitle"
+      itemRecord: "itemRecord"
+      itemComment: "itemComment"
+      itemEndDate: "itemEndDate"
+  Project_conclusionInfo:
+    properties:
+      selfEvaluation:
+        type: "string"
+        description: "项目负责人结项自评"
+      MentorEvaluation:
+        type: "string"
+        description: "导师结项评语"
+    description: "项目结项信息"
+    example:
+      MentorEvaluation: "MentorEvaluation"
+      selfEvaluation: "selfEvaluation"
+  Course_instructions:
+    properties:
+      instructionTitle:
+        type: "string"
+        description: "引导条目标题"
+      instructionStartDate:
+        type: "string"
+        description: "引导条目开始时间"
+      instructionEndDate:
+        type: "string"
+        description: "引导条目结束时间"
+      instructionContent:
+        type: "string"
+        description: "引导条目内容"
+responses:
+  UnauthorizedError:
+    description: "API key is missing or invalid"
+    headers:
+      WWW_Authenticate:
+        type: "string"
