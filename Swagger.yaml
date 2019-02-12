@@ -504,38 +504,47 @@ definitions:
           type: integer
           
 paths:
-  /login:
+  /oauth2:
     get:
-      summary: 获取当前Token信息
+      summary: OAUTH2回调接口
+      parameters:
+        - in: query
+          name: code
+          type: string
+          required: true
+          description: Code
+        - in: query
+          name: state
+          type: string
+          required: true
+          description: state
       tags: 
         - Authentication
       responses:
         '200':
           description: 获取当前Token信息成功
           schema:
-            $ref: '#/definitions/TokenStatus'
+            type: object
+            properties:
+              access_token:
+                type: string
+              expires_in:
+                type: number
+              refresh_token: 
+                type: string
+              openid:
+                type: string
+              scope:
+                type: string
         '401':
           description: 无法获取当前Token信息
-          headers:
-            WWW_Authenticate:
-              type: string
-    post:
-      summary: 尝试登陆
-      tags: 
-        - Authentication
-      parameters:
-        - in: body
-          name: login
-          required: true
           schema:
-            $ref: '#/definitions/LoginRequest'
-      responses:
-        '200':
-          description: 登陆成功
-          schema:
-              $ref: '#/definitions/TokenStatus'
-        '401':
-          $ref: "#/responses/UnauthorizedError"
+            type: object
+            properties:
+              errcode:
+                type: string
+              errmsg:
+                type: string
   /learner:
     head:
       summary: 返回所有Learner的关键信息
@@ -554,7 +563,14 @@ paths:
                   type: string
                   example: John Appleseed
         '401':
-          $ref: "#/responses/UnauthorizedError"
+          description: access_token无效
+          schema:
+            type: object
+            properties:
+              errcode:
+                type: string
+              errmsg:
+                type: string
     get:
       summary: 返回所有的Leaner详细信息
       tags: 
@@ -573,7 +589,7 @@ paths:
         - Learner
       parameters:
         - in: body
-          name: login
+          name: learner
           required: true
           schema:
               $ref: '#/definitions/Learner'
@@ -653,4 +669,4 @@ responses:
     headers:
       WWW_Authenticate:
         type: string
-          
+            

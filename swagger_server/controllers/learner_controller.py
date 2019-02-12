@@ -1,25 +1,30 @@
 import connexion
 import six
 import os
-
 from swagger_server.models.credit_hour_entry import CreditHourEntry  # noqa: E501
 from swagger_server.models.inline_response2001 import InlineResponse2001  # noqa: E501
 from swagger_server.models.inline_response201 import InlineResponse201  # noqa: E501
 from swagger_server.models.learner import Learner  # noqa: E501
 from swagger_server.models.project import Project  # noqa: E501
-from swagger_server import util
+from swagger_server import util, wxLogin, orm
 
+db_session = None
+db_session = orm.init_db(os.environ["SQLALCHEMY_DATABASE_URI"])
 
 def learner_get():  # noqa: E501
-    headers = connexion.request.headers
-    try:
-        access_token = headers['Authorization']
-        refresh_token = headers['refresh_token']
-    except Exception as e:
-        return {"error": e}
-    
-    
-    return 'do some magic!'
+    validation_result = wxLogin.validateUser()
+    if not validation_result["result"]:
+        return {"error": "Failed to validate access token"}, 401
+    result_list = []
+    query = db_session.query(orm.Learner_db).all()
+    for learner in query:
+        result_list.append({
+            "id": learner.id,
+            "givenName": learner.givenName,
+            "familyName": learner.familyName,
+            "isMentor": learner.isMentor
+        })
+    return result_list, 200, {"Authorization": validation_result["access_token"], "refresh_token": validation_result["refresh_token"]}
 
 
 def learner_head():  # noqa: E501
@@ -72,16 +77,16 @@ def learner_learner_id_project_get(learnerId):  # noqa: E501
     return 'do some magic!'
 
 
-def learner_post(login):  # noqa: E501
+def learner_post(learner):  # noqa: E501
     """创建一个Learner
 
     # noqa: E501
 
-    :param login: 
-    :type login: dict | bytes
+    :param learner: 
+    :type learner: dict | bytes
 
     :rtype: InlineResponse201
     """
     if connexion.request.is_json:
-        login = Learner.from_dict(connexion.request.get_json())  # noqa: E501
+        learner = Learner.from_dict(connexion.request.get_json())  # noqa: E501
     return 'do some magic!'

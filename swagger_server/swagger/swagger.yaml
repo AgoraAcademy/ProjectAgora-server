@@ -107,7 +107,7 @@ paths:
       operationId: "learner_post"
       parameters:
       - in: "body"
-        name: "login"
+        name: "learner"
         required: true
         schema:
           $ref: "#/definitions/Learner"

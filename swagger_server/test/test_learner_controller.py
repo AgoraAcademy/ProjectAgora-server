@@ -81,11 +81,11 @@ class TestLearnerController(BaseTestCase):
 
         创建一个Learner
         """
-        login = Learner()
+        learner = Learner()
         response = self.client.open(
             '/v1/learner',
             method='POST',
-            data=json.dumps(login),
+            data=json.dumps(learner),
             content_type='application/json')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
