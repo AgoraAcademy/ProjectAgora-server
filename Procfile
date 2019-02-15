@@ -1,0 +1,1 @@
+web: gunicorn swagger_server:app
