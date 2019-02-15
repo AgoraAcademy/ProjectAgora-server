@@ -180,7 +180,6 @@ paths:
     get:
       tags:
       - "Learner"
-      - "Projects"
       summary: "返回一个Learner相关的课程"
       operationId: "learner_learner_id_project_get"
       parameters:
@@ -202,7 +201,6 @@ paths:
     get:
       tags:
       - "Learner"
-      - "CreditHour"
       summary: "返回一个Learner相关的学时记录"
       operationId: "learner_learner_id_credit_hour_get"
       parameters:
@@ -220,6 +218,101 @@ paths:
             items:
               $ref: "#/definitions/CreditHourEntry"
       x-swagger-router-controller: "swagger_server.controllers.learner_controller"
+  /project:
+    get:
+      tags:
+      - "Project"
+      summary: "返回所有的Project详细信息"
+      description: "返回所有的Project详细信息"
+      operationId: "project_get"
+      parameters: []
+      responses:
+        200:
+          description: "A JSON array of user names"
+          schema:
+            $ref: "#/definitions/Learner"
+        401:
+          description: "API key is missing or invalid"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+      x-swagger-router-controller: "swagger_server.controllers.project_controller"
+    head:
+      tags:
+      - "Project"
+      summary: "返回所有project的关键信息"
+      operationId: "project_head"
+      parameters: []
+      responses:
+        200:
+          description: "成功"
+          schema:
+            type: "object"
+            properties:
+              id:
+                type: "integer"
+                example: 1
+              name:
+                type: "string"
+                example: "John Appleseed"
+        401:
+          description: "API key is missing or invalid"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+      x-swagger-router-controller: "swagger_server.controllers.project_controller"
+    post:
+      tags:
+      - "Project"
+      summary: "创建一个Project"
+      operationId: "project_post"
+      parameters:
+      - in: "body"
+        name: "project"
+        required: true
+        schema:
+          $ref: "#/definitions/Project"
+      responses:
+        201:
+          description: "创建成功"
+          schema:
+            type: "object"
+            properties:
+              id:
+                type: "integer"
+            description: "成功创建的Project的ID"
+        401:
+          description: "API key is missing or invalid"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+      x-swagger-router-controller: "swagger_server.controllers.project_controller"
+    patch:
+      tags:
+      - "Project"
+      summary: "更新一个Project"
+      operationId: "project_patch"
+      parameters:
+      - in: "body"
+        name: "project"
+        required: true
+        schema:
+          $ref: "#/definitions/Project"
+      responses:
+        201:
+          description: "创建成功"
+          schema:
+            type: "object"
+            properties:
+              id:
+                type: "integer"
+            description: "成功创建的Project的ID"
+        401:
+          description: "API key is missing or invalid"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+      x-swagger-router-controller: "swagger_server.controllers.project_controller"
 securityDefinitions:
   APIKeyHeader:
     type: "apiKey"

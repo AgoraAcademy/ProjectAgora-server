@@ -39,7 +39,7 @@ def learner_head():  # noqa: E501
 
 
 def learner_patch(learner):  # noqa: E501
-    """返回所有Learner的关键信息
+    """更新一个learner
 
     # noqa: E501
 
@@ -131,4 +131,4 @@ def learner_post(learner):  # noqa: E501
     except Exception as e:
         print(e)
         return {"error": "Failed to create new learner"}, 401
-    return {}, 200, {"Authorization": validation_result["access_token"], "refresh_token": validation_result["refresh_token"]}
+    return {}, 201, {"Authorization": validation_result["access_token"], "refresh_token": validation_result["refresh_token"]}

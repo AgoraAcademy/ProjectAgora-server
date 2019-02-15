@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, DateTime, String, Integer, Boolean
+from sqlalchemy import create_engine, Column, DateTime, String, Integer, Boolean, UnicodeText
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -27,14 +27,37 @@ class Learner_db(Base):
     destinationOfLeave = Column(String(120), nullable=True)
     mentorship = Column(String(1000), nullable=True)
     salaryCard = Column(String(120), nullable=True)
-    custodianInfo = Column(String(1000), nullable=True)
-    emergentContact = Column(String(1000), nullable=False)
-    contactInfo = Column(String(1000), nullable=False)
-    medicalInfo = Column(String(1000), nullable=False)
-    notes = Column(String(2000), nullable=True)
+    custodianInfo = Column(UnicodeText, nullable=True)
+    emergentContact = Column(UnicodeText, nullable=False)
+    contactInfo = Column(UnicodeText, nullable=False)
+    medicalInfo = Column(UnicodeText, nullable=False)
+    notes = Column(UnicodeText, nullable=True)
 
     def __repr__(self):
         return '<Learner %r %r >' % (self.familyName, self.givenName)
+
+
+class Project_db(Base):
+    __tablename__ = 'project'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(120), nullable=False)
+    createdTime = Column(String(120), nullable=False)
+    createdByID = Column(Integer)
+    createdBy = Column(String(120), nullable=False)
+    relatedCourseId = Column(Integer)
+    relatedCourse = Column(String(120), nullable=False)
+    projectTerm = Column(String(120), nullable=False)
+    projectTermLength = Column(Integer)
+    projectStartDate = Column(String(120), nullable=False)
+    averageIntendedCreditHourPerWeek = Column(Integer)
+    totalIntendedCreditHour = Column(Integer)
+    projectMentorID = Column(Integer)
+    projectMentor = Column(String(120), nullable=False)
+    averageGuidingHourPerWeek = Column(Integer)
+    projectMeta = Column(UnicodeText, nullable=True)
+    projectApprovalInfo = Column(UnicodeText, nullable=True)
+    content = Column(UnicodeText, nullable=True)
+    conclusionInfo = Column(UnicodeText, nullable=True)
 
 
 def init_db(uri):
