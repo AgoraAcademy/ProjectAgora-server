@@ -126,6 +126,32 @@ paths:
             WWW_Authenticate:
               type: "string"
       x-swagger-router-controller: "swagger_server.controllers.learner_controller"
+    patch:
+      tags:
+      - "Learner"
+      summary: "更新一个Learner"
+      operationId: "learner_patch"
+      parameters:
+      - in: "body"
+        name: "learner"
+        required: true
+        schema:
+          $ref: "#/definitions/Learner"
+      responses:
+        201:
+          description: "创建成功"
+          schema:
+            type: "object"
+            properties:
+              id:
+                type: "integer"
+            description: "成功创建的Learner的ID"
+        401:
+          description: "API key is missing or invalid"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+      x-swagger-router-controller: "swagger_server.controllers.learner_controller"
   /learner/{learnerId}:
     get:
       tags:
@@ -227,8 +253,6 @@ definitions:
         type: "string"
     description: "登陆请求"
   Learner:
-    required:
-    - "isMentor"
     properties:
       id:
         type: "integer"

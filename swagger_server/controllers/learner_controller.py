@@ -1,5 +1,4 @@
 import connexion
-import six
 import os
 from swagger_server.models.credit_hour_entry import CreditHourEntry  # noqa: E501
 from swagger_server.models.inline_response2001 import InlineResponse2001  # noqa: E501
@@ -9,7 +8,8 @@ from swagger_server.models.project import Project  # noqa: E501
 from swagger_server import util, wxLogin, orm
 
 db_session = None
-db_session = orm.init_db(os.environ["SQLALCHEMY_DATABASE_URI"])
+db_session = orm.init_db(os.environ["DATABASEURI"])
+
 
 def learner_get():  # noqa: E501
     validation_result = wxLogin.validateUser()
@@ -38,12 +38,23 @@ def learner_head():  # noqa: E501
     return 'do some magic!'
 
 
+def learner_patch(learner):  # noqa: E501
+    """返回所有Learner的关键信息
+
+    # noqa: E501
+
+
+    :rtype: InlineResponse2001
+    """
+    return 'do some magic!patch！'
+
+
 def learner_learner_id_credit_hour_get(learnerId):  # noqa: E501
     """返回一个Learner相关的学时记录
 
     # noqa: E501
 
-    :param learnerId: 
+    :param learnerId:
     :type learnerId: int
 
     :rtype: List[CreditHourEntry]
@@ -56,7 +67,7 @@ def learner_learner_id_get(learnerId):  # noqa: E501
 
     # noqa: E501
 
-    :param learnerId: 
+    :param learnerId:
     :type learnerId: int
 
     :rtype: Learner
@@ -69,7 +80,7 @@ def learner_learner_id_project_get(learnerId):  # noqa: E501
 
     # noqa: E501
 
-    :param learnerId: 
+    :param learnerId:
     :type learnerId: int
 
     :rtype: List[Project]
@@ -82,11 +93,42 @@ def learner_post(learner):  # noqa: E501
 
     # noqa: E501
 
-    :param learner: 
+    :param learner:
     :type learner: dict | bytes
 
     :rtype: InlineResponse201
     """
+    validation_result = wxLogin.validateUser()
+    if not validation_result["result"]:
+        return {"error": "Failed to validate access token"}, 401
     if connexion.request.is_json:
         learner = Learner.from_dict(connexion.request.get_json())  # noqa: E501
-    return 'do some magic!'
+    try:
+        db_session.add(orm.Learner_db(
+            validated=False,
+            openid=connexion.request.headers['openid'],
+            givenName=learner.given_name,
+            familyName=learner.family_name,
+            nickname=learner.nickname,
+            gender=learner.gender,
+            ethnicity=learner.ethnicity,
+            birthday=learner.birthday,
+            mainPersonalIdType=learner.main_personal_id_type,
+            mainPersonalId=learner.main_personal_id,
+            dateOfRegistration=learner.date_of_registration,
+            reasonOfRegistration=learner.reason_of_registration,
+            previousStatus=learner.previous_status,
+            dateOfLeave=learner.date_of_leave,
+            reasonOfLeave=learner.reason_of_leave,
+            destinationOfLeave=learner.destination_of_leave,
+            custodianInfo=str(learner.custodian_info),
+            emergentContact=str(learner.emergent_contact),
+            contactInfo=str(learner.contact_info),
+            medicalInfo=str(learner.medical_info),
+            notes=str(learner.notes),
+        ))
+        db_session.commit()
+    except Exception as e:
+        print(e)
+        return {"error": "Failed to create new learner"}, 401
+    return {}, 200, {"Authorization": validation_result["access_token"], "refresh_token": validation_result["refresh_token"]}

@@ -13,5 +13,5 @@
     "python.linting.mypyArgs": [
         "--ignore-missing-imports",
     ],
-    "python.linting.flake8Args": ["--ignore=E501"]
+    "python.linting.flake8Args": ["--ignore=E501, F401"]
 }
