@@ -1,1 +1,1 @@
-web: gunicorn swagger_server:app
+web: gunicorn --chdir ./swagger_server app:app
