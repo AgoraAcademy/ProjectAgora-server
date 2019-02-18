@@ -57,7 +57,8 @@ class Project_db(Base):
     projectMeta = Column(UnicodeText, nullable=True)
     projectApprovalInfo = Column(UnicodeText, nullable=True)
     content = Column(UnicodeText, nullable=True)
-    conclusionInfo = Column(UnicodeText, nullable=True)
+    conclusionInfo = Column(UnicodeText, nullable=True),
+    lastUpdatedTime = Column(String(120), nullable=True)
 
 
 def init_db(uri):
