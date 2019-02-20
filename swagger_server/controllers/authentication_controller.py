@@ -35,7 +35,8 @@ def oauth2_get(code, state):  # noqa: E501
             'refresh_token': resultjson['refresh_token'],
             'openid': resultjson['openid'],
             'fullname': learner.familyName + learner.givenName,
-            'learnerId': learner.id
+            'learnerId': learner.id,
+            'validated': learner.validated
         }
     except Exception as e:
         return {"error": str(e)}, 401
