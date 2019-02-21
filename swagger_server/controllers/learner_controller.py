@@ -46,7 +46,13 @@ def learner_head():  # noqa: E501
     if not validation_result["result"]:
         return {"error": "Failed to validate access token"}, 401
     learner = db_session.query(orm.Learner_db).filter(orm.Learner_db.openid == validation_result["openid"]).one_or_none()
-    return {"isAdmin": learner.isAdmin, "isMentor": learner.isMentor, "isValidated": learner.validated}, 200, {"Authorization": validation_result["access_token"], "refresh_token": validation_result["refresh_token"]}
+    return {}, 200, {
+        "Authorization": validation_result["access_token"],
+        "refresh_token": validation_result["refresh_token"],
+        "isAdmin": learner.isAdmin,
+        "isMentor": learner.isMentor,
+        "isValidated": learner.validated
+    }
 
 
 def learner_patch(learner):  # noqa: E501
