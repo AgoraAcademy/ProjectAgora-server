@@ -64,7 +64,7 @@ class Project_db(Base):
 
 
 def init_db(uri):
-    ssl_args = {'ssl': {'ca': 'config/amazon-rds-ca-cert.pem'}}
+    ssl_args = {'ssl': {'ca': './config/amazon-rds-ca-cert.pem'}}
     engine = create_engine(uri, convert_unicode=True, connect_args=ssl_args)
     db_session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
     Base.query = db_session.query_property()
