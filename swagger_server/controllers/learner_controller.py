@@ -12,6 +12,14 @@ db_session = orm.init_db(os.environ["DATABASEURI"])
 
 
 def learner_get():  # noqa: E501
+    """返回所有Learner的全部信息
+
+    # noqa: E501
+    # 权限限定：mentor限定（未实装）
+
+
+    :rtype: InlineResponse2001
+    """
     validation_result = wxLogin.validateUser()
     if not validation_result["result"]:
         return {"error": "Failed to validate access token"}, 401
@@ -28,7 +36,7 @@ def learner_get():  # noqa: E501
 
 
 def learner_head():  # noqa: E501
-    """返回所有Learner的关键信息
+    """返回当前Learner信息
 
     # noqa: E501
 
@@ -107,6 +115,7 @@ def learner_post(learner):  # noqa: E501
         db_session.add(orm.Learner_db(
             validated=False,
             openid=connexion.request.headers['openid'],
+            isAdmin=False,
             givenName=learner.given_name,
             familyName=learner.family_name,
             nickname=learner.nickname,

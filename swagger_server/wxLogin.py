@@ -1,6 +1,10 @@
 import requests
 import os
 import connexion
+from swagger_server import util, wxLogin, orm
+
+db_session = None
+db_session = orm.init_db(os.environ["DATABASEURI"])
 
 
 def validateAccessToken(openid, access_token) -> bool:
@@ -53,3 +57,11 @@ def validateUser() -> dict:
     except Exception:
         return {"result": False}
     return {"result": True, "access_token": access_token, "refresh_token": refresh_token, "openid": openid}
+
+
+def getPermission() -> dict:
+    validation_result = wxLogin.validateUser()
+    if not validation_result["result"]:
+        return {"error": "Failed to validate access token"}, 401
+    learner = db_session.query(orm.Learner_db).filter(orm.Learner_db.openid == validation_result["openid"]).one_or_none()
+    return {"isAdmin": learner.isAdmin, "isMentor": learner.isMentor, "isValidated": learner.validated}
