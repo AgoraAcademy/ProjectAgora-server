@@ -40,10 +40,13 @@ def learner_head():  # noqa: E501
 
     # noqa: E501
 
-
     :rtype: InlineResponse2001
     """
-    return 'do some magic!'
+    validation_result = wxLogin.validateUser()
+    if not validation_result["result"]:
+        return {"error": "Failed to validate access token"}, 401
+    learner = db_session.query(orm.Learner_db).filter(orm.Learner_db.openid == validation_result["openid"]).one_or_none()
+    return {"isAdmin": learner.isAdmin, "isMentor": learner.isMentor, "isValidated": learner.validated}, 200, {"Authorization": validation_result["access_token"], "refresh_token": validation_result["refresh_token"]}
 
 
 def learner_patch(learner):  # noqa: E501
