@@ -49,7 +49,9 @@ def oauth2_get(code, state):  # noqa: E501
                 'fullname': learner.familyName + learner.givenName,
                 'learnerId': learner.id,
                 'validated': learner.validated,
-                'isLearner': True
+                'isLearner': True,
+                'isMentor': learner.isMentor,
+                'isAdmin': learner.isAdmin
             }
         except Exception as e:
             return {"error": str(e)}, 401
