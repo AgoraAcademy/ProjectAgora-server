@@ -57,5 +57,3 @@ def validateUser() -> dict:
     except Exception:
         return {"result": False}
     return {"result": True, "access_token": access_token, "refresh_token": refresh_token, "openid": openid}
-
-

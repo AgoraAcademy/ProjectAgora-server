@@ -119,6 +119,7 @@ def learner_post(learner):  # noqa: E501
             validated=False,
             openid=connexion.request.headers['openid'],
             isAdmin=False,
+            status=learner.status,
             isMentor=learner.is_mentor,
             givenName=learner.given_name,
             familyName=learner.family_name,
