@@ -484,8 +484,8 @@ definitions:
           lactoseIntolerance: true
           shellAllergy: true
           peanutAllergy: true
-        generalHealthStatus: 5
-        lastPhysicalExam: 5.63737665663332876420099637471139430999755859375
+        generalHealthStatus: ""
+        lastPhysicalExam: ""
         medicationAllergy:
           antibioticsAllergy: true
           otherMedicationAllergy:
@@ -936,14 +936,14 @@ definitions:
   Learner_medicalInfo:
     properties:
       generalHealthStatus:
-        type: "integer"
-        description: "整体健康状况；0 - 很好（基本不生病，从不住院）； 1 - 一般（偶尔生病住院）； 2 - 欠佳（每个季度都曾生病住院\
+        type: "string"
+        description: "整体健康状况； 很好（基本不生病，从不住院）；  一般（偶尔生病住院）； 欠佳（每个季度都曾生病住院\
           ）"
       bloodType:
         type: "string"
         description: "血型"
       lastPhysicalExam:
-        type: "number"
+        type: "string"
         description: "最近一次体检时间(以年为单位)"
       previousDiagnosis:
         type: "array"
@@ -978,8 +978,8 @@ definitions:
         lactoseIntolerance: true
         shellAllergy: true
         peanutAllergy: true
-      generalHealthStatus: 5
-      lastPhysicalExam: 5.63737665663332876420099637471139430999755859375
+      generalHealthStatus: ""
+      lastPhysicalExam: ""
       medicationAllergy:
         antibioticsAllergy: true
         otherMedicationAllergy:

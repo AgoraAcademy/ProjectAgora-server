@@ -83,7 +83,6 @@ class Learner(Model):
             'gender': str,
             'ethnicity': str,
             'birthday': str,
-            'age': float,
             'status': str,
             'main_personal_id_type': str,
             'main_personal_id': str,
@@ -111,7 +110,6 @@ class Learner(Model):
             'gender': 'gender',
             'ethnicity': 'ethnicity',
             'birthday': 'birthday',
-            'age': 'age',
             'status': 'status',
             'main_personal_id_type': 'mainPersonalIdType',
             'main_personal_id': 'mainPersonalId',
@@ -138,7 +136,6 @@ class Learner(Model):
         self._gender = gender
         self._ethnicity = ethnicity
         self._birthday = birthday
-        self._age = age
         self._status = status
         self._main_personal_id_type = main_personal_id_type
         self._main_personal_id = main_personal_id

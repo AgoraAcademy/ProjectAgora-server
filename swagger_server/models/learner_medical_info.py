@@ -19,7 +19,7 @@ class LearnerMedicalInfo(Model):
     Do not edit the class manually.
     """
 
-    def __init__(self, general_health_status: int=None, blood_type: str=None, last_physical_exam: float=None, previous_diagnosis: List[LearnerMedicalInfoPreviousDiagnosis]=None, regular_medication: List[LearnerMedicalInfoRegularMedication]=None, food_alergy: LearnerMedicalInfoFoodAlergy=None, medication_allergy: LearnerMedicalInfoMedicationAllergy=None):  # noqa: E501
+    def __init__(self, general_health_status: str=None, blood_type: str=None, last_physical_exam: str=None, previous_diagnosis: List[LearnerMedicalInfoPreviousDiagnosis]=None, regular_medication: List[LearnerMedicalInfoRegularMedication]=None, food_alergy: LearnerMedicalInfoFoodAlergy=None, medication_allergy: LearnerMedicalInfoMedicationAllergy=None):  # noqa: E501
         """LearnerMedicalInfo - a model defined in Swagger
 
         :param general_health_status: The general_health_status of this LearnerMedicalInfo.  # noqa: E501
@@ -27,7 +27,7 @@ class LearnerMedicalInfo(Model):
         :param blood_type: The blood_type of this LearnerMedicalInfo.  # noqa: E501
         :type blood_type: str
         :param last_physical_exam: The last_physical_exam of this LearnerMedicalInfo.  # noqa: E501
-        :type last_physical_exam: float
+        :type last_physical_exam: str
         :param previous_diagnosis: The previous_diagnosis of this LearnerMedicalInfo.  # noqa: E501
         :type previous_diagnosis: List[LearnerMedicalInfoPreviousDiagnosis]
         :param regular_medication: The regular_medication of this LearnerMedicalInfo.  # noqa: E501
@@ -38,9 +38,9 @@ class LearnerMedicalInfo(Model):
         :type medication_allergy: LearnerMedicalInfoMedicationAllergy
         """
         self.swagger_types = {
-            'general_health_status': int,
+            'general_health_status': str,
             'blood_type': str,
-            'last_physical_exam': float,
+            'last_physical_exam': str,
             'previous_diagnosis': List[LearnerMedicalInfoPreviousDiagnosis],
             'regular_medication': List[LearnerMedicalInfoRegularMedication],
             'food_alergy': LearnerMedicalInfoFoodAlergy,
@@ -77,7 +77,7 @@ class LearnerMedicalInfo(Model):
         return util.deserialize_model(dikt, cls)
 
     @property
-    def general_health_status(self) -> int:
+    def general_health_status(self) -> str:
         """Gets the general_health_status of this LearnerMedicalInfo.
 
         整体健康状况；0 - 很好（基本不生病，从不住院）； 1 - 一般（偶尔生病住院）； 2 - 欠佳（每个季度都曾生病住院）  # noqa: E501
@@ -88,7 +88,7 @@ class LearnerMedicalInfo(Model):
         return self._general_health_status
 
     @general_health_status.setter
-    def general_health_status(self, general_health_status: int):
+    def general_health_status(self, general_health_status: str):
         """Sets the general_health_status of this LearnerMedicalInfo.
 
         整体健康状况；0 - 很好（基本不生病，从不住院）； 1 - 一般（偶尔生病住院）； 2 - 欠佳（每个季度都曾生病住院）  # noqa: E501
@@ -123,24 +123,24 @@ class LearnerMedicalInfo(Model):
         self._blood_type = blood_type
 
     @property
-    def last_physical_exam(self) -> float:
+    def last_physical_exam(self) -> str:
         """Gets the last_physical_exam of this LearnerMedicalInfo.
 
         最近一次体检时间(以年为单位)  # noqa: E501
 
         :return: The last_physical_exam of this LearnerMedicalInfo.
-        :rtype: float
+        :rtype: str
         """
         return self._last_physical_exam
 
     @last_physical_exam.setter
-    def last_physical_exam(self, last_physical_exam: float):
+    def last_physical_exam(self, last_physical_exam: str):
         """Sets the last_physical_exam of this LearnerMedicalInfo.
 
         最近一次体检时间(以年为单位)  # noqa: E501
 
         :param last_physical_exam: The last_physical_exam of this LearnerMedicalInfo.
-        :type last_physical_exam: float
+        :type last_physical_exam: str
         """
 
         self._last_physical_exam = last_physical_exam
