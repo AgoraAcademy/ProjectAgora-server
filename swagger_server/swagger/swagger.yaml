@@ -110,7 +110,46 @@ paths:
         name: "learner"
         required: true
         schema:
-          $ref: "#/definitions/Learner"
+          type: "object"
+          properties:
+            status:
+              type: "string"
+            isMentor: 
+              type: "boolean"
+            givenName:
+              type: "string"
+            familyName:
+              type: "string"
+            nickname:
+              type: "string"
+            gender:
+              type: "string"
+            ethnicity:
+              type: "string"
+            birthday:
+              type: "string"
+            mainPersonalIdType:
+              type: "string"
+            mainPersonalId:
+              type: "string"
+            dateOfRegistration:
+              type: "string"
+            reasonOfRegistration:
+              type: "string"
+            previousStatus:
+              type: "string"
+            custodianInfo:
+              type: "object"
+            emergentContact:
+              type: "object"
+            contactInfo:
+              type: "object"
+            medicalInfo:
+              type: "object"
+            notes:
+              type: "array"
+              items: 
+                type: string
       responses:
         201:
           description: "创建成功"
@@ -319,32 +358,6 @@ securityDefinitions:
     name: "api_key"
     in: "header"
 definitions:
-  Error:
-    properties:
-      code:
-        type: "integer"
-        example: 401
-      message:
-        type: "string"
-    description: "错误"
-  TokenStatus:
-    properties:
-      learnerID:
-        type: "string"
-      token:
-        type: "string"
-      expireBy:
-        type: "string"
-      refreshed:
-        type: "boolean"
-    description: "Token信息"
-  LoginRequest:
-    properties:
-      username:
-        type: "string"
-      password:
-        type: "string"
-    description: "登陆请求"
   Learner:
     properties:
       id:
@@ -371,9 +384,6 @@ definitions:
       birthday:
         type: "string"
         description: "生日"
-      age:
-        type: "number"
-        description: "年龄（应当是计算字段）"
       status:
         type: "string"
         description: "目前状态，包括在读、在读（游学）、在读（试读）、毕业、导师等；考虑是否需要更换成integer"
@@ -507,7 +517,6 @@ definitions:
       dateOfLeave: "dateOfLeave"
       mainPersonalIdType: "mainPersonalIdType"
       isMentor: true
-      age: 6.02745618307040320615897144307382404804229736328125
       status: "status"
       previousStatus: "previousStatus"
   Project:
@@ -523,6 +532,9 @@ definitions:
       name:
         type: "string"
         description: "项目名称"
+      status:
+        type: "string"
+        description: "状态（审核中，未过审，进行中，已完成，已删除）"
       createdTime:
         type: "string"
         description: "创建时间"

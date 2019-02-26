@@ -43,6 +43,7 @@ class Project_db(Base):
     __tablename__ = 'project'
     id = Column(Integer, primary_key=True)
     name = Column(String(120), nullable=False)
+    status = Column(String(10), nullable=False)
     createdTime = Column(String(120), nullable=False)
     createdByID = Column(Integer)
     createdBy = Column(String(120), nullable=False)

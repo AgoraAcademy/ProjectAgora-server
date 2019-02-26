@@ -62,11 +62,14 @@ def project_post(project):  # noqa: E501
     if not validation_result["result"]:
         return {"error": "Failed to validate access token"}, 401
     learner = db_session.query(orm.Learner_db).filter(orm.Learner_db.openid == validation_result["openid"]).one_or_none()
+    if not learner.validated:
+        return {"error": "Learner not validated"}, 401
     if connexion.request.is_json:
         project = Project.from_dict(connexion.request.get_json())
     try:
         db_session.add(orm.Project_db(
             name=project.name,
+            status="审核中",
             createdTime=str(datetime.date.today()),
             createdByID=learner.id,
             createdBy=learner.familyName + learner.givenName,
@@ -82,7 +85,6 @@ def project_post(project):  # noqa: E501
             averageGuidingHourPerWeek=project.average_guiding_hour_per_week,
             projectMeta=project.project_meta,
             projectApprovalInfo=project.project_approval_info,
-            content=project.content,
             conclusionInfo=project.conclusion_info
         ))
         db_session.commit()
