@@ -314,7 +314,67 @@ paths:
         name: "project"
         required: true
         schema:
-          $ref: "#/definitions/Project"
+          type: "object"
+          properties: 
+            name:
+              type: "string"
+            projectTerm:
+              type: "string"
+            projectTermLength: 
+              type: "number"
+            projectStartDate:
+              type: "string"
+            averageIntendedCreditHourPerWeek:
+              type: "number"
+            totalIntendedCreditHour:
+              type: "number"
+            projectMentorID:
+              type: "number"
+            projectMentor:
+              type: "string"
+            averageGuidingHourPerWeek:
+              type: "number"
+            projectMeta:
+              type: "object"
+              properties: 
+                projectIntro:
+                  type: "string"
+                projectGoal:
+                  type: "string"
+                evaluationSchema:
+                  type: "string"
+                projectPlan:
+                  type: "string"
+                instructionPlan:
+                  type: "string"
+            relatedCourseId:
+              type: "number"
+            relatedCourse:
+              type: "string"
+            projectApprovalInfo:
+              type: "object"
+              properties:
+                approvalCommitteeOfAcademics:
+                  type: object
+                  properties: 
+                    result:
+                      type: string
+                    advice:
+                      type: string
+                approvalMentor:
+                  type: object
+                  properties: 
+                    result:
+                      type: string
+                    advice:
+                      type: string
+            conclusionInfo:
+              type: "object"
+              properties: 
+                selfEvaluation:
+                  type: string
+                mentorEvaluation:
+                  type: string
       responses:
         201:
           description: "创建成功"
@@ -592,7 +652,7 @@ definitions:
     description: "项目"
     example:
       conclusionInfo:
-        MentorEvaluation: "MentorEvaluation"
+        mentorEvaluation: "mentorEvaluation"
         selfEvaluation: "selfEvaluation"
       totalIntendedCreditHour: 2
       relatedCourseId: 1
@@ -1089,12 +1149,12 @@ definitions:
       selfEvaluation:
         type: "string"
         description: "项目负责人结项自评"
-      MentorEvaluation:
+      mentorEvaluation:
         type: "string"
         description: "导师结项评语"
     description: "项目结项信息"
     example:
-      MentorEvaluation: "MentorEvaluation"
+      mentorEvaluation: "mentorEvaluation"
       selfEvaluation: "selfEvaluation"
   Course_instructions:
     properties:
