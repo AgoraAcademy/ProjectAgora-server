@@ -139,7 +139,9 @@ paths:
             previousStatus:
               type: "string"
             custodianInfo:
-              type: "object"
+              type: "array"
+              items:
+                type: object
             emergentContact:
               type: "object"
             contactInfo:
