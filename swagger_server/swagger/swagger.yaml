@@ -143,7 +143,9 @@ paths:
               items:
                 type: object
             emergentContact:
-              type: "object"
+              type: "array"
+              items:
+                type: object
             contactInfo:
               type: "object"
             medicalInfo:
