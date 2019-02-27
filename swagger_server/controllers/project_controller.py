@@ -13,6 +13,20 @@ def project_get():  # noqa: E501
     if not validation_result["result"]:
         db_session.remove()
         return {"error": "Failed to validate access token"}, 401
+    result_list = []
+    query = db_session(orm.Project_db).all()
+    for project in query:
+        result_list.append({
+            "id": project.id,
+            "name": project.name,
+            "createdTime": project.createdTime,
+            "createdBy": project.createdBy,
+            "relatedCourse": project.relatedCourse,
+            "projectMentorID": project.projectMentorID,
+            "status": project.status
+        })
+    db_session.remove()
+    return result_list, 200, {"Authorization": validation_result["access_token"], "refresh_token": validation_result["refresh_token"]}
     """返回所有Project
 
     # noqa: E501
