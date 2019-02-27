@@ -6,13 +6,12 @@ import datetime
 from swagger_server.models.project import Project  # noqa: E501
 from swagger_server import util, wxLogin, orm
 
-db_session = None
-db_session = orm.init_db(os.environ["DATABASEURI"])
-
 
 def project_get():  # noqa: E501
+    db_session = orm.init_db(os.environ["DATABASEURI"])
     validation_result = wxLogin.validateUser()
     if not validation_result["result"]:
+        db_session.remove()
         return {"error": "Failed to validate access token"}, 401
     """返回所有Project
 
@@ -23,6 +22,7 @@ def project_get():  # noqa: E501
 
     :rtype: List[Project]
     """
+    db_session.remove()
     return 'do some magic!'
 
 
@@ -58,11 +58,14 @@ def project_post(project):  # noqa: E501
 
     :rtype: InlineResponse201
     """
+    db_session = orm.init_db(os.environ["DATABASEURI"])
     validation_result = wxLogin.validateUser()
     if not validation_result["result"]:
+        db_session.remove()
         return {"error": "Failed to validate access token"}, 401
     learner = db_session.query(orm.Learner_db).filter(orm.Learner_db.openid == validation_result["openid"]).one_or_none()
     if not learner.validated:
+        db_session.remove()
         return {"error": "Learner not validated"}, 401
     if connexion.request.is_json:
         project = Project.from_dict(connexion.request.get_json())
@@ -83,12 +86,14 @@ def project_post(project):  # noqa: E501
             projectMentorID=project.project_mentor_id,
             projectMentor=project.project_mentor,
             averageGuidingHourPerWeek=project.average_guiding_hour_per_week,
-            projectMeta=project.project_meta,
-            projectApprovalInfo=project.project_approval_info,
-            conclusionInfo=project.conclusion_info
+            projectMeta=str(project.project_meta),
+            projectApprovalInfo=str(project.project_approval_info),
+            conclusionInfo=str(project.conclusion_info)
         ))
         db_session.commit()
     except Exception as e:
         print(e)
+        db_session.remove()
         return {"error": "Failed to create new project"}, 401
+    db_session.remove()
     return {}, 201, {"Authorization": validation_result["access_token"], "refresh_token": validation_result["refresh_token"]}
