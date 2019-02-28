@@ -14,7 +14,7 @@ def project_get():  # noqa: E501
         db_session.remove()
         return {"error": "Failed to validate access token"}, 401
     result_list = []
-    query = db_session(orm.Project_db).all()
+    query = db_session.query(orm.Project_db).all()
     for project in query:
         result_list.append({
             "id": project.id,
