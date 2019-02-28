@@ -21,6 +21,7 @@ def project_get():  # noqa: E501
             "name": project.name,
             "createdTime": project.createdTime,
             "createdBy": project.createdBy,
+            "createdByID": project.createdByID,
             "relatedCourse": project.relatedCourse,
             "projectMentorID": project.projectMentorID,
             "status": project.status
