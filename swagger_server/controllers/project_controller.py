@@ -24,6 +24,7 @@ def project_get():  # noqa: E501
             "createdByID": project.createdByID,
             "relatedCourse": project.relatedCourse,
             "projectMentorID": project.projectMentorID,
+            "projectMentor": project.projectMentor,
             "status": project.status
         })
     db_session.remove()
