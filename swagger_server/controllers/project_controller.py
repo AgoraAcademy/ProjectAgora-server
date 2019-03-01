@@ -113,3 +113,49 @@ def project_post(project):  # noqa: E501
         return {"error": "Failed to create new project"}, 401
     db_session.remove()
     return {}, 201, {"Authorization": validation_result["access_token"], "refresh_token": validation_result["refresh_token"]}
+
+
+def project_project_id_get(projectId):  # noqa: E501
+    """返回一个Project的详细信息
+
+    # noqa: E501
+
+    :param projectId:
+    :type projectId: int
+
+    :rtype: Learner
+    """
+
+    db_session = orm.init_db(os.environ["DATABASEURI"])
+    validation_result = wxLogin.validateUser()
+    if not validation_result["result"]:
+        db_session.remove()
+        return {"error": "Failed to validate access token"}, 401
+    learner = db_session.query(orm.Learner_db).filter(orm.Learner_db.openid == validation_result["openid"]).one_or_none()
+    if not learner.validated:
+        db_session.remove()
+        return {"error": "Learner not validated"}, 401
+    project = db_session.query(orm.Project_db).filter(orm.Project_db.id == projectId).one_or_none()
+    projectInfo = {
+        "id": project.id,
+        "name": project.name,
+        "status": project.status,
+        "createdTime": project.createdTime,
+        "createdByID": project.createdByID,
+        "createdBy": project.createdBy,
+        "relatedCourseId": project.relatedCourseId,
+        "relatedCourse": project.relatedCourse,
+        "projectTerm": project.projectTerm,
+        "projectTermLength": project.projectTermLength,
+        "averageIntendedCreditHourPerWeek": project.averageIntendedCreditHourPerWeek,
+        "totalIntendedCreditHour": project.totalIntendedCreditHour,
+        "projectMentorID": project.projectMentorID,
+        "projectMentor": project.projectMentor,
+        "averageGuidingHourPerWeek": project.averageGuidingHourPerWeek,
+        "projectMeta": project.projectMeta,
+        "projectApprovalInfo": project.projectApprovalInfo,
+        "content": project.content,
+        "conclusionInfo": project.conclusionInfo,
+        "lastUpdatedTime": project.lastUpdatedTime,
+    }
+    return projectInfo, 200

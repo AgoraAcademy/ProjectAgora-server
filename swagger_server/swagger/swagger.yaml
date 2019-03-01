@@ -416,6 +416,35 @@ paths:
             WWW_Authenticate:
               type: "string"
       x-swagger-router-controller: "swagger_server.controllers.project_controller"
+  /project/{projectId}:
+    get:
+      tags:
+      - "Project"
+      summary: "返回一个Project的详细信息"
+      operationId: "project_project_id_get"
+      parameters:
+      - name: "projectId"
+        in: "path"
+        required: true
+        type: "integer"
+        minimum: 1
+        format: "int64"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            type: object
+            properties: 
+              name:
+                type: string
+              status:
+                type: string
+        401:
+          description: "API key is missing or invalid"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+      x-swagger-router-controller: "swagger_server.controllers.project_controller"
 securityDefinitions:
   APIKeyHeader:
     type: "apiKey"
