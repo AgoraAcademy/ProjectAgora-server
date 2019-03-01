@@ -30,7 +30,7 @@ class ProjectConclusionInfo(Model):
 
         self.attribute_map = {
             'self_evaluation': 'selfEvaluation',
-            'mentor_evaluation': 'MentorEvaluation'
+            'mentor_evaluation': 'mentorEvaluation'
         }
 
         self._self_evaluation = self_evaluation

@@ -355,26 +355,26 @@ paths:
               type: "object"
               properties:
                 approvalCommitteeOfAcademics:
-                  type: object
+                  type: "object"
                   properties: 
                     result:
-                      type: string
+                      type: "string"
                     advice:
-                      type: string
+                      type: "string"
                 approvalMentor:
-                  type: object
+                  type: "object"
                   properties: 
                     result:
-                      type: string
+                      type: "string"
                     advice:
-                      type: string
+                      type: "string"
             conclusionInfo:
               type: "object"
               properties: 
                 selfEvaluation:
-                  type: string
+                  type: "string"
                 mentorEvaluation:
-                  type: string
+                  type: "string"
       responses:
         201:
           description: "创建成功"

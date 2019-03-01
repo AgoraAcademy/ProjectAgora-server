@@ -147,6 +147,7 @@ def project_project_id_get(projectId):  # noqa: E501
         "relatedCourse": project.relatedCourse,
         "projectTerm": project.projectTerm,
         "projectTermLength": project.projectTermLength,
+        "projectStartDate": project.projectStartDate,
         "averageIntendedCreditHourPerWeek": project.averageIntendedCreditHourPerWeek,
         "totalIntendedCreditHour": project.totalIntendedCreditHour,
         "projectMentorID": project.projectMentorID,

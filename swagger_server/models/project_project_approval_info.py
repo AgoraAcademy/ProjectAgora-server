@@ -31,8 +31,8 @@ class ProjectProjectApprovalInfo(Model):
         }
 
         self.attribute_map = {
-            'approval_committee_of_academics': 'ApprovalCommitteeOfAcademics',
-            'approval_mentor': 'ApprovalMentor'
+            'approval_committee_of_academics': 'approvalCommitteeOfAcademics',
+            'approval_mentor': 'approvalMentor'
         }
 
         self._approval_committee_of_academics = approval_committee_of_academics
