@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, DateTime, String, Integer, Boolean, UnicodeText
+from sqlalchemy import create_engine, Column, DateTime, String, Integer, Boolean, UnicodeText, DECIMAL
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -50,13 +50,13 @@ class Project_db(Base):
     relatedCourseId = Column(Integer)
     relatedCourse = Column(String(120), nullable=False)
     projectTerm = Column(String(120), nullable=False)
-    projectTermLength = Column(Integer)
+    projectTermLength = Column(DECIMAL(5, 2))
     projectStartDate = Column(String(120), nullable=False)
-    averageIntendedCreditHourPerWeek = Column(Integer)
-    totalIntendedCreditHour = Column(Integer)
+    averageIntendedCreditHourPerWeek = Column(DECIMAL(5, 2))
+    totalIntendedCreditHour = Column(DECIMAL(10, 2))
     projectMentorID = Column(Integer)
     projectMentor = Column(String(120), nullable=False)
-    averageGuidingHourPerWeek = Column(Integer)
+    averageGuidingHourPerWeek = Column(DECIMAL(5, 2))
     projectMeta = Column(UnicodeText, nullable=True)
     projectApprovalInfo = Column(UnicodeText, nullable=True)
     content = Column(UnicodeText, nullable=True)

@@ -19,7 +19,7 @@ class Project(Model):
     Do not edit the class manually.
     """
 
-    def __init__(self, id: int=None, name: str=None, created_time: str=None, created_by_id: int=None, created_by: str=None, related_course_id: int=None, related_course: str=None, project_term: str=None, project_term_length: int=None, project_start_date: str=None, average_intended_credit_hour_per_week: int=None, total_intended_credit_hour: int=None, project_mentor_id: int=None, project_mentor: str=None, average_guiding_hour_per_week: int=None, project_meta: ProjectProjectMeta=None, project_approval_info: ProjectProjectApprovalInfo=None, content: List[ProjectContent]=None, conclusion_info: ProjectConclusionInfo=None):  # noqa: E501
+    def __init__(self, id: int=None, name: str=None, created_time: str=None, created_by_id: int=None, created_by: str=None, related_course_id: int=None, related_course: str=None, project_term: str=None, project_term_length: int=None, project_start_date: str=None, average_intended_credit_hour_per_week: int=None, total_intended_credit_hour: int=None, project_mentor_id: int=None, project_mentor: str=None, average_guiding_hour_per_week: int=None, project_meta: ProjectProjectMeta=None, project_approval_info: ProjectProjectApprovalInfo=None, content: List[ProjectContent]=None, conclusion_info: ProjectConclusionInfo=None, status: str=None):  # noqa: E501
         """Project - a model defined in Swagger
 
         :param id: The id of this Project.  # noqa: E501
@@ -64,6 +64,7 @@ class Project(Model):
         self.swagger_types = {
             'id': int,
             'name': str,
+            'status': str,
             'created_time': str,
             'created_by_id': int,
             'created_by': str,
@@ -86,6 +87,7 @@ class Project(Model):
         self.attribute_map = {
             'id': 'id',
             'name': 'name',
+            'status': 'status',
             'created_time': 'createdTime',
             'created_by_id': 'createdByID',
             'created_by': 'createdBy',
@@ -107,6 +109,7 @@ class Project(Model):
 
         self._id = id
         self._name = name
+        self._status = status
         self._created_time = created_time
         self._created_by_id = created_by_id
         self._created_by = created_by
@@ -183,6 +186,31 @@ class Project(Model):
             raise ValueError("Invalid value for `name`, must not be `None`")  # noqa: E501
 
         self._name = name
+    
+    @property
+    def status(self) -> str:
+        """Gets the name of this Project.
+
+        项目名称  # noqa: E501
+
+        :return: The name of this Project.
+        :rtype: str
+        """
+        return self._status
+
+    @name.setter
+    def name(self, status: str):
+        """Sets the name of this Project.
+
+        项目名称  # noqa: E501
+
+        :param name: The name of this Project.
+        :type name: str
+        """
+        if status is None:
+            raise ValueError("Invalid value for `name`, must not be `None`")  # noqa: E501
+
+        self._status = status
 
     @property
     def created_time(self) -> str:

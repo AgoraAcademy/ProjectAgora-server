@@ -160,3 +160,72 @@ def project_project_id_get(projectId):  # noqa: E501
         "lastUpdatedTime": project.lastUpdatedTime,
     }
     return projectInfo, 200
+
+
+def project_project_id_patch(projectId):  # noqa: E501
+    """返回一个Project的详细信息
+
+    # noqa: E501
+
+    :param projectId:
+    :type projectId: int
+
+    :rtype: Learner
+    """
+
+    db_session = orm.init_db(os.environ["DATABASEURI"])
+    validation_result = wxLogin.validateUser()
+    if not validation_result["result"]:
+        db_session.remove()
+        return {"error": "Failed to validate access token"}, 401
+    learner = db_session.query(orm.Learner_db).filter(orm.Learner_db.openid == validation_result["openid"]).one_or_none()
+    if not learner.validated:
+        db_session.remove()
+        return {"error": "Learner not validated"}, 401
+    project = db_session.query(orm.Project_db).filter(orm.Project_db.id == projectId).one_or_none()
+    if connexion.request.is_json:
+        patch = Project.from_dict(connexion.request.get_json())
+    patchDict = {
+        "name": patch.name,
+        "status": patch.status,
+        "projectTerm": patch.project_term,
+        "projectTermLength": patch.project_term_length,
+        "projectStartDate": patch.project_start_date,
+        "averageIntendedCreditHourPerWeek": patch.average_intended_credit_hour_per_week,
+        "totalIntendedCreditHour": patch.total_intended_credit_hour,
+        "projectMentorID": patch.project_mentor_id,
+        "projectMentor": patch.project_mentor,
+        "averageGuidingHourPerWeek": patch.average_guiding_hour_per_week,
+        "projectMeta": str(patch.project_meta) if patch.project_meta is not None else None,
+        "projectApprovalInfo": str(patch.project_approval_info) if patch.project_approval_info is not None else None,
+        "content": str(patch.content) if patch.content is not None else None,
+        "conclusionInfo": str(patch.conclusion_info) if patch.conclusion_info is not None else None
+    }
+    patchDict = {k: v for k, v in patchDict.items() if v is not None}
+    # patchMapper = {
+    #     "name": project.name,
+    #     "status": project.status,
+    #     "projectTerm": project.projectTerm,
+    #     "projectTermLength": project.projectTermLength,
+    #     "projectStartDate": project.projectStartDate,
+    #     "averageIntendedCreditHourPerWeek": project.averageIntendedCreditHourPerWeek,
+    #     "totalIntendedCreditHour": project.totalIntendedCreditHour,
+    #     "projectMentorID": project.projectMentorID,
+    #     "projectMentor": project.projectMentor,
+    #     "averageGuidingHourPerWeek": project.averageGuidingHourPerWeek,
+    #     "projectMeta": project.projectMeta,
+    #     "projectApprovalInfo": project.projectApprovalInfo,
+    #     "content": project.content,
+    #     "conclusionInfo": project.conclusionInfo,
+    #     "lastUpdatedTime": project.lastUpdatedTime,
+    # }
+    try:
+        for item, value in patchDict.items():
+            setattr(project, item, value)
+        db_session.commit()
+    except Exception as e:
+        print(e)
+        db_session.remove()
+        return {"error": "Failed to create new project"}, 401
+    db_session.remove()
+    return "projectId_patch", 200

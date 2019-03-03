@@ -390,32 +390,6 @@ paths:
             WWW_Authenticate:
               type: "string"
       x-swagger-router-controller: "swagger_server.controllers.project_controller"
-    patch:
-      tags:
-      - "Project"
-      summary: "更新一个Project"
-      operationId: "project_patch"
-      parameters:
-      - in: "body"
-        name: "project"
-        required: true
-        schema:
-          $ref: "#/definitions/Project"
-      responses:
-        201:
-          description: "创建成功"
-          schema:
-            type: "object"
-            properties:
-              id:
-                type: "integer"
-            description: "成功创建的Project的ID"
-        401:
-          description: "API key is missing or invalid"
-          headers:
-            WWW_Authenticate:
-              type: "string"
-      x-swagger-router-controller: "swagger_server.controllers.project_controller"
   /project/{projectId}:
     get:
       tags:
@@ -439,6 +413,92 @@ paths:
                 type: string
               status:
                 type: string
+        401:
+          description: "API key is missing or invalid"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+      x-swagger-router-controller: "swagger_server.controllers.project_controller"
+    patch:
+      tags:
+      - "Project"
+      summary: "更新一个Project"
+      operationId: "project_project_id_patch"
+      parameters:
+      - name: "projectId"
+        in: "path"
+        required: true
+        type: "integer"
+        minimum: 1
+        format: "int64"
+      - in: "body"
+        name: "project"
+        required: true
+        schema:
+          type: "object"
+          properties: 
+            name:
+              type: "string"
+            projectTerm:
+              type: "string"
+            projectTermLength: 
+              type: "number"
+            projectStartDate:
+              type: "string"
+            averageIntendedCreditHourPerWeek:
+              type: "number"
+            totalIntendedCreditHour:
+              type: "number"
+            projectMentorID:
+              type: "number"
+            projectMentor:
+              type: "string"
+            averageGuidingHourPerWeek:
+              type: "number"
+            projectMeta:
+              type: "object"
+              properties: 
+                projectIntro:
+                  type: "string"
+                projectGoal:
+                  type: "string"
+                evaluationSchema:
+                  type: "string"
+                projectPlan:
+                  type: "string"
+                instructionPlan:
+                  type: "string"
+            relatedCourseId:
+              type: "number"
+            relatedCourse:
+              type: "string"
+            projectApprovalInfo:
+              type: "object"
+              properties:
+                approvalCommitteeOfAcademics:
+                  type: "object"
+                  properties: 
+                    result:
+                      type: "string"
+                    advice:
+                      type: "string"
+                approvalMentor:
+                  type: "object"
+                  properties: 
+                    result:
+                      type: "string"
+                    advice:
+                      type: "string"
+            conclusionInfo:
+              type: "object"
+              properties: 
+                selfEvaluation:
+                  type: "string"
+                mentorEvaluation:
+                  type: "string"
+      responses:
+        200:
+          description: "更新成功"
         401:
           description: "API key is missing or invalid"
           headers:
