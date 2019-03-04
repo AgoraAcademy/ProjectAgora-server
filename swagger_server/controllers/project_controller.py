@@ -29,17 +29,6 @@ def project_get():  # noqa: E501
         })
     db_session.remove()
     return result_list, 200, {"Authorization": validation_result["access_token"], "refresh_token": validation_result["refresh_token"]}
-    """返回所有Project
-
-    # noqa: E501
-
-    :param learnerId:
-    :type learnerId: int
-
-    :rtype: List[Project]
-    """
-    db_session.remove()
-    return 'do some magic!'
 
 
 def project_head():  # noqa: E501
@@ -104,7 +93,8 @@ def project_post(project):  # noqa: E501
             averageGuidingHourPerWeek=project.average_guiding_hour_per_week,
             projectMeta=str(project.project_meta),
             projectApprovalInfo=str(project.project_approval_info),
-            conclusionInfo=str(project.conclusion_info)
+            conclusionInfo=str(project.conclusion_info),
+            content="[]"
         ))
         db_session.commit()
     except Exception as e:
