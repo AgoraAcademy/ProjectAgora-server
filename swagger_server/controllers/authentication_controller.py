@@ -52,7 +52,8 @@ def oauth2_get(code, state):  # noqa: E501
                 'validated': learner.validated,
                 'isLearner': True,
                 'isMentor': learner.isMentor,
-                'isAdmin': learner.isAdmin
+                'isAdmin': learner.isAdmin,
+                'isCommitteeOfAcademics': learner.isCommitteeOfAcademics
             }
         except Exception as e:
             db_session.remove()

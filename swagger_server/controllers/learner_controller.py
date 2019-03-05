@@ -22,7 +22,7 @@ def learner_get():  # noqa: E501
     if not validation_result["result"]:
         return {"error": "Failed to validate access token"}, 401
     result_list = []
-    query = db_session.query(orm.Learner_db).all()
+    query = db_session.query(orm.Learner_db).filter(orm.Learner_db.validated == True).all()
     for learner in query:
         result_list.append({
             "id": learner.id,
