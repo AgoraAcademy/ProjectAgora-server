@@ -149,7 +149,7 @@ def project_project_id_get(projectId):  # noqa: E501
         "conclusionInfo": project.conclusionInfo,
         "lastUpdatedTime": project.lastUpdatedTime,
     }
-    return projectInfo, 200
+    return projectInfo, 200, {"Authorization": validation_result["access_token"], "refresh_token": validation_result["refresh_token"]}
 
 
 def project_project_id_patch(projectId):  # noqa: E501
@@ -218,4 +218,4 @@ def project_project_id_patch(projectId):  # noqa: E501
         db_session.remove()
         return {"error": "Failed to create new project"}, 401
     db_session.remove()
-    return "projectId_patch", 200
+    return {}, 200, {"Authorization": validation_result["access_token"], "refresh_token": validation_result["refresh_token"]}
