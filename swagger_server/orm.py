@@ -11,7 +11,7 @@ class Learner_db(Base):
     openid = Column(String(120), nullable=False)
     validated = Column(Boolean, nullable=False)
     isAdmin = Column(Boolean, nullable=False)
-    isCommitteeOfAcademics = Column(Boolean, nullable=False)
+    # isCommitteeOfAcademics = Column(Boolean, nullable=False)
     givenName = Column(String(120), nullable=False)
     familyName = Column(String(120), nullable=False)
     nickname = Column(String(120), nullable=True)
