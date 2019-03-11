@@ -6,7 +6,6 @@ from datetime import date, datetime  # noqa: F401
 from typing import List, Dict  # noqa: F401
 
 from swagger_server.models.base_model_ import Model
-from swagger_server.models.project_project_approval_info_approval_committee_of_academics import ProjectProjectApprovalInfoApprovalCommitteeOfAcademics  # noqa: F401,E501
 from swagger_server.models.project_project_approval_info_approval_mentor import ProjectProjectApprovalInfoApprovalMentor  # noqa: F401,E501
 from swagger_server import util
 
@@ -17,25 +16,20 @@ class ProjectProjectApprovalInfo(Model):
     Do not edit the class manually.
     """
 
-    def __init__(self, approval_committee_of_academics: ProjectProjectApprovalInfoApprovalCommitteeOfAcademics=None, approval_mentor: ProjectProjectApprovalInfoApprovalMentor=None):  # noqa: E501
+    def __init__(self, approval_mentor: ProjectProjectApprovalInfoApprovalMentor=None):  # noqa: E501
         """ProjectProjectApprovalInfo - a model defined in Swagger
 
-        :param approval_committee_of_academics: The approval_committee_of_academics of this ProjectProjectApprovalInfo.  # noqa: E501
-        :type approval_committee_of_academics: ProjectProjectApprovalInfoApprovalCommitteeOfAcademics
         :param approval_mentor: The approval_mentor of this ProjectProjectApprovalInfo.  # noqa: E501
         :type approval_mentor: ProjectProjectApprovalInfoApprovalMentor
         """
         self.swagger_types = {
-            'approval_committee_of_academics': ProjectProjectApprovalInfoApprovalCommitteeOfAcademics,
             'approval_mentor': ProjectProjectApprovalInfoApprovalMentor
         }
 
         self.attribute_map = {
-            'approval_committee_of_academics': 'approvalCommitteeOfAcademics',
             'approval_mentor': 'approvalMentor'
         }
 
-        self._approval_committee_of_academics = approval_committee_of_academics
         self._approval_mentor = approval_mentor
 
     @classmethod
@@ -48,27 +42,6 @@ class ProjectProjectApprovalInfo(Model):
         :rtype: ProjectProjectApprovalInfo
         """
         return util.deserialize_model(dikt, cls)
-
-    @property
-    def approval_committee_of_academics(self) -> ProjectProjectApprovalInfoApprovalCommitteeOfAcademics:
-        """Gets the approval_committee_of_academics of this ProjectProjectApprovalInfo.
-
-
-        :return: The approval_committee_of_academics of this ProjectProjectApprovalInfo.
-        :rtype: ProjectProjectApprovalInfoApprovalCommitteeOfAcademics
-        """
-        return self._approval_committee_of_academics
-
-    @approval_committee_of_academics.setter
-    def approval_committee_of_academics(self, approval_committee_of_academics: ProjectProjectApprovalInfoApprovalCommitteeOfAcademics):
-        """Sets the approval_committee_of_academics of this ProjectProjectApprovalInfo.
-
-
-        :param approval_committee_of_academics: The approval_committee_of_academics of this ProjectProjectApprovalInfo.
-        :type approval_committee_of_academics: ProjectProjectApprovalInfoApprovalCommitteeOfAcademics
-        """
-
-        self._approval_committee_of_academics = approval_committee_of_academics
 
     @property
     def approval_mentor(self) -> ProjectProjectApprovalInfoApprovalMentor:

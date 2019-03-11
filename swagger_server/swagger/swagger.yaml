@@ -354,13 +354,6 @@ paths:
             projectApprovalInfo:
               type: "object"
               properties:
-                approvalCommitteeOfAcademics:
-                  type: "object"
-                  properties: 
-                    result:
-                      type: "string"
-                    advice:
-                      type: "string"
                 approvalMentor:
                   type: "object"
                   properties: 
@@ -475,13 +468,6 @@ paths:
             projectApprovalInfo:
               type: "object"
               properties:
-                approvalCommitteeOfAcademics:
-                  type: "object"
-                  properties: 
-                    result:
-                      type: "string"
-                    advice:
-                      type: "string"
                 approvalMentor:
                   type: "object"
                   properties: 
@@ -755,9 +741,6 @@ definitions:
       projectMentorID: 7
       projectMentor: "projectMentor"
       projectApprovalInfo:
-        ApprovalCommitteeOfAcademics:
-          result: "result"
-          advice: "advice"
         ApprovalMentor:
           result: "result"
           advice: "advice"
@@ -1168,18 +1151,6 @@ definitions:
       evaluationSchema: "evaluationSchema"
       projectPlan: "projectPlan"
       instructionPlan: "instructionPlan"
-  Project_projectApprovalInfo_ApprovalCommitteeOfAcademics:
-    properties:
-      result:
-        type: "string"
-        description: "学术委员会审核结果"
-      advice:
-        type: "string"
-        description: "学术委员会审核建议"
-    description: "学术委员会审核"
-    example:
-      result: "result"
-      advice: "advice"
   Project_projectApprovalInfo_ApprovalMentor:
     properties:
       result:
@@ -1194,15 +1165,10 @@ definitions:
       advice: "advice"
   Project_projectApprovalInfo:
     properties:
-      ApprovalCommitteeOfAcademics:
-        $ref: "#/definitions/Project_projectApprovalInfo_ApprovalCommitteeOfAcademics"
       ApprovalMentor:
         $ref: "#/definitions/Project_projectApprovalInfo_ApprovalMentor"
     description: "项目审核信息"
     example:
-      ApprovalCommitteeOfAcademics:
-        result: "result"
-        advice: "advice"
       ApprovalMentor:
         result: "result"
         advice: "advice"
