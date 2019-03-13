@@ -188,10 +188,10 @@ def project_project_id_patch(projectId):  # noqa: E501
         "projectMentorID": patch.project_mentor_id,
         "projectMentor": patch.project_mentor,
         "averageGuidingHourPerWeek": patch.average_guiding_hour_per_week,
-        "projectMeta": str(patch.project_meta) if patch.project_meta is not None else None,
-        "projectApprovalInfo": str(patch.project_approval_info) if patch.project_approval_info is not None else None,
-        "content": str(patch.content) if patch.content is not None else None,
-        "conclusionInfo": str(patch.conclusion_info) if patch.conclusion_info is not None else None
+        "projectMeta": json.dumps(connexion.request.get_json()["projectMeta"]) if patch.project_meta is not None else None,
+        "projectApprovalInfo": json.dumps(connexion.request.get_json()["projectApprovalInfo"]) if patch.project_approval_info is not None else None,
+        "content": json.dumps(connexion.request.get_json()["content"]) if patch.content is not None else None,
+        "conclusionInfo": json.dumps(connexion.request.get_json()["conclusionInfo"]) if patch.conclusion_info is not None else None
     }
     patchDict = {k: v for k, v in patchDict.items() if v is not None}
     # patchMapper = {
