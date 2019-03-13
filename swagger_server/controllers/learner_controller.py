@@ -1,5 +1,6 @@
 import connexion
 import os
+import json
 from swagger_server.models.credit_hour_entry import CreditHourEntry  # noqa: E501
 from swagger_server.models.inline_response2001 import InlineResponse2001  # noqa: E501
 from swagger_server.models.inline_response201 import InlineResponse201  # noqa: E501
@@ -110,6 +111,8 @@ def learner_post(learner):  # noqa: E501
         return {"error": "Failed to validate access token"}, 401
     if connexion.request.is_json:
         learner = Learner.from_dict(connexion.request.get_json())  # noqa: E501
+        learner_dict = connexion.request.get_json()
+    
     try:
         db_session.add(orm.Learner_db(
             validated=False,
@@ -128,10 +131,10 @@ def learner_post(learner):  # noqa: E501
             dateOfRegistration=learner.date_of_registration,
             reasonOfRegistration=learner.reason_of_registration,
             previousStatus=learner.previous_status,
-            custodianInfo=str(learner.custodian_info),
-            emergentContact=str(learner.emergent_contact),
-            contactInfo=str(learner.contact_info),
-            medicalInfo=str(learner.medical_info),
+            custodianInfo=json.dumps(learner_dict["custodianInfo"]),
+            emergentContact=json.dumps(learner_dict["emergentContact"]),
+            contactInfo=json.dumps(learner_dict["contactInfo"]),
+            medicalInfo=json.dumps(learner_dict["medicalInfo"]),
             notes=str(learner.notes),
         ))
         db_session.commit()

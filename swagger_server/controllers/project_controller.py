@@ -2,6 +2,7 @@ import connexion
 import six
 import os
 import datetime
+import json
 
 from swagger_server.models.project import Project  # noqa: E501
 from swagger_server import util, wxLogin, orm
@@ -74,6 +75,7 @@ def project_post(project):  # noqa: E501
         return {"error": "Learner not validated"}, 401
     if connexion.request.is_json:
         project = Project.from_dict(connexion.request.get_json())
+    project_dict = connexion.request.get_json()
     try:
         db_session.add(orm.Project_db(
             name=project.name,
@@ -91,9 +93,9 @@ def project_post(project):  # noqa: E501
             projectMentorID=project.project_mentor_id,
             projectMentor=project.project_mentor,
             averageGuidingHourPerWeek=project.average_guiding_hour_per_week,
-            projectMeta=str(project.project_meta),
-            projectApprovalInfo=str(project.project_approval_info),
-            conclusionInfo=str(project.conclusion_info),
+            projectMeta=json.dumps(project_dict["projectMeta"]),
+            projectApprovalInfo=json.dumps(project_dict["projectApprovalInfo"]),
+            conclusionInfo=json.dumps(project_dict["conclusionInfo"]),
             content="[]"
         ))
         db_session.commit()
