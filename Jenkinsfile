@@ -6,6 +6,13 @@ pipeline {
             args '-p 10081:10081 --security-opt apparmor=unconfined'
         }
     }
+
+    environment {
+        DATABASEURI = credentials('WXLOGINAPPID')
+        WXLOGINAPPID = credentials('WXLOGINAPPID')
+        WXLOGINSECRET = credentials('WXLOGINSECRET')
+    }
+
     stages {
         stage('Initialize') {
             steps {
