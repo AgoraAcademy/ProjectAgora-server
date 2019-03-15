@@ -1,16 +1,11 @@
 FROM python:3-alpine
 
-RUN mkdir -p /usr/src/app
-WORKDIR /usr/src/app
-
-COPY requirements.txt /usr/src/app/
-
+RUN apt-get clean
+RUN apt-get update
+RUN apt-get install -y software-properties-common
+RUN apt-get update
+RUN apt-get -f install -y nginx
+ADD default /etc/nginx/sites-available
 RUN pip3 install --no-cache-dir -r requirements.txt
 
-COPY . /usr/src/app
-
-EXPOSE 8080
-
-ENTRYPOINT ["python3"]
-
-CMD ["-m", "swagger_server"]
+EXPOSE 10081
