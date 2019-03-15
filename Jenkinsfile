@@ -8,7 +8,7 @@ pipeline {
     }
 
     environment {
-        DATABASEURI = credentials('WXLOGINAPPID')
+        DATABASEURI = credentials('DATABASEURI')
         WXLOGINAPPID = credentials('WXLOGINAPPID')
         WXLOGINSECRET = credentials('WXLOGINSECRET')
     }
