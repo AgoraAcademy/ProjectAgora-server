@@ -112,7 +112,6 @@ def learner_post(learner):  # noqa: E501
     if connexion.request.is_json:
         learner = Learner.from_dict(connexion.request.get_json())  # noqa: E501
         learner_dict = connexion.request.get_json()
-    
     try:
         db_session.add(orm.Learner_db(
             validated=False,
@@ -131,11 +130,11 @@ def learner_post(learner):  # noqa: E501
             dateOfRegistration=learner.date_of_registration,
             reasonOfRegistration=learner.reason_of_registration,
             previousStatus=learner.previous_status,
-            custodianInfo=json.dumps(learner_dict["custodianInfo"]),
-            emergentContact=json.dumps(learner_dict["emergentContact"]),
-            contactInfo=json.dumps(learner_dict["contactInfo"]),
-            medicalInfo=json.dumps(learner_dict["medicalInfo"]),
-            notes=str(learner.notes),
+            custodianInfo=learner_dict["custodianInfo"],
+            emergentContact=learner_dict["emergentContact"],
+            contactInfo=learner_dict["contactInfo"],
+            medicalInfo=learner_dict["medicalInfo"],
+            notes=learner_dict["notes"],
         ))
         db_session.commit()
     except Exception as e:

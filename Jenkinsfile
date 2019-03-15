@@ -16,7 +16,6 @@ pipeline {
     stages {
         stage('Install') {
             steps { 
-                input message: 'install'
                 sh 'pip3 install --no-cache-dir -r /var/jenkins_home/workspace/ProjectAgora-server/requirements.txt'
             }
         }

@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, DateTime, String, Integer, Boolean, UnicodeText, DECIMAL
+from sqlalchemy import create_engine, Column, DateTime, String, Integer, Boolean, DECIMAL, JSON
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -29,11 +29,11 @@ class Learner_db(Base):
     destinationOfLeave = Column(String(120), nullable=True)
     mentorship = Column(String(1000), nullable=True)
     salaryCard = Column(String(120), nullable=True)
-    custodianInfo = Column(UnicodeText, nullable=True)
-    emergentContact = Column(UnicodeText, nullable=False)
-    contactInfo = Column(UnicodeText, nullable=False)
-    medicalInfo = Column(UnicodeText, nullable=False)
-    notes = Column(UnicodeText, nullable=True)
+    custodianInfo = Column(JSON, nullable=True)
+    emergentContact = Column(JSON, nullable=False)
+    contactInfo = Column(JSON, nullable=False)
+    medicalInfo = Column(JSON, nullable=False)
+    notes = Column(JSON, nullable=True)
 
     def __repr__(self):
         return '<Learner %r %r >' % (self.familyName, self.givenName)
@@ -55,18 +55,19 @@ class Project_db(Base):
     averageIntendedCreditHourPerWeek = Column(DECIMAL(5, 2))
     totalIntendedCreditHour = Column(DECIMAL(10, 2))
     projectMentorID = Column(Integer)
-    projectMentor = Column(String(120), nullable=False)
+    projectMentor = Column(String(120), nullable=True)
     averageGuidingHourPerWeek = Column(DECIMAL(5, 2))
-    projectMeta = Column(UnicodeText, nullable=True)
-    projectApprovalInfo = Column(UnicodeText, nullable=True)
-    content = Column(UnicodeText, nullable=True)
-    conclusionInfo = Column(UnicodeText, nullable=True)
+    projectMeta = Column(JSON, nullable=True)
+    projectApprovalInfo = Column(JSON, nullable=True)
+    content = Column(JSON, nullable=True)
+    conclusionInfo = Column(JSON, nullable=True)
     lastUpdatedTime = Column(String(120), nullable=True)
 
 
 def init_db(uri):
-    ssl_args = {'ssl': {'ca': '../config/amazon-rds-ca-cert.pem'}}
-    engine = create_engine(uri, convert_unicode=True, connect_args=ssl_args)
+    # ssl_args = {'ssl': {'ca': './config/amazon-rds-ca-cert.pem'}}
+    # engine = create_engine(uri, convert_unicode=True, connect_args=ssl_args)
+    engine = create_engine(uri, convert_unicode=True)
     db_session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
     Base.query = db_session.query_property()
     Base.metadata.create_all(bind=engine)
