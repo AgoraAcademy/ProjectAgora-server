@@ -21,7 +21,7 @@ pipeline {
         }
         stage('Initialize') {
             steps {
-                sh 'gunicorn --chdir ./swagger_server app:app -b :81'
+                sh 'gunicorn --chdir ./swagger_server app:app -b :10081'
             }
         }
         stage('Deliver'){
