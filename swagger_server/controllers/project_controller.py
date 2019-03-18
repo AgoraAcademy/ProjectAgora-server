@@ -79,7 +79,7 @@ def project_post(project):  # noqa: E501
     try:
         db_session.add(orm.Project_db(
             name=project.name,
-            status="审核中",
+            status="未提交",
             createdTime=datetime.date.today().strftime('%Y-%m-%d'),
             createdByID=learner.id,
             createdBy=learner.familyName + learner.givenName,
