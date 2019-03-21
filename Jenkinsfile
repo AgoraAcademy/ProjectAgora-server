@@ -3,7 +3,7 @@ pipeline {
         dockerfile {
             filename 'Dockerfile'
             additionalBuildArgs '--no-cache'
-            args '-p 10081:10081 --restart=always --security-opt apparmor=unconfined'
+            args '-p 10081:10081 -v ProjectAgora-storage:/var/ProjectAgora-storage --restart=always --security-opt apparmor=unconfined'
         }
     }
 
