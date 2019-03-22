@@ -13,8 +13,9 @@ consumes:
 - "application/json"
 produces:
 - "application/json"
-security:
-- APIKeyHeader: []
+- "image/png"
+- "image/gif"
+- "image/jpeg"
 paths:
   /oauth2:
     get:
@@ -57,6 +58,61 @@ paths:
             WWW_Authenticate:
               type: "string"
       x-swagger-router-controller: "swagger_server.controllers.authentication_controller"
+  /utilities/project_cover:
+    get:
+      tags:
+      - "Utilities"
+      summary: "获取项目封面"
+      operationId: "project_cover_get"
+      parameters:
+      - name: "learnerId"
+        in: "query"
+        description: "学习者的ID"
+        required: true
+        type: "string"
+      - name: "uid"
+        in: "query"
+        description: "图片的UID"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "获取项目封面"
+          schema:
+            type: "object"
+            properties: 
+              projectCover:
+                type: "string"
+                format: "byte"
+      x-swagger-router-controller: "swagger_server.controllers.utilities_controller"
+    post:
+      tags:
+      - "Utilities"
+      summary: "上传图片"
+      operationId: "project_cover_post"
+      consumes:
+        - multipart/form-data
+      parameters:
+        - in: formData
+          name: project_cover
+          type: file
+          required: true
+          description: 项目封面图
+      responses:
+        201:
+          description: "创建成功"
+          schema:
+            type: "object"
+            properties:
+              url:
+                type: "string"
+            description: "访问用的url"
+        401:
+          description: "API key is missing or invalid"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+      x-swagger-router-controller: "swagger_server.controllers.utilities_controller"
   /learner:
     get:
       tags:

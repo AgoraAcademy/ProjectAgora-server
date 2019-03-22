@@ -26,7 +26,8 @@ def project_get():  # noqa: E501
             "relatedCourse": project.relatedCourse,
             "projectMentorID": project.projectMentorID,
             "projectMentor": project.projectMentor,
-            "status": project.status
+            "status": project.status,
+            "coverImageURL": project.coverImageURL
         })
     db_session.remove()
     return result_list, 200, {"Authorization": validation_result["access_token"], "refresh_token": validation_result["refresh_token"]}
@@ -96,7 +97,8 @@ def project_post(project):  # noqa: E501
             projectMeta=project_dict["projectMeta"],
             projectApprovalInfo=project_dict["projectApprovalInfo"],
             conclusionInfo=project_dict["conclusionInfo"],
-            content=[]
+            content=[],
+            coverImageURL=project_dict["coverImageURL"]
         ))
         db_session.commit()
     except Exception as e:

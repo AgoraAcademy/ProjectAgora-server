@@ -62,6 +62,7 @@ class Project_db(Base):
     content = Column(JSON, nullable=True)
     conclusionInfo = Column(JSON, nullable=True)
     lastUpdatedTime = Column(String(120), nullable=True)
+    coverImageURL = Column(String(120), nullable=True)
 
 
 def init_db(uri):
