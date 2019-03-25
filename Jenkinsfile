@@ -11,6 +11,7 @@ pipeline {
         DATABASEURI = credentials('DATABASEURI')
         WXLOGINAPPID = credentials('WXLOGINAPPID')
         WXLOGINSECRET = credentials('WXLOGINSECRET')
+        STORAGEURL = credentials('STORAGEURL')
     }
 
     stages {
