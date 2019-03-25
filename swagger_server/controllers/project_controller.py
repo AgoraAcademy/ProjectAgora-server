@@ -152,6 +152,7 @@ def project_project_id_get(projectId):  # noqa: E501
         "content": project.content,
         "conclusionInfo": project.conclusionInfo,
         "lastUpdatedTime": project.lastUpdatedTime,
+        "coverImageURL": project.coverImageURL
     }
     return projectInfo, 200, {"Authorization": validation_result["access_token"], "refresh_token": validation_result["refresh_token"]}
 
@@ -193,7 +194,8 @@ def project_project_id_patch(projectId):  # noqa: E501
         "projectMeta": connexion.request.get_json()["projectMeta"] if patch.project_meta is not None else None,
         "projectApprovalInfo": connexion.request.get_json()["projectApprovalInfo"] if patch.project_approval_info is not None else None,
         "content": connexion.request.get_json()["content"] if patch.content is not None else None,
-        "conclusionInfo": connexion.request.get_json()["conclusionInfo"] if patch.conclusion_info is not None else None
+        "conclusionInfo": connexion.request.get_json()["conclusionInfo"] if patch.conclusion_info is not None else None,
+        "coverImageURL": connexion.request.get_json()["coverImageURL"],
     }
     patchDict = {k: v for k, v in patchDict.items() if v is not None}
     # patchMapper = {
