@@ -195,7 +195,7 @@ def project_project_id_patch(projectId):  # noqa: E501
         "projectApprovalInfo": connexion.request.get_json()["projectApprovalInfo"] if patch.project_approval_info is not None else None,
         "content": connexion.request.get_json()["content"] if patch.content is not None else None,
         "conclusionInfo": connexion.request.get_json()["conclusionInfo"] if patch.conclusion_info is not None else None,
-        "coverImageURL": connexion.request.get_json()["coverImageURL"] if patch.coverImageURL is not None else None,
+        "coverImageURL": connexion.request.get_json().get("coverImageURL", default=None),
     }
     patchDict = {k: v for k, v in patchDict.items() if v is not None}
     # patchMapper = {
