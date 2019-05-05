@@ -58,6 +58,18 @@ paths:
             WWW_Authenticate:
               type: "string"
       x-swagger-router-controller: "swagger_server.controllers.authentication_controller"
+  /utilities/config:
+    get:
+      tags:
+      - "Utilities"
+      summary: "获取基本设置。没有加密，切勿放置敏感信息。"
+      operationId: "config_get"
+      responses:
+        200:
+          description: "获取基本设置"
+          schema:
+            type: "object"
+      x-swagger-router-controller: "swagger_server.controllers.utilities_controller"
   /utilities/project_cover:
     get:
       tags:
@@ -113,6 +125,68 @@ paths:
             WWW_Authenticate:
               type: "string"
       x-swagger-router-controller: "swagger_server.controllers.utilities_controller"
+  /utilities/course_cover:
+    get:
+      tags:
+      - "Utilities"
+      summary: "获取课程封面"
+      operationId: "course_cover_get"
+      parameters:
+      - name: "coverImageURL"
+        in: "query"
+        description: "课程封面的UID"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "获取课程封面"
+          schema:
+            type: "object"
+            properties: 
+              courseCover:
+                type: "string"
+                format: "byte"
+      x-swagger-router-controller: "swagger_server.controllers.utilities_controller"
+    post:
+      tags:
+      - "Utilities"
+      summary: "上传图片"
+      operationId: "course_cover_post"
+      consumes:
+        - multipart/form-data
+      parameters:
+        - in: formData
+          name: course_cover
+          type: file
+          required: true
+          description: 课程封面图
+      responses:
+        201:
+          description: "创建成功"
+          schema:
+            type: "object"
+            properties:
+              url:
+                type: "string"
+            description: "访问用的url"
+        401:
+          description: "API key is missing or invalid"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+      x-swagger-router-controller: "swagger_server.controllers.utilities_controller"
+  /booking:
+    get:
+      tags:
+      - "Booking"
+      summary: "获取所有的房间信息"
+      operationId: "booking_get"
+      responses:
+        200:
+          description: "所有的房间信息"
+          schema:
+            type: "object"
+      x-swagger-router-controller: "swagger_server.controllers.booking_controller"
   /learner:
     get:
       tags:

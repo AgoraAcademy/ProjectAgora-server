@@ -65,6 +65,29 @@ class Project_db(Base):
     coverImageURL = Column(String(120), nullable=True)
 
 
+class Course_db(Base):
+    __tablename__ = 'course'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(120), nullable=False)
+    status = Column(String(10), nullable=False)
+    createdTime = Column(String(120), nullable=False)
+    createdByID = Column(Integer)
+    createdBy = Column(String(120), nullable=False)
+    creditHourPerWeek = Column(DECIMAL(5, 2))
+    courseTimeShift = Column(JSON, nullable=True)
+    courseLengthInWeeks = Column(Integer)
+    courseMeta = Column(JSON, nullable=True)
+    content = Column(JSON, nullable=True)
+    coverImageURL = Column(String(120), nullable=True)
+
+
+class Config_db(Base):
+    __tablename__ = 'config'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(120), nullable=False)
+    value = Column(JSON, nullable=True)
+
+
 def init_db(uri):
     # ssl_args = {'ssl': {'ca': './config/amazon-rds-ca-cert.pem'}}
     # engine = create_engine(uri, convert_unicode=True, connect_args=ssl_args)
