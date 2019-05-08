@@ -1,5 +1,5 @@
-from sqlalchemy import create_engine, Column, DateTime, String, Integer, Boolean, DECIMAL, JSON
-from sqlalchemy.orm import scoped_session, sessionmaker
+from sqlalchemy import create_engine, Column, DateTime, String, Integer, Boolean, DECIMAL, JSON, ForeignKey
+from sqlalchemy.orm import scoped_session, sessionmaker, relationship
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
@@ -86,6 +86,14 @@ class Config_db(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(120), nullable=False)
     value = Column(JSON, nullable=True)
+
+
+class BookingNotes_db(Base):
+    __tablename__ = 'bookingNotes'
+    id = Column(Integer, primary_key=True)
+    changekey = Column(String(100), nullable=False)
+    bookedByID = Column(Integer, nullable=False)
+    bookedByName = Column(String(120), nullable=False)
 
 
 def init_db(uri):

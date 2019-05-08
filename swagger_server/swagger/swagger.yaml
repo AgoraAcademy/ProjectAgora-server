@@ -187,6 +187,88 @@ paths:
           schema:
             type: "object"
       x-swagger-router-controller: "swagger_server.controllers.booking_controller"
+  /booking/{roomCode}:
+    get:
+      tags:
+      - "Booking"
+      summary: "返回指定房间指定月期的预约信息"
+      operationId: "booking_roomCode_get"
+      parameters:
+      - name: "roomCode"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "monthToLoad"
+        in: "query"
+        required: true
+        type: string
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/Learner"
+        401:
+          description: "API key is missing or invalid"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+      x-swagger-router-controller: "swagger_server.controllers.booking_controller"
+    post:
+      tags:
+      - "Booking"
+      summary: "在指定房间创建预约信息"
+      operationId: "booking_roomCode_post"
+      parameters:
+      - name: "roomCode"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "appointment"
+        in: "body"
+        required: true
+        schema:
+          type: object
+      responses:
+        201:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/Learner"
+        401:
+          description: "API key is missing or invalid"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+      x-swagger-router-controller: "swagger_server.controllers.booking_controller"
+    delete:
+      tags:
+      - "Booking"
+      summary: "在指定房间指定月份删除预约信息"
+      operationId: "booking_roomCode_delete"
+      parameters:
+      - name: "roomCode"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "monthToLoad"
+        in: "query"
+        required: true
+        type: string
+      - name: "deleteInfo"
+        in: "body"
+        required: true
+        schema:
+          type: object
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/Learner"
+        401:
+          description: "API key is missing or invalid"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+      x-swagger-router-controller: "swagger_server.controllers.booking_controller"
   /learner:
     get:
       tags:
