@@ -1,6 +1,7 @@
 import connexion
 import six
 import os
+from tzlocal import get_localzone
 from dateutil.relativedelta import relativedelta
 from exchangelib import Credentials, Account, Configuration, DELEGATE, RoomList, CalendarItem, EWSDateTime
 from exchangelib.services import GetRooms
@@ -83,13 +84,15 @@ def booking_roomCode_get(roomCode, monthToLoad):  # noqa: E501
     try:
         for item in room_account.calendar.filter(start__range=(start, end)).all().order_by('start'):
             notes = db_session.query(orm.BookingNotes_db).filter(orm.BookingNotes_db.changekey == item.changekey).one_or_none()
+            localizedStart = item.start.astimezone(get_localzone())
+            localizedEnd = item.end.astimezone(get_localzone())
             bookedByID = getattr(notes, "bookedByID", 0)
             bookedByName = getattr(notes, "bookedByName", "")
             responseList.append({
-                'startDate': ("%d-%0*d-%0*d" % (item.start.year, 2, item.start.month, 2, item.start.day)),
-                'endDate': ("%d-%0*d-%0*d" % (item.end.year, 2, item.end.month, 2, item.end.day)),
-                'startTime': ("%0*d:%0*d" % (2, item.start.hour, 2, item.start.minute)),
-                'endTime': ("%0*d:%0*d" % (2, item.end.hour, 2, item.end.minute)),
+                'startDate': ("%d-%0*d-%0*d" % (localizedStart.year, 2, localizedStart.month, 2, localizedStart.day)),
+                'endDate': ("%d-%0*d-%0*d" % (localizedEnd.year, 2, localizedEnd.month, 2, localizedEnd.day)),
+                'startTime': ("%0*d:%0*d" % (2, localizedStart.hour, 2, localizedStart.minute)),
+                'endTime': ("%0*d:%0*d" % (2, localizedEnd.hour, 2, localizedEnd.minute)),
                 'subject': item.subject,
                 'changekey': item.changekey,
                 'bookedByID': bookedByID,
@@ -116,26 +119,26 @@ def booking_roomCode_post(roomCode, appointment):  # noqa: E501
         credentials=credentials,
         config=config
     )
-    startDateTime = EWSDateTime(
+    startDateTime = room_account.default_timezone.localize(EWSDateTime(
         appointment['startYear'],
         appointment['startMonth'],
         appointment['startDay'],
         appointment['startHour'],
         appointment['startMinute']
-    )
-    endDateTime = EWSDateTime(
+    ))
+    endDateTime = room_account.default_timezone.localize(EWSDateTime(
         appointment['endYear'],
         appointment['endMonth'],
         appointment['endDay'],
         appointment['endHour'],
         appointment['endMinute']
-    )
+    ))
     try:
         item = CalendarItem(
             account=room_account,
             folder=room_account.calendar,
-            start=room_account.default_timezone.localize(startDateTime),
-            end=room_account.default_timezone.localize(endDateTime),
+            start=startDateTime,
+            end=endDateTime,
             subject=appointment['subject'],
             body=appointment['description'],
         )
