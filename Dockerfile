@@ -1,6 +1,7 @@
 FROM ubuntu:18.04
 
-RUN timedatectl set-timezone Asia/Shanghai
+RUN echo "Asia/Shanghai" > /etc/timezone
+RUN dpkg-reconfigure -f noninteractive tzdata
 RUN apt-get clean
 RUN apt-get update
 RUN apt-get install -y software-properties-common
