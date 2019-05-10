@@ -12,6 +12,8 @@ pipeline {
         WXLOGINAPPID = credentials('WXLOGINAPPID')
         WXLOGINSECRET = credentials('WXLOGINSECRET')
         STORAGEURL = credentials('STORAGEURL')
+        EWS_admin_password = credentials('EWS_admin_password')
+        EWS_admin_email = credentials('EWS_admin_email')
     }
 
     stages {
