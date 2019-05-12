@@ -56,7 +56,7 @@ def booking_get():  # noqa: E501
             }
             response.append(entry)
     except Exception as e:
-        return e
+        return e, 400, {"Authorization": validation_result["access_token"], "refresh_token": validation_result["refresh_token"]}
     return response, 200, {"Authorization": validation_result["access_token"], "refresh_token": validation_result["refresh_token"]}
 
 
@@ -101,7 +101,7 @@ def booking_roomCode_get(roomCode, monthToLoad):  # noqa: E501
                 'type': 'appointment'
             })
     except Exception as e:
-        print(e)
+        return e, 400, {"Authorization": validation_result["access_token"], "refresh_token": validation_result["refresh_token"]}
     return responseList, 200, {"Authorization": validation_result["access_token"], "refresh_token": validation_result["refresh_token"]}
 
 
@@ -152,7 +152,7 @@ def booking_roomCode_post(roomCode, appointment):  # noqa: E501
         db_session.remove()
     except Exception as e:
         db_session.remove()
-        return e
+        return e, 400, {"Authorization": validation_result["access_token"], "refresh_token": validation_result["refresh_token"]}
     return {'message': 'success'}, 201, {"Authorization": validation_result["access_token"], "refresh_token": validation_result["refresh_token"]}
 
 
@@ -190,5 +190,5 @@ def booking_roomCode_delete(roomCode, monthToLoad, deleteInfo):  # noqa: E501
         db_session.remove()
     except Exception as e:
         db_session.remove()
-        print(e)
+        return e, 400, {"Authorization": validation_result["access_token"], "refresh_token": validation_result["refresh_token"]}
     return {'message': 'success'}, 201, {"Authorization": validation_result["access_token"], "refresh_token": validation_result["refresh_token"]}
