@@ -74,15 +74,20 @@ def booking_roomCode_get(roomCode, monthToLoad):  # noqa: E501
         )
     except Exception as e:
         return e
-    start_year = int(monthToLoad.split("-")[0])
-    start_month = int(monthToLoad.split("-")[1])
-    start = room_account.default_timezone.localize(EWSDateTime(start_year, start_month, 1))
-    if start_month == 12:
-        end = room_account.default_timezone.localize(EWSDateTime(start_year + 1, 1, 1))
+    monthToLoad_year = int(monthToLoad.split("-")[0])
+    monthToLoad_month = int(monthToLoad.split("-")[1])
+    if monthToLoad_month == 1:
+        start = room_account.default_timezone.localize(EWSDateTime(monthToLoad_year - 1, 12, 1))
     else:
-        end = room_account.default_timezone.localize(EWSDateTime(start_year, start_month + 1, 1))
+        start = room_account.default_timezone.localize(EWSDateTime(monthToLoad_year, monthToLoad_month - 1, 1))
+    if monthToLoad_month == 11:
+        end = room_account.default_timezone.localize(EWSDateTime(monthToLoad_year + 1, 1, 1))
+    elif monthToLoad_month == 12:
+        end = room_account.default_timezone.localize(EWSDateTime(monthToLoad_year + 1, 2, 1))
+    else:
+        end = room_account.default_timezone.localize(EWSDateTime(monthToLoad_year, monthToLoad_month + 2, 1))
     try:
-        for item in room_account.calendar.filter(start__range=(start, end)).all().order_by('start'):
+        for item in room_account.calendar.view(start=start, end=end).all().order_by('start'):
             notes = db_session.query(orm.BookingNotes_db).filter(orm.BookingNotes_db.changekey == item.changekey).one_or_none()
             localizedStart = item.start.astimezone(get_localzone())
             localizedEnd = item.end.astimezone(get_localzone())
