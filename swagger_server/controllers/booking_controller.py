@@ -31,6 +31,7 @@ def booking_get():  # noqa: E501
     db_session = orm.init_db(os.environ["DATABASEURI"])
     validation_result = wxLogin.validateUser()
     if not validation_result["result"]:
+        db_session.remove()
         return {"error": "Failed to validate access token"}, 401
     response = []
     roomLists = db_session.query(orm.Config_db).filter(orm.Config_db.name == 'roomLists').one_or_none().value
@@ -56,15 +57,19 @@ def booking_get():  # noqa: E501
             }
             response.append(entry)
     except Exception as e:
+        db_session.remove()
         return e, 400, {"Authorization": validation_result["access_token"], "refresh_token": validation_result["refresh_token"]}
+    db_session.remove()
     return response, 200, {"Authorization": validation_result["access_token"], "refresh_token": validation_result["refresh_token"]}
 
 
 def booking_roomCode_get(roomCode, monthToLoad):  # noqa: E501
     # 按房间信息和月份（query中）获取所有的预约信息
+    db_session = orm.init_db(os.environ["DATABASEURI"])
     responseList = []
     validation_result = wxLogin.validateUser()
     if not validation_result["result"]:
+        db_session.remove()
         return {"error": "Failed to validate access token"}, 401
     try:
         room_account = Account(
@@ -73,6 +78,7 @@ def booking_roomCode_get(roomCode, monthToLoad):  # noqa: E501
             config=config
         )
     except Exception as e:
+        db_session.remove()
         return e
     monthToLoad_year = int(monthToLoad.split("-")[0])
     monthToLoad_month = int(monthToLoad.split("-")[1])
@@ -106,14 +112,18 @@ def booking_roomCode_get(roomCode, monthToLoad):  # noqa: E501
                 'type': 'appointment'
             })
     except Exception as e:
+        db_session.remove()
         return e, 400, {"Authorization": validation_result["access_token"], "refresh_token": validation_result["refresh_token"]}
+    db_session.remove()
     return responseList, 200, {"Authorization": validation_result["access_token"], "refresh_token": validation_result["refresh_token"]}
 
 
 def booking_roomCode_post(roomCode, appointment):  # noqa: E501
     # 添加预约信息
+    db_session = orm.init_db(os.environ["DATABASEURI"])
     validation_result = wxLogin.validateUser()
     if not validation_result["result"]:
+        db_session.remove()
         return {"error": "Failed to validate access token"}, 401
     learner = db_session.query(orm.Learner_db).filter(orm.Learner_db.openid == validation_result["openid"]).one_or_none()
     if not learner.validated:
@@ -154,21 +164,24 @@ def booking_roomCode_post(roomCode, appointment):  # noqa: E501
             bookedByName=learner.familyName + learner.givenName
         ))
         db_session.commit()
-        db_session.remove()
     except Exception as e:
         db_session.remove()
         return e, 400, {"Authorization": validation_result["access_token"], "refresh_token": validation_result["refresh_token"]}
+    db_session.remove()
     return {'message': 'success'}, 201, {"Authorization": validation_result["access_token"], "refresh_token": validation_result["refresh_token"]}
 
 
 def booking_roomCode_delete(roomCode, monthToLoad, deleteInfo):  # noqa: E501
     # 按照月份、changekey、房间号删除预约信息
-    changekey = deleteInfo['changekey']
+    db_session = orm.init_db(os.environ["DATABASEURI"])
     validation_result = wxLogin.validateUser()
+    changekey = deleteInfo['changekey']
     if not validation_result["result"]:
+        db_session.remove()
         return {"error": "Failed to validate access token"}, 401
     validation_result = wxLogin.validateUser()
     if not validation_result["result"]:
+        db_session.remove()
         return {"error": "Failed to validate access token"}, 401
     learner = db_session.query(orm.Learner_db).filter(orm.Learner_db.openid == validation_result["openid"]).one_or_none()
     try:
@@ -178,6 +191,7 @@ def booking_roomCode_delete(roomCode, monthToLoad, deleteInfo):  # noqa: E501
             config=config
         )
     except Exception as e:
+        db_session.remove()
         return e
     start_year = int(monthToLoad.split("-")[0])
     start_month = int(monthToLoad.split("-")[1])
@@ -192,8 +206,8 @@ def booking_roomCode_delete(roomCode, monthToLoad, deleteInfo):  # noqa: E501
                 notes = db_session.query(orm.BookingNotes_db).filter(orm.BookingNotes_db.changekey == item.changekey).one_or_none()
                 if notes.bookedByID == learner.id:
                     item.delete()
-        db_session.remove()
     except Exception as e:
         db_session.remove()
         return e, 400, {"Authorization": validation_result["access_token"], "refresh_token": validation_result["refresh_token"]}
+    db_session.remove()
     return {'message': 'success'}, 201, {"Authorization": validation_result["access_token"], "refresh_token": validation_result["refresh_token"]}
