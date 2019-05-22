@@ -154,6 +154,7 @@ def project_project_id_get(projectId):  # noqa: E501
         "lastUpdatedTime": project.lastUpdatedTime,
         "coverImageURL": project.coverImageURL
     }
+    db_session.remove()
     return projectInfo, 200, {"Authorization": validation_result["access_token"], "refresh_token": validation_result["refresh_token"]}
 
 

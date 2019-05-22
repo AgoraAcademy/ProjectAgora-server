@@ -38,6 +38,7 @@ def project_cover_post():  # noqa: E501
     extension = os.path.splitext(img.filename)[-1]
     uid = create_uuid()
     if not allowed_file(img.filename):
+        db_session.remove()
         return {"error": "文件类型错误"}, 403, {"Authorization": validation_result["access_token"], "refresh_token": validation_result["refresh_token"]}
     path = os.path.join(os.environ["STORAGEURL"], str(learner.id))
     if not os.path.exists(path):
@@ -45,6 +46,7 @@ def project_cover_post():  # noqa: E501
     file_path = os.path.join(path, uid + extension)
     url = uid + extension
     img.save(file_path)
+    db_session.remove()
     return {"url": url}, 201, {"Authorization": validation_result["access_token"], "refresh_token": validation_result["refresh_token"]}
 
 
@@ -63,6 +65,7 @@ def project_cover_get(learnerId, uid):  # noqa: E501
     with open(img_local_path, 'rb') as img_f:
         img_stream = img_f.read()
         img_stream = base64.b64encode(img_stream)
+    db_session.remove()
     return {"projectCover": img_stream.decode("utf-8")}, 200, {"Authorization": validation_result["access_token"], "refresh_token": validation_result["refresh_token"]}
 
 
@@ -94,6 +97,7 @@ def course_cover_post():  # noqa: E501
     extension = os.path.splitext(img.filename)[-1]
     uid = create_uuid()
     if not allowed_file(img.filename):
+        db_session.remove()
         return {"error": "文件类型错误"}, 403, {"Authorization": validation_result["access_token"], "refresh_token": validation_result["refresh_token"]}
     path = os.path.join(os.environ["STORAGEURL"], "courseCover")
     if not os.path.exists(path):
@@ -101,6 +105,7 @@ def course_cover_post():  # noqa: E501
     file_path = os.path.join(path, uid + extension)
     url = uid + extension
     img.save(file_path)
+    db_session.remove()
     return {"url": url}, 201, {"Authorization": validation_result["access_token"], "refresh_token": validation_result["refresh_token"]}
 
 
@@ -119,6 +124,7 @@ def course_cover_get(coverImageURL):  # noqa: E501
     with open(img_local_path, 'rb') as img_f:
         img_stream = img_f.read()
         img_stream = base64.b64encode(img_stream)
+    db_session.remove()    
     return {"courseCover": img_stream.decode("utf-8")}, 200, {"Authorization": validation_result["access_token"], "refresh_token": validation_result["refresh_token"]}
 
 
@@ -135,4 +141,5 @@ def config_get():
         response.append({
             item.name: item.value
         })
+    db_session.remove()    
     return response, 200, {"Authorization": validation_result["access_token"], "refresh_token": validation_result["refresh_token"]}
