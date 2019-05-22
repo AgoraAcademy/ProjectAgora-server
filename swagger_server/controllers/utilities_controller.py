@@ -124,7 +124,7 @@ def course_cover_get(coverImageURL):  # noqa: E501
     with open(img_local_path, 'rb') as img_f:
         img_stream = img_f.read()
         img_stream = base64.b64encode(img_stream)
-    db_session.remove()    
+    db_session.remove()
     return {"courseCover": img_stream.decode("utf-8")}, 200, {"Authorization": validation_result["access_token"], "refresh_token": validation_result["refresh_token"]}
 
 
@@ -141,5 +141,5 @@ def config_get():
         response.append({
             item.name: item.value
         })
-    db_session.remove()    
+    db_session.remove()
     return response, 200, {"Authorization": validation_result["access_token"], "refresh_token": validation_result["refresh_token"]}
