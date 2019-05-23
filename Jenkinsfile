@@ -24,7 +24,7 @@ pipeline {
         }
         stage('Initialize') {
             steps {
-                sh 'gunicorn --chdir ./swagger_server --certfile /etc/agora/cert.pem --keyfile /etc/agora/cert.pem app:app -b :10081'
+                sh 'gunicorn --chdir ./swagger_server --certfile /var/jenkins_home/workspace/ProjectAgora-server/ssl/cert.pem --keyfile /var/jenkins_home/workspace/ProjectAgora-server/ssl/key.pem app:app -b :10081'
             }
         }
         // stage('Deliver'){
