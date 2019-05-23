@@ -9,7 +9,8 @@ RUN dpkg-reconfigure -f noninteractive tzdata
 RUN apt-get install -y software-properties-common
 RUN add-apt-repository ppa:deadsnakes/ppa
 RUN apt-get update
-RUN apt-get -f install -y nginx python3.6 python3-pip
+RUN apt-get -f install -y nginx python3.6 python3-pip openssl
 ADD default /etc/nginx/sites-available
+RUN openssl req -x509 -newkey rsa:4096 -nodes -out /etc/agora/cert.pem -keyout /etc/agora/key.pem -days 365
 
 EXPOSE 10081

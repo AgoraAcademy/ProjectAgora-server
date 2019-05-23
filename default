@@ -1,6 +1,6 @@
 server {
 	listen 10081 ssl;
-	server_name agora.mynetgear.com;
+	server_name projectagora.agoraacademy.cn;
 	access_log /var/log/nginx/server.log;
     
 	location / {
