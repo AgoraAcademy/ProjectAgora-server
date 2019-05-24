@@ -16,6 +16,7 @@ pipeline {
         EWS_admin_email = credentials('EWS_admin_email')
         SSL_CERT_KEY = credentials('SSL_CERT_KEY')
         SSL_CERT_PEM = credentials('SSL_CERT_PEM')
+        MINIPROGRAM_QR_VERIFICATION_FILE = credentials('MINIPROGRAM_QR_VERIFICATION_FILE')
     }
 
     stages {
