@@ -22,7 +22,7 @@ pipeline {
     stages {
         stage('Install') {
             steps { 
-                sh 'pip3 install --no-cache-dir -r /var/jenkins_home/workspace/ProjectAgora-server/requirements.txt'
+                sh 'pip3 install --no-cache-dir -r /var/jenkins_home/workspace/ProjectAgora-server/requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple'
             }
         }
         stage('Initialize') {
