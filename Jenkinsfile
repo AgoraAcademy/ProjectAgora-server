@@ -14,6 +14,8 @@ pipeline {
         STORAGEURL = credentials('STORAGEURL')
         EWS_admin_password = credentials('EWS_admin_password')
         EWS_admin_email = credentials('EWS_admin_email')
+        SSL_CERT_KEY = credentials('SSL_CERT_KEY')
+        SSL_CERT_PEM = credentials('SSL_CERT_PEM')
     }
 
     stages {
@@ -24,7 +26,7 @@ pipeline {
         }
         stage('Initialize') {
             steps {
-                sh 'gunicorn --chdir ./swagger_server --certfile /var/jenkins_home/workspace/ProjectAgora-server/ssl/cert.pem --keyfile /var/jenkins_home/workspace/ProjectAgora-server/ssl/key.pem app:app -b :10081'
+                sh 'gunicorn --chdir ./swagger_server --certfile $SSL_CERT_PEM --keyfile $SSL_CERT_KEY app:app -b :10081'
             }
         }
         // stage('Deliver'){
