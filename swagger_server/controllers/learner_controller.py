@@ -1,6 +1,7 @@
 import connexion
 import os
 import json
+import requests
 from swagger_server.models.credit_hour_entry import CreditHourEntry  # noqa: E501
 from swagger_server.models.inline_response2001 import InlineResponse2001  # noqa: E501
 from swagger_server.models.inline_response201 import InlineResponse201  # noqa: E501
@@ -112,10 +113,14 @@ def learner_post(learner):  # noqa: E501
     if connexion.request.is_json:
         learner = Learner.from_dict(connexion.request.get_json())  # noqa: E501
         learner_dict = connexion.request.get_json()
+    # 获取unionid
     try:
+        userInfo = requests.get("https://api.weixin.qq.com/sns/userinfo?access_token=%s&openid=%s" % (validation_result["access_token"], connexion.request.headers['openid']))
         db_session.add(orm.Learner_db(
             validated=False,
             openid=connexion.request.headers['openid'],
+            unionid=userInfo.json()['unionid'],
+            openidWeApp='0',
             isAdmin=False,
             status=learner.status,
             isMentor=learner.is_mentor,

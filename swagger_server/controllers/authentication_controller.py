@@ -41,6 +41,14 @@ def oauth2_get(code, state):  # noqa: E501
             return {"error": str(e)}, 401
     else:
         try:
+            if not learner.unionid:
+                userInfo = requests.get("https://api.weixin.qq.com/sns/userinfo?access_token=%s&openid=%s" % (resultjson["access_token"], resultjson['openid']))
+                setattr(learner, "unionid", userInfo.json()['unionid'])
+                db_session.commit()
+        except Exception as e:
+            db_session.remove()
+            return {"error": str(e)}, 401
+        try:
             db_session.remove()
             return {
                 'access_token': resultjson['access_token'],
