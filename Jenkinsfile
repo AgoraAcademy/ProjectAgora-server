@@ -17,6 +17,8 @@ pipeline {
         SSL_CERT_KEY = credentials('SSL_CERT_KEY')
         SSL_CERT_PEM = credentials('SSL_CERT_PEM')
         MINIPROGRAM_QR_VERIFICATION_FILE = credentials('MINIPROGRAM_QR_VERIFICATION_FILE')
+        MINIPROGRAM_APPID = credentials('MINIPROGRAM_APPID')
+        MINIPROGRAM_APPSECRET = credentials('MINIPROGRAM_APPSECRET')
     }
 
     stages {

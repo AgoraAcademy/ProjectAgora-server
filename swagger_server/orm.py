@@ -9,6 +9,8 @@ class Learner_db(Base):
     __tablename__ = 'learner'
     id = Column(Integer, primary_key=True)
     openid = Column(String(120), nullable=False)
+    unionid = Column(String(120), nullable=True)
+    openid_weapp = Column(String(120), nullable=True)
     validated = Column(Boolean, nullable=False)
     isAdmin = Column(Boolean, nullable=False)
     givenName = Column(String(120), nullable=False)
