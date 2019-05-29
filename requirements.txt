@@ -4,6 +4,6 @@ setuptools >= 21.0.0
 flask_cors >= 3.0.7
 flask_sqlalchemy >= 2.3.2
 PyMySQL >= 0.9.3
-pycrptodome >= 3.8.1
+pycryptodome >= 3.8.1
 gunicorn >= 19.9.0
 exchangelib==1.12.3
