@@ -38,6 +38,8 @@ def oauth2_get(code, state):  # noqa: E501
             }
         except Exception as e:
             db_session.remove()
+            print("Error message:", str(e))
+            print("resultjson", resultjson)
             return {"error": str(e)}, 401
     else:
         try:
@@ -49,6 +51,7 @@ def oauth2_get(code, state):  # noqa: E501
                 print("filled in unionid based on openid")
         except Exception as e:
             db_session.remove()
+            print("Error message:", str(e))
             return {"error": str(e)}, 401
         try:
             db_session.remove()
@@ -66,4 +69,5 @@ def oauth2_get(code, state):  # noqa: E501
             }
         except Exception as e:
             db_session.remove()
+            print("Error message:", str(e))
             return {"error": str(e)}, 401
