@@ -17,6 +17,101 @@ produces:
 - "image/gif"
 - "image/jpeg"
 paths:
+  /miniprogram/booking/{roomCode}:
+    get:
+      tags:
+      - "Booking"
+      - "MiniProgram"
+      summary: "返回指定房间指定月期的预约信息"
+      operationId: "miniprogram_booking_roomCode_get"
+      parameters:
+      - name: "roomCode"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "monthToLoad"
+        in: "query"
+        required: true
+        type: string
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/Learner"
+        401:
+          description: "API key is missing or invalid"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+      x-swagger-router-controller: "swagger_server.controllers.miniprogram_controller"
+    post:
+      tags:
+      - "Booking"
+      summary: "在指定房间创建预约信息"
+      operationId: "miniprogram_booking_roomCode_post"
+      parameters:
+      - name: "roomCode"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "appointment"
+        in: "body"
+        required: true
+        schema:
+          type: object
+      responses:
+        201:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/Learner"
+        401:
+          description: "API key is missing or invalid"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+      x-swagger-router-controller: "swagger_server.controllers.miniprogram_controller"
+    delete:
+      tags:
+      - "Booking"
+      summary: "在指定房间指定月份删除预约信息"
+      operationId: "miniprogram_booking_roomCode_delete"
+      parameters:
+      - name: "roomCode"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "monthToLoad"
+        in: "query"
+        required: true
+        type: string
+      - name: "deleteInfo"
+        in: "body"
+        required: true
+        schema:
+          type: object
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/Learner"
+        401:
+          description: "API key is missing or invalid"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+      x-swagger-router-controller: "swagger_server.controllers.miniprogram_controller"
+  /miniprogram/booking:
+    get:
+      tags:
+      - "MiniProgram"
+      summary: "微信小程序用 - 获取房间列表"
+      operationId: "miniprogram_booking_get"
+      responses:
+        200:
+          description: "成功"
+          schema:
+            type: "object"
+      x-swagger-router-controller: "swagger_server.controllers.miniprogram_controller"
   /miniprogram/ping:
     get:
       tags:
@@ -34,7 +129,7 @@ paths:
       tags:
       - "MiniProgram"
       summary: "微信小程序登录 code2session"
-      operationId: "miniprogram_login"
+      operationId: "miniprogram_login_get"
       parameters:
       - name: "js_code"
         in: "query"
@@ -43,6 +138,34 @@ paths:
         type: "string"
       responses:
         200:
+          description: "成功"
+          schema:
+            type: "object"
+            properties: 
+              projectCover:
+                type: "string"
+                format: "byte"
+      x-swagger-router-controller: "swagger_server.controllers.miniprogram_controller"
+    post:
+      tags:
+      - "MiniProgram"
+      summary: "处理登录过程中的授权与鉴权请求"
+      operationId: "miniprogram_login_post"
+      parameters:
+      - in: "body"
+        name: "loginPostBody"
+        required: true
+        schema:
+          type: "object"
+          properties:
+            sessionKey:
+              type: "string"
+            encryptedData: 
+              type: "string"
+            iv:
+              type: "string"
+      responses:
+        201:
           description: "成功"
           schema:
             type: "object"

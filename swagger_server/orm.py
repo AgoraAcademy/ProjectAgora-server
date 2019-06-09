@@ -11,6 +11,7 @@ class Learner_db(Base):
     openid = Column(String(120), nullable=False)
     unionid = Column(String(120), nullable=True)
     openidWeApp = Column(String(120), nullable=True)
+    sessionKey = Column(String(120), nullable=True)
     validated = Column(Boolean, nullable=False)
     isAdmin = Column(Boolean, nullable=False)
     givenName = Column(String(120), nullable=False)

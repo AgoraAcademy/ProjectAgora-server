@@ -1,6 +1,9 @@
 import base64
 import json
+import os
+import connexion
 from Crypto.Cipher import AES
+from swagger_server import util, wxLogin, orm
 
 
 class WXBizDataCrypt:
@@ -24,4 +27,17 @@ class WXBizDataCrypt:
         return decrypted
 
     def _unpad(self, s):
-        return s[:-ord(s[len(s)-1:])]
+        return s[:-ord(s[len(s) - 1:])]
+
+
+def getLearner() -> str:
+    db_session = orm.init_db(os.environ["DATABASEURI"])
+    headers = connexion.request.headers
+    try:
+        sessionKey = headers['token']
+    except Exception as e:
+        db_session.remove()
+        return {"error": e}
+    learner = db_session.query(orm.Learner_db).filter(orm.Learner_db.sessionKey == sessionKey).one_or_none()
+    db_session.remove()
+    return learner
