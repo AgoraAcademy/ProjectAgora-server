@@ -75,7 +75,7 @@ def miniprogram_login_post(loginPostBody):
         return {"error": str(e)}, 403
     db_session.commit()
     db_session.remove()
-    return {"unionid": unionid, "learnerFullName": learner.familyName + learner.givenName}, 200
+    return {"unionid": unionid, "learnerFullName": learner.familyName + learner.givenName, "isAdmin": learner.isAdmin}, 200
 
 
 def miniprogram_ping():
