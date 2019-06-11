@@ -74,8 +74,9 @@ def miniprogram_login_post(loginPostBody):
         db_session.remove()
         return {"error": str(e)}, 403
     db_session.commit()
+    response = {"unionid": unionid, "learnerFullName": learner.familyName + learner.givenName, "isAdmin": learner.isAdmin}
     db_session.remove()
-    return {"unionid": unionid, "learnerFullName": learner.familyName + learner.givenName, "isAdmin": learner.isAdmin}, 200
+    return response, 200
 
 
 def miniprogram_ping():
@@ -256,6 +257,7 @@ def miniprogram_booking_roomCode_delete(roomCode, monthToLoad, deleteInfo):  # n
                 if notes.bookedByID == learner.id:
                     item.delete()
     except Exception as e:
+        print(e)
         db_session.remove()
         return e, 400
     db_session.remove()
