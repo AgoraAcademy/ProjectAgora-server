@@ -113,7 +113,7 @@ def miniprogram_booking_get():
             response.append(entry)
     except Exception as e:
         db_session.remove()
-        return e, 400
+        return {"error": str(e)}, 400
     db_session.remove()
     return response, 200
 
@@ -133,7 +133,7 @@ def miniprogram_booking_roomCode_get(roomCode, monthToLoad):  # noqa: E501
         )
     except Exception as e:
         db_session.remove()
-        return e
+        return {"error": str(e)}, 400
     monthToLoad_year = int(monthToLoad.split("-")[0])
     monthToLoad_month = int(monthToLoad.split("-")[1])
     if monthToLoad_month == 1:
