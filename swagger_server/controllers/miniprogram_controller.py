@@ -38,14 +38,11 @@ def miniprogram_login_get(js_code):
     try:
         result = requests.get("https://api.weixin.qq.com/sns/jscode2session?appid=%s&secret=%s&js_code=%s&grant_type=authorization_code" % (MINIPROGRAM_APPID, MINIPROGRAM_APPSECRET, js_code))
         resultjson = result.json()
-        learner = db_session.query(orm.Learner_db).filter(orm.Learner_db.openidWeApp == resultjson['openid']).one_or_none()
-        learner.sessionKey = resultjson['session_key']
-        db_session.commit()
-        db_session.remove()
     except Exception as e:
         db_session.remove()
         return {"error": str(e)}, 401
-    return {'openidWeApp': resultjson['openid'], 'token': resultjson['session_key']}, 200
+    db_session.remove()
+    return {'token': resultjson['session_key']}, 200
 
 
 def miniprogram_login_post(loginPostBody):
