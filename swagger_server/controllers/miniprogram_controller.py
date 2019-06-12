@@ -41,7 +41,7 @@ def miniprogram_login_get(js_code):
     except Exception as e:
         db_session.remove()
         return {"error": str(e)}, 401
-    learner = db_session.query(orm.Learner_db).filter(orm.Learner_db.sessionKey == resultjson['session_key']).one_or_none()
+    learner = db_session.query(orm.Learner_db).filter(orm.Learner_db.openidWeApp == resultjson['openid']).one_or_none()
     response = {'token': resultjson['session_key'], 'unionid': learner.unionid if learner else ''}
     db_session.remove()
     return response, 200
