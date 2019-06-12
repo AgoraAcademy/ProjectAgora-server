@@ -54,9 +54,9 @@ def miniprogram_login_post(loginPostBody):
     loginPostBody_dict = connexion.request.get_json()
     sessionKey = connexion.request.headers['token']
     decrypter = weapp.WXBizDataCrypt(MINIPROGRAM_APPID, sessionKey)
-    decrptedData = decrypter.decrypt(loginPostBody_dict['encryptedData'], loginPostBody_dict['iv'])
+    decryptedData = decrypter.decrypt(loginPostBody_dict['encryptedData'], loginPostBody_dict['iv'])
     try:
-        unionid = decrptedData['unionId']
+        unionid = decryptedData['unionId']
     except Exception as e:
         print(e)
         db_session.remove()
@@ -66,7 +66,7 @@ def miniprogram_login_post(loginPostBody):
         db_session.remove()
         return {"message": "unionid not found"}, 401
     try:
-        learner.openidWeApp = decrptedData['openId']
+        learner.openidWeApp = decryptedData['openId']
         learner.sessionKey = sessionKey
     except Exception as e:
         print(e)
