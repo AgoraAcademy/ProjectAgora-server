@@ -120,6 +120,7 @@ def learner_post(learner):  # noqa: E501
             validated=False,
             openid=connexion.request.headers['openid'],
             unionid=userInfo.json()['unionid'],
+            sessionKey='0',
             openidWeApp='0',
             isAdmin=False,
             status=learner.status,
