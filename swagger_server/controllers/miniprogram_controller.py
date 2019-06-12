@@ -166,7 +166,7 @@ def miniprogram_booking_roomCode_get(roomCode, monthToLoad):  # noqa: E501
             })
     except Exception as e:
         db_session.remove()
-        return e, 400
+        return {'error': str(e)}, 400
     db_session.remove()
     return responseList, 200
 
@@ -219,7 +219,7 @@ def miniprogram_booking_roomCode_post(roomCode, appointment):  # noqa: E501
         db_session.commit()
     except Exception as e:
         db_session.remove()
-        return e, 400
+        return {'error': str(e)}, 400
     db_session.remove()
     return {'message': 'success'}, 201
 
@@ -258,6 +258,6 @@ def miniprogram_booking_roomCode_delete(roomCode, monthToLoad, deleteInfo):  # n
     except Exception as e:
         print(e)
         db_session.remove()
-        return e, 400
+        return {'error': str(e)}, 400
     db_session.remove()
     return {'message': 'success'}, 201
