@@ -102,9 +102,8 @@ def project_post(project):  # noqa: E501
         ))
         db_session.commit()
     except Exception as e:
-        print(e)
         db_session.remove()
-        return {"error": "Failed to create new project"}, 401
+        return {"error": str(e)}, 401
     db_session.remove()
     return {}, 201, {"Authorization": validation_result["access_token"], "refresh_token": validation_result["refresh_token"]}
 
@@ -221,8 +220,7 @@ def project_project_id_patch(projectId):  # noqa: E501
             setattr(project, item, value)
         db_session.commit()
     except Exception as e:
-        print(e)
         db_session.remove()
-        return {"error": "Failed to create new project"}, 401
+        return {"error": str(e)}, 401
     db_session.remove()
     return {}, 200, {"Authorization": validation_result["access_token"], "refresh_token": validation_result["refresh_token"]}

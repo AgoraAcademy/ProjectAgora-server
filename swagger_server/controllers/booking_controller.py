@@ -58,7 +58,7 @@ def booking_get():  # noqa: E501
             response.append(entry)
     except Exception as e:
         db_session.remove()
-        return e, 400, {"Authorization": validation_result["access_token"], "refresh_token": validation_result["refresh_token"]}
+        return {"error": str(e)}, 400, {"Authorization": validation_result["access_token"], "refresh_token": validation_result["refresh_token"]}
     db_session.remove()
     return response, 200, {"Authorization": validation_result["access_token"], "refresh_token": validation_result["refresh_token"]}
 
@@ -79,7 +79,7 @@ def booking_roomCode_get(roomCode, monthToLoad):  # noqa: E501
         )
     except Exception as e:
         db_session.remove()
-        return e
+        return {"error": str(e)}, 400, {"Authorization": validation_result["access_token"], "refresh_token": validation_result["refresh_token"]}
     monthToLoad_year = int(monthToLoad.split("-")[0])
     monthToLoad_month = int(monthToLoad.split("-")[1])
     if monthToLoad_month == 1:
@@ -113,7 +113,7 @@ def booking_roomCode_get(roomCode, monthToLoad):  # noqa: E501
             })
     except Exception as e:
         db_session.remove()
-        return e, 400, {"Authorization": validation_result["access_token"], "refresh_token": validation_result["refresh_token"]}
+        return {"error": str(e)}, 400, {"Authorization": validation_result["access_token"], "refresh_token": validation_result["refresh_token"]}
     db_session.remove()
     return responseList, 200, {"Authorization": validation_result["access_token"], "refresh_token": validation_result["refresh_token"]}
 
@@ -166,7 +166,7 @@ def booking_roomCode_post(roomCode, appointment):  # noqa: E501
         db_session.commit()
     except Exception as e:
         db_session.remove()
-        return e, 400, {"Authorization": validation_result["access_token"], "refresh_token": validation_result["refresh_token"]}
+        return {"error": str(e)}, 400, {"Authorization": validation_result["access_token"], "refresh_token": validation_result["refresh_token"]}
     db_session.remove()
     return {'message': 'success'}, 201, {"Authorization": validation_result["access_token"], "refresh_token": validation_result["refresh_token"]}
 
@@ -192,7 +192,7 @@ def booking_roomCode_delete(roomCode, monthToLoad, deleteInfo):  # noqa: E501
         )
     except Exception as e:
         db_session.remove()
-        return e
+        return {"error": str(e)}, 400, {"Authorization": validation_result["access_token"], "refresh_token": validation_result["refresh_token"]}
     start_year = int(monthToLoad.split("-")[0])
     start_month = int(monthToLoad.split("-")[1])
     start = room_account.default_timezone.localize(EWSDateTime(start_year, start_month, 1))
@@ -208,6 +208,6 @@ def booking_roomCode_delete(roomCode, monthToLoad, deleteInfo):  # noqa: E501
                     item.delete()
     except Exception as e:
         db_session.remove()
-        return e, 400, {"Authorization": validation_result["access_token"], "refresh_token": validation_result["refresh_token"]}
+        return {"error": str(e)}, 400, {"Authorization": validation_result["access_token"], "refresh_token": validation_result["refresh_token"]}
     db_session.remove()
     return {'message': 'success'}, 201, {"Authorization": validation_result["access_token"], "refresh_token": validation_result["refresh_token"]}

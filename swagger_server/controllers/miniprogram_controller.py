@@ -241,7 +241,7 @@ def miniprogram_booking_roomCode_delete(roomCode, monthToLoad, deleteInfo):  # n
         )
     except Exception as e:
         db_session.remove()
-        return e
+        return {'error': str(e)}, 400
     start_year = int(monthToLoad.split("-")[0])
     start_month = int(monthToLoad.split("-")[1])
     start = room_account.default_timezone.localize(EWSDateTime(start_year, start_month, 1))
@@ -256,7 +256,6 @@ def miniprogram_booking_roomCode_delete(roomCode, monthToLoad, deleteInfo):  # n
                 if notes.bookedByID == learner.id:
                     item.delete()
     except Exception as e:
-        print(e)
         db_session.remove()
         return {'error': str(e)}, 400
     db_session.remove()
