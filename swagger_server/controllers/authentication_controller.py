@@ -54,8 +54,7 @@ def oauth2_get(code, state):  # noqa: E501
             print("Error message:", str(e))
             return {"error": str(e)}, 401
         try:
-            db_session.remove()
-            return {
+            response = {
                 'access_token': resultjson['access_token'],
                 'expires_in': resultjson['expires_in'],
                 'refresh_token': resultjson['refresh_token'],
@@ -67,6 +66,8 @@ def oauth2_get(code, state):  # noqa: E501
                 'isMentor': learner.isMentor,
                 'isAdmin': learner.isAdmin,
             }
+            db_session.remove()
+            return response
         except Exception as e:
             db_session.remove()
             print("Error message:", str(e))
