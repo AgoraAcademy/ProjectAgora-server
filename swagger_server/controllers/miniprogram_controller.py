@@ -97,6 +97,60 @@ def miniprogram_login_post(loginPostBody):
     return response, 200
 
 
+def miniprogram_learner_post(learner):
+    db_session = None
+    if "DEVMODE" in os.environ:
+        if os.environ["DEVMODE"] == "True":
+            db_session = orm.init_db(os.environ["DEV_DATABASEURI"])
+        else:
+            db_session = orm.init_db(os.environ["DATABASEURI"])
+    else:
+        db_session = orm.init_db(os.environ["DATABASEURI"])
+    MINIPROGRAM_APPID: str = os.environ['MINIPROGRAM_APPID']
+    learnerPostBody_dict = connexion.request.get_json()
+    sessionKey = connexion.request.headers['token']
+    decrypter = weapp.WXBizDataCrypt(MINIPROGRAM_APPID, sessionKey)
+    decryptedData = decrypter.decrypt(learnerPostBody_dict['encryptedData'], learnerPostBody_dict['iv'])
+    try:
+        unionid = decryptedData['unionId']
+    except Exception as e:
+        print(e)
+        db_session.remove()
+        return {"error": str(e)}, 403
+    try:
+        db_session.add(orm.Learner_db(
+            validated=False,
+            branch=learnerPostBody_dict['branch'],
+            openid="",
+            unionid=unionid,
+            sessionKey=sessionKey,
+            openidWeApp=decryptedData['openId'],
+            isAdmin=False,
+            status="",
+            isMentor=learnerPostBody_dict['isMentor'],
+            givenName=learnerPostBody_dict['givenName'],
+            familyName=learnerPostBody_dict['familyName'],
+            gender="",
+            ethnicity="",
+            birthday=learnerPostBody_dict['birthday'],
+            mainPersonalIdType="",
+            mainPersonalId="",
+            dateOfRegistration="",
+            reasonOfRegistration="",
+            previousStatus="",
+            emergentContact=[],
+            contactInfo=[],
+            medicalInfo=[],
+        ))
+        db_session.commit()
+    except Exception as e:
+        db_session.remove()
+        return {"error": str(e)}, 401
+    response = {"unionid": unionid}
+    db_session.remove()
+    return response, 201
+
+
 def miniprogram_ping():
     return {'message': 'pinged!'}, 200
 

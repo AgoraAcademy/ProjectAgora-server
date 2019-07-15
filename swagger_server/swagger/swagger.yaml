@@ -17,6 +17,45 @@ produces:
 - "image/gif"
 - "image/jpeg"
 paths:
+  /miniprogram/learner:
+    post:
+      tags:
+      - "Learner"
+      - "MiniProgram"
+      summary: "小程序端注册账户"
+      operationId:  "miniprogram_learner_post"
+      parameters:
+      - in: "body"
+        name: "learnerPostBody"
+        required: true
+        schema:
+          type: "object"
+          properties:
+            sessionKey:
+              type: "string"
+            encryptedData: 
+              type: "string"
+            iv:
+              type: "string"
+            branch:
+              type: "string"
+            isMentor:
+              type: "number"
+            givenName:
+              type: "string"
+            familyName:
+              type: "string"
+            birthday:
+              type: "string"
+      responses:
+        201:
+          description: "成功"
+          schema:
+            type: "object"
+            properties: 
+              unionid:
+                type: "string"
+      x-swagger-router-controller: "swagger_server.controllers.miniprogram_controller"
   /miniprogram/booking/{roomCode}:
     get:
       tags:

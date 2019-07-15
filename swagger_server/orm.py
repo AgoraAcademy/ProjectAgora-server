@@ -8,6 +8,7 @@ Base = declarative_base()
 class Learner_db(Base):
     __tablename__ = 'learner'
     id = Column(Integer, primary_key=True)
+    branch = Column(String(45), nullable=True)
     openid = Column(String(120), nullable=False)
     unionid = Column(String(120), nullable=True)
     openidWeApp = Column(String(120), nullable=True)
