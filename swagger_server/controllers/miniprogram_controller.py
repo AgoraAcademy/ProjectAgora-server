@@ -97,7 +97,7 @@ def miniprogram_login_post(loginPostBody):
     return response, 200
 
 
-def miniprogram_learner_post(learner):
+def miniprogram_learner_post(learnerPostBody):
     db_session = None
     if "DEVMODE" in os.environ:
         if os.environ["DEVMODE"] == "True":
