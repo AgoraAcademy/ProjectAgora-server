@@ -7,7 +7,7 @@ pipeline {
         }
     }
     parameters {
-        port(
+        choice(
             name: 'port',
             choices: '10081\n10082',
             description: 'Which port to publish'
