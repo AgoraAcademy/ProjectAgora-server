@@ -12,4 +12,4 @@ RUN apt-get update
 RUN apt-get -f install -y nginx python3.6 python3-pip openssl
 ADD default /etc/nginx/sites-available
 
-EXPOSE 10081
+EXPOSE 80
