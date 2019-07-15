@@ -3,7 +3,7 @@ pipeline {
         dockerfile {
             filename 'Dockerfile'
             additionalBuildArgs '--no-cache'
-            args '-p 10082:80 -v ProjectAgora-storage:/var/ProjectAgora-storage --restart=always --security-opt apparmor=unconfined'
+            args '-p 18088:80 -v ProjectAgora-storage:/var/ProjectAgora-storage --restart=always --security-opt apparmor=unconfined'
         }
     }
     environment {
@@ -29,7 +29,7 @@ pipeline {
         }
         stage('Initialize') {
             steps {
-                sh 'gunicorn --chdir ./swagger_server --certfile $SSL_CERT_PEM --keyfile $SSL_CERT_KEY app:app -b :10082'
+                sh 'gunicorn --chdir ./swagger_server --certfile $SSL_CERT_PEM --keyfile $SSL_CERT_KEY app:app -b :18088'
             }
         }
         // stage('Deliver'){
