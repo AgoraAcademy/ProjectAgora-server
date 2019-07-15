@@ -10,7 +10,7 @@ def learner_learner_id_credit_hour_get(learnerId):  # noqa: E501
 
      # noqa: E501
 
-    :param learnerId: 
+    :param learnerId:
     :type learnerId: int
 
     :rtype: List[CreditHourEntry]

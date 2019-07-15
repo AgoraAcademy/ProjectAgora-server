@@ -20,7 +20,14 @@ def oauth2_get(code, state):  # noqa: E501
     :rtype: InlineResponse200
     """
     print(code)
-    db_session = orm.init_db(os.environ["DATABASEURI"])
+    db_session = None
+    if "DEVMODE" in os.environ:
+        if os.environ["DEVMODE"] == "True":
+            db_session = orm.init_db(os.environ["DEV_DATABASEURI"])
+        else:
+            db_session = orm.init_db(os.environ["DATABASEURI"])
+    else:
+        db_session = orm.init_db(os.environ["DATABASEURI"])
     WXLOGINAPPID: str = os.environ['WXLOGINAPPID']
     WXLOGINSECRET: str = os.environ['WXLOGINSECRET']
     result = requests.get("https://api.weixin.qq.com/sns/oauth2/access_token?appid=%s&secret=%s&code=%s&grant_type=authorization_code" % (WXLOGINAPPID, WXLOGINSECRET, code))

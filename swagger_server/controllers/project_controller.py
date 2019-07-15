@@ -9,7 +9,14 @@ from swagger_server import util, wxLogin, orm
 
 
 def project_get():  # noqa: E501
-    db_session = orm.init_db(os.environ["DATABASEURI"])
+    db_session = None
+    if "DEVMODE" in os.environ:
+        if os.environ["DEVMODE"] == "True":
+            db_session = orm.init_db(os.environ["DEV_DATABASEURI"])
+        else:
+            db_session = orm.init_db(os.environ["DATABASEURI"])
+    else:
+        db_session = orm.init_db(os.environ["DATABASEURI"])
     validation_result = wxLogin.validateUser()
     if not validation_result["result"]:
         db_session.remove()
@@ -65,7 +72,14 @@ def project_post(project):  # noqa: E501
 
     :rtype: InlineResponse201
     """
-    db_session = orm.init_db(os.environ["DATABASEURI"])
+    db_session = None
+    if "DEVMODE" in os.environ:
+        if os.environ["DEVMODE"] == "True":
+            db_session = orm.init_db(os.environ["DEV_DATABASEURI"])
+        else:
+            db_session = orm.init_db(os.environ["DATABASEURI"])
+    else:
+        db_session = orm.init_db(os.environ["DATABASEURI"])
     validation_result = wxLogin.validateUser()
     if not validation_result["result"]:
         db_session.remove()
@@ -119,7 +133,14 @@ def project_project_id_get(projectId):  # noqa: E501
     :rtype: Learner
     """
 
-    db_session = orm.init_db(os.environ["DATABASEURI"])
+    db_session = None
+    if "DEVMODE" in os.environ:
+        if os.environ["DEVMODE"] == "True":
+            db_session = orm.init_db(os.environ["DEV_DATABASEURI"])
+        else:
+            db_session = orm.init_db(os.environ["DATABASEURI"])
+    else:
+        db_session = orm.init_db(os.environ["DATABASEURI"])
     validation_result = wxLogin.validateUser()
     if not validation_result["result"]:
         db_session.remove()
@@ -168,7 +189,14 @@ def project_project_id_patch(projectId):  # noqa: E501
     :rtype: Learner
     """
 
-    db_session = orm.init_db(os.environ["DATABASEURI"])
+    db_session = None
+    if "DEVMODE" in os.environ:
+        if os.environ["DEVMODE"] == "True":
+            db_session = orm.init_db(os.environ["DEV_DATABASEURI"])
+        else:
+            db_session = orm.init_db(os.environ["DATABASEURI"])
+    else:
+        db_session = orm.init_db(os.environ["DATABASEURI"])
     validation_result = wxLogin.validateUser()
     if not validation_result["result"]:
         db_session.remove()

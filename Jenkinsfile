@@ -6,8 +6,15 @@ pipeline {
             args '-p 10081:10081 -v ProjectAgora-storage:/var/ProjectAgora-storage --restart=always --security-opt apparmor=unconfined'
         }
     }
-
+    parameters {
+        port(
+            name: 'port',
+            choices: '10081\n10082',
+            description: 'Which port to publish'
+        )
+    }
     environment {
+        DEV_DATABASEURI = credentials('DEV_DATABASEURI')
         DATABASEURI = credentials('DATABASEURI')
         WXLOGINAPPID = credentials('WXLOGINAPPID')
         WXLOGINSECRET = credentials('WXLOGINSECRET')
@@ -29,7 +36,7 @@ pipeline {
         }
         stage('Initialize') {
             steps {
-                sh 'gunicorn --chdir ./swagger_server --certfile $SSL_CERT_PEM --keyfile $SSL_CERT_KEY app:app -b :10081'
+                sh 'gunicorn --chdir ./swagger_server --certfile $SSL_CERT_PEM --keyfile $SSL_CERT_KEY app:app -b :${params.port}'
             }
         }
         // stage('Deliver'){

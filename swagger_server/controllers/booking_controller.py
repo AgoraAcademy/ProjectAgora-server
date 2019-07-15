@@ -8,8 +8,6 @@ from exchangelib.services import GetRooms
 from exchangelib.items import MeetingRequest, MeetingCancellation, SEND_TO_ALL_AND_SAVE_COPY
 from swagger_server import util, wxLogin, orm
 
-db_session = None
-db_session = orm.init_db(os.environ["DATABASEURI"])
 
 credentials = Credentials(
     os.environ["EWS_admin_email"],
@@ -28,7 +26,14 @@ account = Account(
 
 def booking_get():  # noqa: E501
     # 获取所有的房间信息
-    db_session = orm.init_db(os.environ["DATABASEURI"])
+    db_session = None
+    if "DEVMODE" in os.environ:
+        if os.environ["DEVMODE"] == "True":
+            db_session = orm.init_db(os.environ["DEV_DATABASEURI"])
+        else:
+            db_session = orm.init_db(os.environ["DATABASEURI"])
+    else:
+        db_session = orm.init_db(os.environ["DATABASEURI"])
     validation_result = wxLogin.validateUser()
     if not validation_result["result"]:
         db_session.remove()
@@ -65,7 +70,14 @@ def booking_get():  # noqa: E501
 
 def booking_roomCode_get(roomCode, monthToLoad):  # noqa: E501
     # 按房间信息和月份（query中）获取所有的预约信息
-    db_session = orm.init_db(os.environ["DATABASEURI"])
+    db_session = None
+    if "DEVMODE" in os.environ:
+        if os.environ["DEVMODE"] == "True":
+            db_session = orm.init_db(os.environ["DEV_DATABASEURI"])
+        else:
+            db_session = orm.init_db(os.environ["DATABASEURI"])
+    else:
+        db_session = orm.init_db(os.environ["DATABASEURI"])
     responseList = []
     validation_result = wxLogin.validateUser()
     if not validation_result["result"]:
@@ -120,7 +132,14 @@ def booking_roomCode_get(roomCode, monthToLoad):  # noqa: E501
 
 def booking_roomCode_post(roomCode, appointment):  # noqa: E501
     # 添加预约信息
-    db_session = orm.init_db(os.environ["DATABASEURI"])
+    db_session = None
+    if "DEVMODE" in os.environ:
+        if os.environ["DEVMODE"] == "True":
+            db_session = orm.init_db(os.environ["DEV_DATABASEURI"])
+        else:
+            db_session = orm.init_db(os.environ["DATABASEURI"])
+    else:
+        db_session = orm.init_db(os.environ["DATABASEURI"])
     validation_result = wxLogin.validateUser()
     if not validation_result["result"]:
         db_session.remove()
@@ -173,7 +192,14 @@ def booking_roomCode_post(roomCode, appointment):  # noqa: E501
 
 def booking_roomCode_delete(roomCode, monthToLoad, deleteInfo):  # noqa: E501
     # 按照月份、changekey、房间号删除预约信息
-    db_session = orm.init_db(os.environ["DATABASEURI"])
+    db_session = None
+    if "DEVMODE" in os.environ:
+        if os.environ["DEVMODE"] == "True":
+            db_session = orm.init_db(os.environ["DEV_DATABASEURI"])
+        else:
+            db_session = orm.init_db(os.environ["DATABASEURI"])
+    else:
+        db_session = orm.init_db(os.environ["DATABASEURI"])
     validation_result = wxLogin.validateUser()
     changekey = deleteInfo['changekey']
     if not validation_result["result"]:

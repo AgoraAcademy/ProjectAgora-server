@@ -25,7 +25,14 @@ def project_cover_post():  # noqa: E501
         uniqueNum = str(nowTime) + str(randomNum)
         return uniqueNum
 
-    db_session = orm.init_db(os.environ["DATABASEURI"])
+    db_session = None
+    if "DEVMODE" in os.environ:
+        if os.environ["DEVMODE"] == "True":
+            db_session = orm.init_db(os.environ["DEV_DATABASEURI"])
+        else:
+            db_session = orm.init_db(os.environ["DATABASEURI"])
+    else:
+        db_session = orm.init_db(os.environ["DATABASEURI"])
     validation_result = wxLogin.validateUser()
     if not validation_result["result"]:
         db_session.remove()
@@ -51,7 +58,14 @@ def project_cover_post():  # noqa: E501
 
 
 def project_cover_get(learnerId, uid):  # noqa: E501
-    db_session = orm.init_db(os.environ["DATABASEURI"])
+    db_session = None
+    if "DEVMODE" in os.environ:
+        if os.environ["DEVMODE"] == "True":
+            db_session = orm.init_db(os.environ["DEV_DATABASEURI"])
+        else:
+            db_session = orm.init_db(os.environ["DATABASEURI"])
+    else:
+        db_session = orm.init_db(os.environ["DATABASEURI"])
     validation_result = wxLogin.validateUser()
     if not validation_result["result"]:
         db_session.remove()
@@ -84,7 +98,14 @@ def course_cover_post():  # noqa: E501
         uniqueNum = str(nowTime) + str(randomNum)
         return uniqueNum
 
-    db_session = orm.init_db(os.environ["DATABASEURI"])
+    db_session = None
+    if "DEVMODE" in os.environ:
+        if os.environ["DEVMODE"] == "True":
+            db_session = orm.init_db(os.environ["DEV_DATABASEURI"])
+        else:
+            db_session = orm.init_db(os.environ["DATABASEURI"])
+    else:
+        db_session = orm.init_db(os.environ["DATABASEURI"])
     validation_result = wxLogin.validateUser()
     if not validation_result["result"]:
         db_session.remove()
@@ -110,7 +131,14 @@ def course_cover_post():  # noqa: E501
 
 
 def course_cover_get(coverImageURL):  # noqa: E501
-    db_session = orm.init_db(os.environ["DATABASEURI"])
+    db_session = None
+    if "DEVMODE" in os.environ:
+        if os.environ["DEVMODE"] == "True":
+            db_session = orm.init_db(os.environ["DEV_DATABASEURI"])
+        else:
+            db_session = orm.init_db(os.environ["DATABASEURI"])
+    else:
+        db_session = orm.init_db(os.environ["DATABASEURI"])
     validation_result = wxLogin.validateUser()
     if not validation_result["result"]:
         db_session.remove()
@@ -130,7 +158,14 @@ def course_cover_get(coverImageURL):  # noqa: E501
 
 def config_get():
     # 获取基本设置。没有加密，切勿放置敏感信息。
-    db_session = orm.init_db(os.environ["DATABASEURI"])
+    db_session = None
+    if "DEVMODE" in os.environ:
+        if os.environ["DEVMODE"] == "True":
+            db_session = orm.init_db(os.environ["DEV_DATABASEURI"])
+        else:
+            db_session = orm.init_db(os.environ["DATABASEURI"])
+    else:
+        db_session = orm.init_db(os.environ["DATABASEURI"])
     validation_result = wxLogin.validateUser()
     if not validation_result["result"]:
         db_session.remove()

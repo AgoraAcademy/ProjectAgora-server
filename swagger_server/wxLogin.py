@@ -4,7 +4,13 @@ import connexion
 from swagger_server import util, wxLogin, orm
 
 db_session = None
-db_session = orm.init_db(os.environ["DATABASEURI"])
+if "DEVMODE" in os.environ:
+    if os.environ["DEVMODE"] == "True":
+        db_session = orm.init_db(os.environ["DEV_DATABASEURI"])
+    else:
+        db_session = orm.init_db(os.environ["DATABASEURI"])
+else:
+    db_session = orm.init_db(os.environ["DATABASEURI"])
 
 
 def validateAccessToken(openid, access_token) -> bool:

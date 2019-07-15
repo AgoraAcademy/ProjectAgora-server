@@ -29,7 +29,14 @@ class WXBizDataCrypt:
 
 
 def getLearner() -> str:
-    db_session = orm.init_db(os.environ["DATABASEURI"])
+    db_session = None
+    if "DEVMODE" in os.environ:
+        if os.environ["DEVMODE"] == "True":
+            db_session = orm.init_db(os.environ["DEV_DATABASEURI"])
+        else:
+            db_session = orm.init_db(os.environ["DATABASEURI"])
+    else:
+        db_session = orm.init_db(os.environ["DATABASEURI"])
     headers = connexion.request.headers
     try:
         sessionKey = headers['token']

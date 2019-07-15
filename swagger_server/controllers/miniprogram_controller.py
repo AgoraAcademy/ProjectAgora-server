@@ -32,7 +32,14 @@ def miniprogram_qr_get(qrtype):  # noqa: E501
 
 
 def miniprogram_login_get(js_code):
-    db_session = orm.init_db(os.environ["DATABASEURI"])
+    db_session = None
+    if "DEVMODE" in os.environ:
+        if os.environ["DEVMODE"] == "True":
+            db_session = orm.init_db(os.environ["DEV_DATABASEURI"])
+        else:
+            db_session = orm.init_db(os.environ["DATABASEURI"])
+    else:
+        db_session = orm.init_db(os.environ["DATABASEURI"])
     MINIPROGRAM_APPID: str = os.environ['MINIPROGRAM_APPID']
     MINIPROGRAM_APPSECRET: str = os.environ['MINIPROGRAM_APPSECRET']
     try:
@@ -54,7 +61,14 @@ def miniprogram_login_get(js_code):
 
 def miniprogram_login_post(loginPostBody):
     # 处理授权用于获取unionid，openid，sessionKey并记入数据库内
-    db_session = orm.init_db(os.environ["DATABASEURI"])
+    db_session = None
+    if "DEVMODE" in os.environ:
+        if os.environ["DEVMODE"] == "True":
+            db_session = orm.init_db(os.environ["DEV_DATABASEURI"])
+        else:
+            db_session = orm.init_db(os.environ["DATABASEURI"])
+    else:
+        db_session = orm.init_db(os.environ["DATABASEURI"])
     MINIPROGRAM_APPID: str = os.environ['MINIPROGRAM_APPID']
     loginPostBody_dict = connexion.request.get_json()
     sessionKey = connexion.request.headers['token']
@@ -88,7 +102,14 @@ def miniprogram_ping():
 
 
 def miniprogram_booking_get():
-    db_session = orm.init_db(os.environ["DATABASEURI"])
+    db_session = None
+    if "DEVMODE" in os.environ:
+        if os.environ["DEVMODE"] == "True":
+            db_session = orm.init_db(os.environ["DEV_DATABASEURI"])
+        else:
+            db_session = orm.init_db(os.environ["DATABASEURI"])
+    else:
+        db_session = orm.init_db(os.environ["DATABASEURI"])
     if not weapp.getLearner():
         db_session.remove()
         return {"message": "unionid not found"}, 401
@@ -124,7 +145,14 @@ def miniprogram_booking_get():
 
 def miniprogram_booking_roomCode_get(roomCode, monthToLoad):  # noqa: E501
     # 按房间信息和月份（query中）获取所有的预约信息
-    db_session = orm.init_db(os.environ["DATABASEURI"])
+    db_session = None
+    if "DEVMODE" in os.environ:
+        if os.environ["DEVMODE"] == "True":
+            db_session = orm.init_db(os.environ["DEV_DATABASEURI"])
+        else:
+            db_session = orm.init_db(os.environ["DATABASEURI"])
+    else:
+        db_session = orm.init_db(os.environ["DATABASEURI"])
     responseList = []
     if not weapp.getLearner():
         db_session.remove()
@@ -178,7 +206,14 @@ def miniprogram_booking_roomCode_get(roomCode, monthToLoad):  # noqa: E501
 
 def miniprogram_booking_roomCode_post(roomCode, appointment):  # noqa: E501
     # 添加预约信息
-    db_session = orm.init_db(os.environ["DATABASEURI"])
+    db_session = None
+    if "DEVMODE" in os.environ:
+        if os.environ["DEVMODE"] == "True":
+            db_session = orm.init_db(os.environ["DEV_DATABASEURI"])
+        else:
+            db_session = orm.init_db(os.environ["DATABASEURI"])
+    else:
+        db_session = orm.init_db(os.environ["DATABASEURI"])
     if not weapp.getLearner():
         db_session.remove()
         return {"message": "unionid not found"}, 401
@@ -231,7 +266,14 @@ def miniprogram_booking_roomCode_post(roomCode, appointment):  # noqa: E501
 
 def miniprogram_booking_roomCode_delete(roomCode, monthToLoad, deleteInfo):  # noqa: E501
     # 按照月份、changekey、房间号删除预约信息
-    db_session = orm.init_db(os.environ["DATABASEURI"])
+    db_session = None
+    if "DEVMODE" in os.environ:
+        if os.environ["DEVMODE"] == "True":
+            db_session = orm.init_db(os.environ["DEV_DATABASEURI"])
+        else:
+            db_session = orm.init_db(os.environ["DATABASEURI"])
+    else:
+        db_session = orm.init_db(os.environ["DATABASEURI"])
     if not weapp.getLearner():
         db_session.remove()
         return {"message": "unionid not found"}, 401

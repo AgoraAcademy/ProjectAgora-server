@@ -6,7 +6,13 @@ from swagger_server.models.course import Course  # noqa: E501
 from swagger_server import util, wxLogin, orm
 
 db_session = None
-db_session = orm.init_db(os.environ["DATABASEURI"])
+if "DEVMODE" in os.environ:
+    if os.environ["DEVMODE"] == "True":
+        db_session = orm.init_db(os.environ["DEV_DATABASEURI"])
+    else:
+        db_session = orm.init_db(os.environ["DATABASEURI"])
+else:
+    db_session = orm.init_db(os.environ["DATABASEURI"])
 
 
 def course_get():  # noqa: E501
