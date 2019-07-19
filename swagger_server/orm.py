@@ -100,6 +100,33 @@ class BookingNotes_db(Base):
     bookedByName = Column(String(120), nullable=False)
 
 
+class PushMessage_db(Base):
+    __tablename__ = 'pushMessage'
+    id = Column(Integer, primary_key=True)
+    messageType = Column(String(10), nullable=False)
+    entityId = Column(Integer, nullable=True, comment='信息相关记录id（只记录id数值，不作表关联')
+    senderId = Column(Integer, ForeignKey("learner.id"), nullable=False)
+    senderDisplayName = Column(String(20), nullable=True)
+    recipients = Column(JSON, nullable=True)
+    rsvp = Column(JSON, nullable=True)
+    sentTime = Column(String(120), nullable=False)
+    modifiedTime = Column(String(120), nullable=False)
+    expireTime = Column(String(120), nullable=False)
+    thumbnail = Column(JSON, nullable=True)
+    content = Column(JSON, nullable=True)
+
+
+class Event_db(Base):
+    __tablename__ = 'event'
+    id = Column(Integer, primary_key=True)
+    pushMessageId = Column(Integer, ForeignKey("pushMessage.id"), nullable=True)
+    initiatorId = Column(Integer, ForeignKey("learner.id"), nullable=False)
+    initiatorDisplayName = Column(String(20), nullable=True)
+    eventInfo = Column(JSON, nullable=True)
+    invitee = Column(JSON, nullable=True)
+    thumbnail = Column(JSON, nullable=True)
+
+
 def init_db(uri):
     # ssl_args = {'ssl': {'ca': './config/amazon-rds-ca-cert.pem'}}
     # engine = create_engine(uri, convert_unicode=True, connect_args=ssl_args)

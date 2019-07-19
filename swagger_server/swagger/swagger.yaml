@@ -17,6 +17,71 @@ produces:
 - "image/gif"
 - "image/jpeg"
 paths:
+  /miniprogram/event:
+    post:
+      tags:
+      - "Event"
+      - "MiniProgram"
+      summary: "小程序端发起活动"
+      operationId: "miniprogram_event_post"
+      parameters:
+      - name: "eventPostBody"
+        in: "body"
+        required: true
+        schema:
+          type: "object"
+          properties: 
+            initiatorDisplayName:
+              type: "string"
+            eventInfo:
+              type: "object"
+              properties: 
+                title:
+                  type: "string"
+                description:
+                  type: "string"
+                startDate:
+                  type: "string"
+                startTime:
+                  type: "string"
+                endDate:
+                  type: "string"
+                endTime:
+                  type: "string"
+                location:
+                  type: "array"
+                  items:
+                    type: "object"
+                fee:
+                  type: "string"
+                recruitingUntilDate:
+                  type: string
+                recruitingUntilTime:
+                  type: string
+            invitee:
+              type: "array"
+              items:
+                type: "object"
+                properties: 
+                  type: 
+                    type: "string"
+                  rule:
+                    type: "string"
+            thumbnail:
+              type: "array"
+              items:
+                type: "string"
+      responses:
+        201:
+          description: "成功"
+          schema:
+            type: "object"
+            properties: 
+              pushMessage_id:
+                type: "number"
+              event_id:
+                type: "number"
+      x-swagger-router-controller: "swagger_server.controllers.miniprogram_event_controller"
   /miniprogram/learner:
     post:
       tags:
@@ -25,8 +90,8 @@ paths:
       summary: "小程序端注册账户"
       operationId:  "miniprogram_learner_post"
       parameters:
-      - in: "body"
-        name: "learnerPostBody"
+      - name: "learnerPostBody"
+        in: "body"
         required: true
         schema:
           type: "object"
