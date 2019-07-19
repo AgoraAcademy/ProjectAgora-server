@@ -72,9 +72,9 @@ def miniprogram_login_post(loginPostBody):
     MINIPROGRAM_APPID: str = os.environ['MINIPROGRAM_APPID']
     loginPostBody_dict = connexion.request.get_json()
     sessionKey = connexion.request.headers['token']
-    decrypter = weapp.WXBizDataCrypt(MINIPROGRAM_APPID, sessionKey)
-    decryptedData = decrypter.decrypt(loginPostBody_dict['encryptedData'], loginPostBody_dict['iv'])
     try:
+        decrypter = weapp.WXBizDataCrypt(MINIPROGRAM_APPID, sessionKey)
+        decryptedData = decrypter.decrypt(loginPostBody_dict['encryptedData'], loginPostBody_dict['iv'])
         unionid = decryptedData['unionId']
     except Exception as e:
         print(e)
@@ -109,10 +109,19 @@ def miniprogram_learner_post(learnerPostBody):
     MINIPROGRAM_APPID: str = os.environ['MINIPROGRAM_APPID']
     learnerPostBody_dict = connexion.request.get_json()
     sessionKey = connexion.request.headers['token']
-    decrypter = weapp.WXBizDataCrypt(MINIPROGRAM_APPID, sessionKey)
-    decryptedData = decrypter.decrypt(learnerPostBody_dict['encryptedData'], learnerPostBody_dict['iv'])
     try:
+        decrypter = weapp.WXBizDataCrypt(MINIPROGRAM_APPID, sessionKey)
+        decryptedData = decrypter.decrypt(learnerPostBody_dict['encryptedData'], learnerPostBody_dict['iv'])
         unionid = decryptedData['unionId']
+    except Exception as e:
+        print(e)
+        db_session.remove()
+        return {"error": str(e)}, 403
+    try:
+        learner = db_session.query(orm.Learner_db).filter(orm.Learner_db.unionid == unionid).one_or_none()
+        if learner:
+            db_session.remove()
+            return {"error": "用户已存在注册记录"}, 403
     except Exception as e:
         print(e)
         db_session.remove()
