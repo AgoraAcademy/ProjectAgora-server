@@ -66,7 +66,7 @@ def miniprogram_event_post(eventPostBody):
             senderId=learner.id,
             senderDisplayName=initiatorDisplayName,
             recipients=eventPostBody_dict["invitee"],
-            rsvp=[],
+            rsvp={},
             sentTime=account.default_timezone.localize(EWSDateTime.now()).ewsformat(),
             modifiedTime=account.default_timezone.localize(EWSDateTime.now()).ewsformat(),
             expireTime=eventPostBody_dict["expireTime"],
@@ -82,3 +82,72 @@ def miniprogram_event_post(eventPostBody):
     response = {"pushMessage_id": newPushMessage.id, "event_id": newEvent.id}
     db_session.remove()
     return response, 201
+
+
+def miniprogram_event_patch(eventId):
+    # 修改活动接口，包括报名的部分
+    db_session = None
+    if "DEVMODE" in os.environ:
+        if os.environ["DEVMODE"] == "True":
+            db_session = orm.init_db(os.environ["DEV_DATABASEURI"])
+        else:
+            db_session = orm.init_db(os.environ["DATABASEURI"])
+    else:
+        db_session = orm.init_db(os.environ["DATABASEURI"])
+    eventPatchBody_dict = connexion.request.get_json()
+    sessionKey = connexion.request.headers['token']
+    learner = db_session.query(orm.Learner_db).filter(orm.Learner_db.sessionKey == sessionKey).one_or_none()
+    if not learner:
+        db_session.remove()
+        return {"message": "learner not found"}, 401
+    event = db_session.query(orm.Event_db).filter(orm.Event_db.id == eventId).one_or_none()
+    try: 
+        if event.initiatoriaId != learner.id:
+            pushMessage = db_session.query(orm.PushMessage_db).filter(orm.PushMessage_db.id == event.pushMessageId).one_or_none()
+            pushMessage.rsvp[learner.id] = eventPatchBody_dict["rsvp"]
+            db_session.commit()
+            db_session.remove()
+            return 200, {"message": "event rsvp updated"}
+        else:
+            for itemKey in eventPatchBody_dict:
+                setattr(event, itemKey, eventPatchBody_dict[itemKey])
+            db_session.commit()
+            db_session.remove()
+            return 200, {"message": "event updated"}
+    except Exception as e:
+        db_session.remove()
+        return {'error': str(e)}, 400
+
+
+def miniprogram_event_get(eventId):
+    # 获取活动的详情以及相关的rsvp详情
+    db_session = None
+    if "DEVMODE" in os.environ:
+        if os.environ["DEVMODE"] == "True":
+            db_session = orm.init_db(os.environ["DEV_DATABASEURI"])
+        else:
+            db_session = orm.init_db(os.environ["DATABASEURI"])
+    else:
+        db_session = orm.init_db(os.environ["DATABASEURI"])
+    sessionKey = connexion.request.headers['token']
+    learner = db_session.query(orm.Learner_db).filter(orm.Learner_db.sessionKey == sessionKey).one_or_none()
+    if not learner:
+        db_session.remove()
+        return {"message": "learner not found"}, 401
+    event = db_session.query(orm.Event_db).filter(orm.Event_db.id == eventId).one_or_none()
+    pushMessage = db_session.query(orm.PushMessage_db).filter(orm.PushMessage_db.id == event.pushMessageId).one_or_none()
+    try:
+        response = {
+            "id": event.id,
+            "initiatorId": event.initiatorId,
+            "initiatorDisplayName": event.initiatorDisplayName,
+            "eventInfo": event.eventInfo,
+            "invitee": event.invitee,
+            "thumbnail": event.thumbnail,
+            "rsvp": pushMessage.rsvp
+        }
+        db_session.remove()
+        return 200, response
+    except Exception as e:
+        db_session.remove()
+        return {'error': str(e)}, 400

@@ -82,6 +82,55 @@ paths:
               event_id:
                 type: "number"
       x-swagger-router-controller: "swagger_server.controllers.miniprogram_event_controller"
+  /miniprogram/event/{eventId}:
+    get:
+      tags:
+      - "Event"
+      - "MiniProgram"
+      summary: "获得一个event的详细信息"
+      description: "获得一个event的详细信息"
+      parameters:
+        - name: eventId
+          in: path
+          type: number
+          required: true
+      operationId: "miniprogram_event_get"
+      responses:
+        200:
+          description: "获得一个event的详细信息"
+          schema:
+            type: "object"
+        401:
+          description: "API key is missing or invalid"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+      x-swagger-router-controller: "swagger_server.controllers.miniprogram_event_controller"
+    patch:
+      tags:
+      - "Event"
+      - "MiniProgram"
+      summary: "小程序端发起活动"
+      operationId: "miniprogram_event_patch"
+      parameters:
+      - name: "eventId"
+        type: "number"
+        in: "path"
+        required: true
+      - name: "eventPatchBody"
+        schema:
+          type: "object"
+        in: "body"
+        required: true
+      responses:
+        200:
+          description: "成功"
+          schema:
+            type: "object"
+            properties: 
+              message:
+                type: "string"
+      x-swagger-router-controller: "swagger_server.controllers.miniprogram_event_controller"  
   /miniprogram/learner:
     post:
       tags:
