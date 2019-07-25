@@ -18,6 +18,20 @@ produces:
 - "image/jpeg"
 paths:
   /miniprogram/event:
+    get:
+      tags:
+      - "Event"
+      - "MiniProgram"
+      summary: "小程序端获取活动列表"
+      operationId: "miniprogram_event_get"
+      responses:
+        200:
+          description: "成功"
+          schema:
+            type: "array"
+            items: 
+              type: "object"
+      x-swagger-router-controller: "swagger_server.controllers.miniprogram_event_controller"
     post:
       tags:
       - "Event"
@@ -94,7 +108,7 @@ paths:
           in: path
           type: number
           required: true
-      operationId: "miniprogram_event_get"
+      operationId: "miniprogram_event_eventId_get"
       responses:
         200:
           description: "获得一个event的详细信息"

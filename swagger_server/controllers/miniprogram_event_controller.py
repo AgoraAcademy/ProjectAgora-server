@@ -119,7 +119,7 @@ def miniprogram_event_patch(eventId):
         return {'error': str(e)}, 400
 
 
-def miniprogram_event_get(eventId):
+def miniprogram_event_eventId_get(eventId):
     # 获取活动的详情以及相关的rsvp详情
     db_session = None
     if "DEVMODE" in os.environ:
@@ -151,3 +151,27 @@ def miniprogram_event_get(eventId):
     except Exception as e:
         db_session.remove()
         return {'error': str(e)}, 400
+
+
+def miniprogram_event_get():
+    # 获取活动列表，目前暂时默认为返回全部条目
+    db_session = None
+    if "DEVMODE" in os.environ:
+        if os.environ["DEVMODE"] == "True":
+            db_session = orm.init_db(os.environ["DEV_DATABASEURI"])
+        else:
+            db_session = orm.init_db(os.environ["DATABASEURI"])
+    else:
+        db_session = orm.init_db(os.environ["DATABASEURI"])
+    sessionKey = connexion.request.headers['token']
+    learner = db_session.query(orm.Learner_db).filter(orm.Learner_db.sessionKey == sessionKey).one_or_none()
+    if not learner:
+        db_session.remove()
+        return {"message": "learner not found"}, 401
+    try: 
+        eventList = db_session(orm.Event_db).all()
+        db_session.remove()
+    except Exception as e:
+        db_session.remove()
+        return {'error': str(e)}, 400
+    return 200, eventList
