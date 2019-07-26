@@ -1,4 +1,5 @@
 import connexion
+from flask import make_response
 import six
 import os
 import requests
@@ -77,9 +78,10 @@ def pushMessage_picture_get(uid):  # noqa: E501
     try:
         with open(img_local_path, 'rb') as img_f:
             img_stream = img_f.read()
-            img_stream = base64.b64encode(img_stream)
+            response = make_response(img_stream)
+            response.headers['Content-Type'] = 'image/png'
     except Exception as e:
         db_session.remove()
         return {'error': str(e)}, 400
     db_session.remove()
-    return {"pushMessagePicture": img_stream.decode("utf-8")}, 200
+    return response, 200
