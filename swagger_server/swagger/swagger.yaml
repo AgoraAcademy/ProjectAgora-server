@@ -17,6 +17,56 @@ produces:
 - "image/gif"
 - "image/jpeg"
 paths:
+  /utilities/pushMessage_picture:
+    get:
+      tags:
+      - "Utilities"
+      summary: "获取推送信息中的图片"
+      operationId: "pushMessage_picture_get"
+      parameters:
+      - name: "uid"
+        in: "query"
+        description: "图片的UID"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "获取推送信息中的图片"
+          schema:
+            type: "object"
+            properties: 
+              pushMessagePicture:
+                type: "string"
+                format: "byte"
+      x-swagger-router-controller: "swagger_server.controllers.utilities_controller"
+    post:
+      tags:
+      - "Utilities"
+      summary: "为推送信息上传图片"
+      operationId: "pushMessage_picture_post"
+      consumes:
+        - multipart/form-data
+      parameters:
+        - in: formData
+          name: pushMessage_picture
+          type: file
+          required: true
+          description: 推送信息相关图片
+      responses:
+        201:
+          description: "创建成功"
+          schema:
+            type: "object"
+            properties:
+              url:
+                type: "string"
+            description: "访问用的url"
+        401:
+          description: "API key is missing or invalid"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+      x-swagger-router-controller: "swagger_server.controllers.utilities_controller"
   /miniprogram/event:
     get:
       tags:
