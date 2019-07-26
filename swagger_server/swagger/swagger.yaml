@@ -17,7 +17,7 @@ produces:
 - "image/gif"
 - "image/jpeg"
 paths:
-  /utilities/pushMessage_picture:
+  /miniprogram/utilities/pushMessage_picture:
     get:
       tags:
       - "Utilities"
@@ -38,7 +38,7 @@ paths:
               pushMessagePicture:
                 type: "string"
                 format: "byte"
-      x-swagger-router-controller: "swagger_server.controllers.utilities_controller"
+      x-swagger-router-controller: "swagger_server.controllers.miniprogram_utilities_controller"
     post:
       tags:
       - "Utilities"
@@ -66,7 +66,7 @@ paths:
           headers:
             WWW_Authenticate:
               type: "string"
-      x-swagger-router-controller: "swagger_server.controllers.utilities_controller"
+      x-swagger-router-controller: "swagger_server.controllers.miniprogram_utilities_controller"
   /miniprogram/event:
     get:
       tags:
@@ -174,7 +174,7 @@ paths:
       tags:
       - "Event"
       - "MiniProgram"
-      summary: "小程序端发起活动"
+      summary: "小程序端修改活动信息和报名接口"
       operationId: "miniprogram_event_patch"
       parameters:
       - name: "eventId"
