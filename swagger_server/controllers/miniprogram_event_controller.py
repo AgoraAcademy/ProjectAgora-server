@@ -107,13 +107,13 @@ def miniprogram_event_patch(eventId):
             pushMessage.rsvp[learner.id] = eventPatchBody_dict["rsvp"]
             db_session.commit()
             db_session.remove()
-            return 200, {"message": "event rsvp updated"}
+            return {"message": "event rsvp updated"}, 200
         else:
             for itemKey in eventPatchBody_dict:
                 setattr(event, itemKey, eventPatchBody_dict[itemKey])
             db_session.commit()
             db_session.remove()
-            return 200, {"message": "event updated"}
+            return {"message": "event updated"}, 200
     except Exception as e:
         db_session.remove()
         return {'error': str(e)}, 400
@@ -147,7 +147,7 @@ def miniprogram_event_eventId_get(eventId):
             "rsvp": pushMessage.rsvp
         }
         db_session.remove()
-        return 200, response
+        return response, 200
     except Exception as e:
         db_session.remove()
         return {'error': str(e)}, 400
@@ -168,10 +168,10 @@ def miniprogram_event_get():
     if not learner:
         db_session.remove()
         return {"message": "learner not found"}, 401
-    try: 
+    try:
         eventList = db_session(orm.Event_db).all()
         db_session.remove()
     except Exception as e:
         db_session.remove()
         return {'error': str(e)}, 400
-    return 200, eventList
+    return eventList, 200
