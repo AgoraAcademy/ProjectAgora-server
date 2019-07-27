@@ -135,6 +135,8 @@ paths:
               type: "array"
               items:
                 type: "string"
+            content:
+              type: "object"
       responses:
         201:
           description: "成功"

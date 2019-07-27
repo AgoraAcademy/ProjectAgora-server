@@ -111,7 +111,7 @@ class PushMessage_db(Base):
     rsvp = Column(JSON, nullable=True)
     sentTime = Column(String(120), nullable=False)
     modifiedTime = Column(String(120), nullable=False)
-    expireTime = Column(String(120), nullable=False)
+    expireDate = Column(String(120), nullable=False)
     thumbnail = Column(JSON, nullable=True)
     content = Column(JSON, nullable=True)
 
