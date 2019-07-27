@@ -169,9 +169,18 @@ def miniprogram_event_get():
         db_session.remove()
         return {"message": "learner not found"}, 401
     try:
-        eventList = db_session(orm.Event_db).all()
+        eventList = db_session.query(orm.Event_db).all()
+        response = []
+        for event in eventList:
+            response.append({
+                "id": event.id,
+                "initiatorId": event.initiatorId,
+                "initiatorDisplayName": event.initiatorDisplayName,
+                "eventInfo": event.eventInfo,
+                "invitee": event.invitee
+            })
         db_session.remove()
     except Exception as e:
         db_session.remove()
         return {'error': str(e)}, 400
-    return eventList, 200
+    return response, 200
