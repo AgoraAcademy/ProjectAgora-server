@@ -75,6 +75,8 @@ def miniprogram_event_post(eventPostBody):
         )
         db_session.add(newPushMessage)
         db_session.commit()
+        newEvent.pushMessageId = newPushMessage.id
+        db_session.commit()
         # TODO: 这里应当添加Microsoft Graph API为initiator添加appointment并发送至recipients
     except Exception as e:
         db_session.remove()
