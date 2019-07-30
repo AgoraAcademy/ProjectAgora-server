@@ -46,7 +46,7 @@ def miniprogram_event_post(eventPostBody):
     if not learner.isAdmin:
         if "initiatorDisplayName" in eventPostBody:
             db_session.remove()
-            return {"message": "非管理员不可自定义发起者名称"}, 401
+            return {"message": "非管理员不可自定义发起者名称"}, 403
         initiatorDisplayName = learner.familyName + learner.givenName
     else:
         initiatorDisplayName = eventPostBody_dict["initiatorDisplayName"] if "initiatorDisplayName" in eventPostBody_dict else learner.familyName + learner.givenName
