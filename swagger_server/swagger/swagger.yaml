@@ -17,10 +17,25 @@ produces:
 - "image/gif"
 - "image/jpeg"
 paths:
+  /miniprogram/pushMessage:
+    get:
+      tags:
+      - "PushMessage"
+      summary: "获取推送信息列表"
+      operationId: "miniprogram_pushMessage_get"
+      responses:
+        200:
+          description: "成功获取推送信息列表"
+          schema:
+            type: "array"
+            items:
+              type: "object"
+      x-swagger-router-controller: "swagger_server.controllers.miniprogram_controller"
   /miniprogram/utilities/pushMessage_picture:
     get:
       tags:
       - "Utilities"
+      - "PushMessage"
       summary: "获取推送信息中的图片"
       operationId: "pushMessage_picture_get"
       parameters:
@@ -42,6 +57,7 @@ paths:
     post:
       tags:
       - "Utilities"
+      - "PushMessage"
       summary: "为推送信息上传图片"
       operationId: "pushMessage_picture_post"
       consumes:

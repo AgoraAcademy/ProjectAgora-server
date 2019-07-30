@@ -370,3 +370,36 @@ def miniprogram_booking_roomCode_delete(roomCode, monthToLoad, deleteInfo):  # n
         return {'error': str(e)}, 400
     db_session.remove()
     return {'message': 'success'}, 201
+
+
+def miniprogram_pushMessage_get():
+    db_session = None
+    if "DEVMODE" in os.environ:
+        if os.environ["DEVMODE"] == "True":
+            db_session = orm.init_db(os.environ["DEV_DATABASEURI"])
+        else:
+            db_session = orm.init_db(os.environ["DATABASEURI"])
+    else:
+        db_session = orm.init_db(os.environ["DATABASEURI"])
+    if not weapp.getLearner():
+        db_session.remove()
+        return {"message": "unionid not found"}, 401
+    response = []
+    pushMessageList = db_session.query(orm.PushMessage_db).all()
+    for pushMessage in pushMessageList:
+        # TODO: 这里应该有一个根据recipients字段判断是否推送信息的流程，暂时全推送
+        response.append({
+            "id": pushMessage.id,
+            "messageType": pushMessage.messageType,
+            "entityId": pushMessage.entityId,
+            "senderId": pushMessage.senderId,
+            "recipients": pushMessage.recipients,
+            "rsvp": pushMessage.rsvp,
+            "sentTime": pushMessage.sentTime,
+            "modifiedTime": pushMessage.modifiedTime,
+            "expireDate": pushMessage.expireDate,
+            "thumbnail": pushMessage.thumbnail,
+            "content": pushMessage.content
+        })
+    db_session.remove()
+    return response, 200
