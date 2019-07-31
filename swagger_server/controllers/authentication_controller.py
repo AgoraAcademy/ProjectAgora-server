@@ -34,15 +34,43 @@ def oauth2_get(code, state):  # noqa: E501
     resultjson = result.json()
     learner = db_session.query(orm.Learner_db).filter(orm.Learner_db.openid == resultjson['openid']).one_or_none()
     if not learner:
+        # 尝试根据unionId获取是否在小程序上注册过
         try:
-            db_session.remove()
-            return {
-                'access_token': resultjson['access_token'],
-                'expires_in': resultjson['expires_in'],
-                'refresh_token': resultjson['refresh_token'],
-                'openid': resultjson['openid'],
-                'isLearner': False
-            }
+            weAppUserInfo = requests.get("https://api.weixin.qq.com/sns/userinfo?access_token=%s&openid=%s" % (resultjson["access_token"], resultjson['openid']))
+            weAppLearner = db_session.query(orm.Learner_db).filter(orm.Learner_db.unionid == weAppUserInfo.json()['unionid']).one_or_none()
+            if not weAppLearner:
+                db_session.remove()
+                return {
+                    'access_token': resultjson['access_token'],
+                    'expires_in': resultjson['expires_in'],
+                    'refresh_token': resultjson['refresh_token'],
+                    'openid': resultjson['openid'],
+                    'isLearner': False
+                }
+            else:
+                setattr(weAppLearner, "openid", resultjson['openid'])
+                db_session.commit()
+                print("filled in openid based on unionid")
+                try:
+                    response = {
+                        'access_token': resultjson['access_token'],
+                        'expires_in': resultjson['expires_in'],
+                        'refresh_token': resultjson['refresh_token'],
+                        'openid': resultjson['openid'],
+                        'fullname': weAppLearner.familyName + learner.givenName,
+                        'learnerId': weAppLearner.id,
+                        'validated': weAppLearner.validated,
+                        'isLearner': True,
+                        'isMentor': weAppLearner.isMentor,
+                        'isAdmin': weAppLearner.isAdmin,
+                    }
+                    db_session.remove()
+                    return response, 200
+                except Exception as e:
+                    db_session.remove()
+                    print("Error message:", str(e))
+                    print("resultjson", resultjson)
+                    return {"error": str(e)}, 401
         except Exception as e:
             db_session.remove()
             print("Error message:", str(e))
@@ -74,7 +102,7 @@ def oauth2_get(code, state):  # noqa: E501
                 'isAdmin': learner.isAdmin,
             }
             db_session.remove()
-            return response
+            return response, 200
         except Exception as e:
             db_session.remove()
             print("Error message:", str(e))
