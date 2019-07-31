@@ -17,6 +17,7 @@ class Learner_db(Base):
     isAdmin = Column(Boolean, nullable=False)
     givenName = Column(String(120), nullable=False)
     familyName = Column(String(120), nullable=False)
+    role = Column(String(120), nullable=False)
     nickname = Column(String(120), nullable=True)
     isMentor = Column(Boolean, nullable=False)
     gender = Column(String(120), nullable=False)
@@ -125,6 +126,20 @@ class Event_db(Base):
     eventInfo = Column(JSON, nullable=True)
     invitee = Column(JSON, nullable=True)
     thumbnail = Column(JSON, nullable=True)
+
+
+class Announcement_db(Base):
+    __tablename__ = 'announcement'
+    id = Column(Integer, primary_key=True)
+    pushMessageId = Column(Integer, ForeignKey("pushMessage.id"), nullable=True)
+    initiatorId = Column(Integer, ForeignKey("learner.id"), nullable=False)
+    initiatorDisplayName = Column(String(20), nullable=True)
+    recipients = Column(JSON, nullable=True)
+    sentTime = Column(String(120), nullable=False)
+    modifiedTime = Column(String(120), nullable=False)
+    expireDate = Column(String(120), nullable=False)
+    thumbnail = Column(JSON, nullable=True)
+    body = Column(JSON, nullable=True)
 
 
 def init_db(uri):
