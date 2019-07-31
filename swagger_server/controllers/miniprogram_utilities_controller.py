@@ -11,7 +11,7 @@ from swagger_server.models.inline_response200 import InlineResponse200  # noqa: 
 from swagger_server import util, orm, wxLogin
 
 
-def pushMessage_picture_post():  # noqa: E501
+def miniprogram_picture_post(pictureType: str):  # noqa: E501
 
     ALLOWED_EXTENSIONS = set(['png', 'jpg', 'JPG', 'PNG', 'gif', 'GIF'])
 
@@ -39,13 +39,15 @@ def pushMessage_picture_post():  # noqa: E501
     if not learner:
         db_session.remove()
         return {"message": "learner not found"}, 401
-    img = connexion.request.files.get('pushMessage_picture')
+    if pictureType not in ["event", "announcement", "project", "course", "club"]:
+        return {"message": "图片类别不支持"}, 403
+    img = connexion.request.files.get('picture')
     extension = os.path.splitext(img.filename)[-1]
     uid = create_uuid()
     if not allowed_file(img.filename):
         db_session.remove()
         return {"error": "文件类型错误"}, 400
-    path = os.path.join(os.environ["STORAGEURL"], "pushMessage_picture")
+    path = os.path.join(os.environ["STORAGEURL"], pictureType)
     if not os.path.exists(path):
         os.makedirs(path)
     try:
@@ -59,7 +61,7 @@ def pushMessage_picture_post():  # noqa: E501
     return {"url": url}, 201
 
 
-def pushMessage_picture_get(uid):  # noqa: E501
+def miniprogram_picture_get(uid, pictureType):  # noqa: E501
     db_session = None
     if "DEVMODE" in os.environ:
         if os.environ["DEVMODE"] == "True":
@@ -73,13 +75,15 @@ def pushMessage_picture_get(uid):  # noqa: E501
     if not learner:
         db_session.remove()
         return {"message": "learner not found"}, 401
-    img_local_path = os.path.join(os.environ["STORAGEURL"], "pushMessage_picture", uid)
+    if pictureType not in ["event", "announcement", "project", "course", "club"]:
+        return {"message": "图片类别不支持"}, 403
+    img_local_path = os.path.join(os.environ["STORAGEURL"], "pictureType", uid)
     img_stream = ''
     try:
         with open(img_local_path, 'rb') as img_f:
             img_stream = img_f.read()
             response = make_response(img_stream)
-            response.headers['Content-Type'] = 'image/png'
+            response.headers['Content-Type'] = 'image'
     except Exception as e:
         db_session.remove()
         return {'error': str(e)}, 400

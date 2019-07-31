@@ -31,26 +31,31 @@ paths:
             items:
               type: "object"
       x-swagger-router-controller: "swagger_server.controllers.miniprogram_controller"
-  /miniprogram/utilities/pushMessage_picture:
+  /miniprogram/utilities/picture:
     get:
       tags:
       - "Utilities"
       - "PushMessage"
-      summary: "获取推送信息中的图片"
-      operationId: "pushMessage_picture_get"
+      summary: "小程序统一获取图片接口"
+      operationId: "miniprogram_picture_get"
       parameters:
       - name: "uid"
         in: "query"
         description: "图片的UID"
         required: true
         type: "string"
+      - name: "pictureType"
+        in: "query"
+        description: "类别"
+        required: true
+        type: "string"
       responses:
         200:
-          description: "获取推送信息中的图片"
+          description: "小程序统一获取图片接口"
           schema:
             type: "object"
             properties: 
-              pushMessagePicture:
+              picture:
                 type: "string"
                 format: "byte"
       x-swagger-router-controller: "swagger_server.controllers.miniprogram_utilities_controller"
@@ -58,16 +63,21 @@ paths:
       tags:
       - "Utilities"
       - "PushMessage"
-      summary: "为推送信息上传图片"
-      operationId: "pushMessage_picture_post"
+      summary: "小程序统一上传图片接口"
+      operationId: "miniprogram_picture_post"
       consumes:
         - multipart/form-data
       parameters:
-        - in: formData
-          name: pushMessage_picture
+        - name: picture
+          in: formData
           type: file
           required: true
-          description: 推送信息相关图片
+          description: 上传的图片
+        - name: "pictureType"
+          in: "query"
+          description: "类别"
+          required: true
+          type: "string"
       responses:
         201:
           description: "创建成功"
