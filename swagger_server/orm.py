@@ -113,7 +113,6 @@ class PushMessage_db(Base):
     sentTime = Column(String(120), nullable=False)
     modifiedTime = Column(String(120), nullable=False)
     expireDate = Column(String(120), nullable=False)
-    thumbnail = Column(JSON, nullable=True)
     content = Column(JSON, nullable=True)
 
 

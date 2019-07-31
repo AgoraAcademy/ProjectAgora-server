@@ -399,7 +399,6 @@ def miniprogram_pushMessage_get():
                 "sentTime": pushMessage.sentTime,
                 "modifiedTime": pushMessage.modifiedTime,
                 "expireDate": pushMessage.expireDate,
-                "thumbnail": pushMessage.thumbnail,
                 "content": pushMessage.content
             })
     db_session.remove()

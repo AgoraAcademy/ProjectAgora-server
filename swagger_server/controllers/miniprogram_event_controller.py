@@ -70,7 +70,6 @@ def miniprogram_event_post(eventPostBody):
             sentTime=account.default_timezone.localize(EWSDateTime.now()).ewsformat(),
             modifiedTime=account.default_timezone.localize(EWSDateTime.now()).ewsformat(),
             expireDate=eventPostBody_dict["eventInfo"]["endDate"],
-            thumbnail=eventPostBody_dict["thumbnail"],
             content=eventPostBody_dict["content"]
         )
         db_session.add(newPushMessage)
