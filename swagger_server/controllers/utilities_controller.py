@@ -45,8 +45,8 @@ def connectToMicrosoft(connectToMicrosoftBody):
         learner.microsoftAccessToken = microsoftAccessToken
         learner.microsoftRefreshToken = microsoftRefreshToken
         me = graphAPI.getMe(microsoftAccessToken)
-        learner.microsoftId = me.id
-        learner.microsoftUserPrincipalName = me.userPrincipalName
+        learner.microsoftId = me['id']
+        learner.microsoftUserPrincipalName = me['userPrincipalName']
         db_session.commit()
     except Exception as e:
         db_session.remove()
