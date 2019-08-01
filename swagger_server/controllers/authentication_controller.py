@@ -63,6 +63,8 @@ def oauth2_get(code, state):  # noqa: E501
                         'isLearner': True,
                         'isMentor': weAppLearner.isMentor,
                         'isAdmin': weAppLearner.isAdmin,
+                        'microsoftId': weAppLearner.microsoftId,
+                        'microsoftUserPrincipalName': weAppLearner.microsoftUserPrincipalName
                     }
                     db_session.remove()
                     return response, 200
@@ -100,6 +102,8 @@ def oauth2_get(code, state):  # noqa: E501
                 'isLearner': True,
                 'isMentor': learner.isMentor,
                 'isAdmin': learner.isAdmin,
+                'microsoftId': learner.microsoftId,
+                'microsoftUserPrincipalName': learner.microsoftUserPrincipalName
             }
             db_session.remove()
             return response, 200

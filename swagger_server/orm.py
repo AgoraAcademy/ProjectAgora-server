@@ -39,6 +39,10 @@ class Learner_db(Base):
     contactInfo = Column(JSON, nullable=False)
     medicalInfo = Column(JSON, nullable=False)
     notes = Column(JSON, nullable=True)
+    microsoftAccessToken = Column(String(2000), nullable=True)
+    microsoftRefreshToken = Column(String(2000), nullable=True)
+    microsoftId = Column(String(120), nullable=True)
+    microsoftUserPrincipalName = Column(String(120), nullable=True)
 
     def __repr__(self):
         return '<Learner %r %r >' % (self.familyName, self.givenName)

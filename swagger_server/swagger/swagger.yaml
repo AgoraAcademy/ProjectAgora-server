@@ -17,6 +17,27 @@ produces:
 - "image/gif"
 - "image/jpeg"
 paths:
+  /utilities/connectToMicrosoft:
+    post:
+      tags:
+      - "Utilities"
+      summary: "Microsoft账户授权与绑定"
+      operationId: "connectToMicrosoft"
+      parameters:
+        - name: "connectToMicrosoftBody"
+          in: "body"
+          required: true
+          schema:
+            type: "object"
+            properties:
+              code:
+                type: string
+      responses:
+        200:
+          description: "成功"
+          schema: 
+            type: "object"
+      x-swagger-router-controller: "swagger_server.controllers.utilities_controller"
   /miniprogram/pushMessage:
     get:
       tags:
