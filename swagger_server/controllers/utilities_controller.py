@@ -52,7 +52,7 @@ def connectToMicrosoft(connectToMicrosoftBody):
         db_session.remove()
         return {'error': str(e)}, 400
     db_session.remove()
-    return {"message": "成功写入Microsoft账号相关信息"}, 200
+    return {"message": "成功写入Microsoft账号相关信息", "microsoftId": me['id']}, 200
 
 
 def project_cover_post():  # noqa: E501

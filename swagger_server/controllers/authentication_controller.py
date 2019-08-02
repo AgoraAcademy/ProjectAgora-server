@@ -32,7 +32,12 @@ def oauth2_get(code, state):  # noqa: E501
     WXLOGINSECRET: str = os.environ['WXLOGINSECRET']
     result = requests.get("https://api.weixin.qq.com/sns/oauth2/access_token?appid=%s&secret=%s&code=%s&grant_type=authorization_code" % (WXLOGINAPPID, WXLOGINSECRET, code))
     resultjson = result.json()
-    learner = db_session.query(orm.Learner_db).filter(orm.Learner_db.openid == resultjson['openid']).one_or_none()
+    try:
+        learner = db_session.query(orm.Learner_db).filter(orm.Learner_db.openid == resultjson['openid']).one_or_none()
+    except Exception as e:
+        db_session.remove()
+        print("Error message:", str(e))
+        return {"error": str(e)}, 401
     if not learner:
         # 尝试根据unionId获取是否在小程序上注册过
         try:
