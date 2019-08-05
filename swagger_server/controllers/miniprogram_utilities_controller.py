@@ -77,7 +77,7 @@ def miniprogram_picture_get(uid, pictureType):  # noqa: E501
         return {"message": "learner not found"}, 401
     if pictureType not in ["event", "announcement", "project", "course", "club"]:
         return {"message": "图片类别不支持"}, 403
-    img_local_path = os.path.join(os.environ["STORAGEURL"], "pictureType", uid)
+    img_local_path = os.path.join(os.environ["STORAGEURL"], pictureType, uid)
     img_stream = ''
     try:
         with open(img_local_path, 'rb') as img_f:
