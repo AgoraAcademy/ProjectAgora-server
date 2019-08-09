@@ -188,7 +188,7 @@ paths:
                 properties: 
                   type: 
                     type: "string"
-                  rule:
+                  content:
                     type: "string"
             thumbnail:
               type: "array"
