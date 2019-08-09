@@ -102,19 +102,29 @@ def miniprogram_event_patch(eventId):
         db_session.remove()
         return {"message": "learner not found"}, 401
     event = db_session.query(orm.Event_db).filter(orm.Event_db.id == eventId).one_or_none()
-    try: 
+    try:
         if event.initiatoriaId != learner.id:
-            pushMessage = db_session.query(orm.PushMessage_db).filter(orm.PushMessage_db.id == event.pushMessageId).one_or_none()
-            pushMessage.rsvp[learner.id] = eventPatchBody_dict["rsvp"]
-            db_session.commit()
+            try:
+                pushMessage = db_session.query(orm.PushMessage_db).filter(orm.PushMessage_db.id == event.pushMessageId).one_or_none()
+                pushMessage.rsvp[learner.id] = eventPatchBody_dict["rsvp"]
+                db_session.commit()
+            except Exception as e:
+                db_session.remove()
+                return {'error': str(e)}, 400
             db_session.remove()
             return {"message": "event rsvp updated"}, 200
         else:
             for itemKey in eventPatchBody_dict:
-                setattr(event, itemKey, eventPatchBody_dict[itemKey])
+                if itemKey == "initiatorDisplayName":
+                    event.initiatorDisplayName = eventPatchBody_dict[itemKey]
+                if itemKey == "invitee":
+                    event.invitee = eventPatchBody_dict[itemKey]
+                if itemKey == "thumbnail":
+                    event.thumbnail = eventPatchBody_dict[itemKey]
+                if itemKey == "thumbnail":
+                    event.thumbnail = eventPatchBody_dict[itemKey]
             db_session.commit()
             db_session.remove()
-            # 此处需要细微调整每种参数应该如何patch
             return {"message": "event updated"}, 200
     except Exception as e:
         db_session.remove()
