@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, DateTime, String, Integer, Boolean, DECIMAL, JSON, ForeignKey
+from sqlalchemy import create_engine, Column, DateTime, String, Integer, Boolean, DECIMAL, JSON, ForeignKey, DateTime
 from sqlalchemy.orm import scoped_session, sessionmaker, relationship
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -114,9 +114,9 @@ class PushMessage_db(Base):
     senderDisplayName = Column(String(20), nullable=True)
     recipients = Column(JSON, nullable=True)
     rsvp = Column(JSON, nullable=True)
-    sentTime = Column(String(120), nullable=False)
-    modifiedTime = Column(String(120), nullable=False)
-    expireDate = Column(String(120), nullable=False)
+    sentDateTime = Column(DateTime)
+    modifiedDateTime = Column(DateTime)
+    expireDateTime = Column(DateTime)
     content = Column(JSON, nullable=True)
 
 
@@ -138,9 +138,9 @@ class Announcement_db(Base):
     initiatorId = Column(Integer, ForeignKey("learner.id"), nullable=False)
     initiatorDisplayName = Column(String(20), nullable=True)
     recipients = Column(JSON, nullable=True)
-    sentTime = Column(String(120), nullable=False)
-    modifiedTime = Column(String(120), nullable=False)
-    expireDate = Column(String(120), nullable=False)
+    sentDateTime = Column(DateTime)
+    modifiedDateTime = Column(DateTime)
+    expireDateTime = Column(DateTime)
     thumbnail = Column(JSON, nullable=True)
     body = Column(JSON, nullable=True)
 

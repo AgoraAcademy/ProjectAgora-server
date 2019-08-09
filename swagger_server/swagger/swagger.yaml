@@ -17,6 +17,24 @@ produces:
 - "image/gif"
 - "image/jpeg"
 paths:
+  # /miniprogram/utilities/mySchedule:
+  #   get:
+  #     tags:
+  #     - "Utilities"
+  #     summary: "获取用户自己的schedule"
+  #     operationId: "mySchedule_get"
+  #     parameters:
+  #       - name: "dateToLoad"
+  #         in: query
+  #         type: "string"
+  #     responses:
+  #       200:
+  #         description: "成功"
+  #         schema:
+  #           type: "array"
+  #           items:
+  #             type: "object"
+  #     x-swagger-router-controller: "swagger_server.controllers.miniprogram_utilities_controller"
   /utilities/connectToMicrosoft:
     post:
       tags:
@@ -151,13 +169,9 @@ paths:
                   type: "string"
                 description:
                   type: "string"
-                startDate:
+                startDateTime:
                   type: "string"
-                startTime:
-                  type: "string"
-                endDate:
-                  type: "string"
-                endTime:
+                endDateTime:
                   type: "string"
                 location:
                   type: "array"
@@ -165,10 +179,8 @@ paths:
                     type: "object"
                 fee:
                   type: "string"
-                recruitingUntilDate:
-                  type: string
-                recruitingUntilTime:
-                  type: string
+                expireDateTime:
+                  type: "string"
             invitee:
               type: "array"
               items:

@@ -67,9 +67,9 @@ def miniprogram_event_post(eventPostBody):
             senderDisplayName=initiatorDisplayName,
             recipients=eventPostBody_dict["invitee"],
             rsvp={},
-            sentTime=account.default_timezone.localize(EWSDateTime.now()).ewsformat(),
-            modifiedTime=account.default_timezone.localize(EWSDateTime.now()).ewsformat(),
-            expireDate=eventPostBody_dict["eventInfo"]["endDate"],
+            sentTime=account.default_timezone.localize(EWSDateTime.now()),
+            modifiedTime=account.default_timezone.localize(EWSDateTime.now()),
+            expireDateTime=EWSDateTime.from_string(eventPostBody_dict["eventInfo"]["expireDateTime"]),
             content=eventPostBody_dict["content"]
         )
         db_session.add(newPushMessage)
@@ -114,6 +114,7 @@ def miniprogram_event_patch(eventId):
                 setattr(event, itemKey, eventPatchBody_dict[itemKey])
             db_session.commit()
             db_session.remove()
+            # 此处需要细微调整每种参数应该如何patch
             return {"message": "event updated"}, 200
     except Exception as e:
         db_session.remove()

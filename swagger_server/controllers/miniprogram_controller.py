@@ -396,9 +396,9 @@ def miniprogram_pushMessage_get():
                 "senderId": pushMessage.senderId,
                 "recipients": pushMessage.recipients,
                 "rsvp": pushMessage.rsvp,
-                "sentTime": pushMessage.sentTime,
-                "modifiedTime": pushMessage.modifiedTime,
-                "expireDate": pushMessage.expireDate,
+                "sentDateTime": EWSDateTime.from_datetime(pushMessage.sentDateTime).ewsformat(),
+                "modifiedDateTime": EWSDateTime.from_datetime(pushMessage.modifiedDateTime).ewsformat(),
+                "expireDateTime": EWSDateTime.from_datetime(pushMessage.expireDateTime).ewsformat(),
                 "content": pushMessage.content
             })
     db_session.remove()
