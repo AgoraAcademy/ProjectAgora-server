@@ -280,7 +280,8 @@ paths:
             WWW_Authenticate:
               type: "string"
       x-swagger-router-controller: "swagger_server.controllers.miniprogram_event_controller"
-    patch:
+  /miniprogram/event/{eventId}/patch:
+    post:
       tags:
       - "Event"
       - "MiniProgram"
