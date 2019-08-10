@@ -67,9 +67,9 @@ def miniprogram_event_post(eventPostBody):
             senderDisplayName=initiatorDisplayName,
             recipients=eventPostBody_dict["invitee"],
             rsvp={},
-            sentDateTime=account.default_timezone.localize(EWSDateTime.now()),
-            modifiedDateTime=account.default_timezone.localize(EWSDateTime.now()),
-            expireDateTime=EWSDateTime.from_string(eventPostBody_dict["eventInfo"]["expireDateTime"]),
+            sentDateTime=util.EWSDateTimeToDateTime(account.default_timezone.localize(EWSDateTime.now())),
+            modifiedDateTime=util.EWSDateTimeToDateTime(account.default_timezone.localize(EWSDateTime.now())),
+            expireDateTime=util.EWSDateTimeToDateTime(EWSDateTime.from_string(eventPostBody_dict["eventInfo"]["expireDateTime"])),
             content=eventPostBody_dict["content"]
         )
         db_session.add(newPushMessage)
@@ -123,10 +123,18 @@ def miniprogram_event_patch(eventId):
                     event.thumbnail = eventPatchBody_dict[itemKey]
                 if itemKey == "content":
                     pushMessage.content = eventPatchBody_dict[itemKey]
-                if itemKey in ["title", "description", "fee", "location", "expireDateTime", "endDateTime", "startDateTime"]:
+                if itemKey in ["title", "description", "fee", "location"]:
                     newEventInfo = event.eventInfo
                     newEventInfo[itemKey] = eventPatchBody_dict[itemKey]
                     event.eventInfo = newEventInfo
+                if itemKey in ["expireDateTime", "endDateTime", "startDateTime"]:
+                    newEventInfo = event.eventInfo
+                    newEventInfo[itemKey] = eventPatchBody_dict[itemKey]
+                    event.eventInfo = newEventInfo
+                    newPatchDateTime = util.EWSDateTimeToDateTime(EWSDateTime.from_string(eventPatchBody_dict[itemKey])),
+                    setattr(pushMessage, itemKey, newPatchDateTime)
+            newModifiedDateTime = util.EWSDateTimeToDateTime(account.default_timezone.localize(EWSDateTime.now())),
+            pushMessage.modifiedDateTime = newModifiedDateTime
             db_session.commit()
             db_session.remove()
             return {"message": "event updated"}, 200

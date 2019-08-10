@@ -1,4 +1,6 @@
-import datetime
+from datetime import datetime
+from exchangelib import EWSDateTime
+import pytz
 
 import six
 import typing
@@ -156,3 +158,10 @@ def isRecipient(learner, rules: dict) -> bool:
                         return False
             return True
     return False
+
+
+def EWSDateTimeToDateTime(EWSDateTime: EWSDateTime) -> datetime:
+    tzinfo = pytz.timezone('Asia/Shanghai')
+    naiveDateTime = datetime(EWSDateTime.year, EWSDateTime.month, EWSDateTime.day, EWSDateTime.hour, EWSDateTime.minute, EWSDateTime.second)
+    responseDateTime = tzinfo.localize(naiveDateTime)
+    return responseDateTime
