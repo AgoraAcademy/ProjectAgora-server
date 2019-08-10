@@ -243,7 +243,7 @@ paths:
       parameters:
         - name: eventId
           in: path
-          type: number
+          type: "integer"
           required: true
       operationId: "miniprogram_event_eventId_get"
       responses:
