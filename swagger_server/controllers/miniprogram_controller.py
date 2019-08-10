@@ -54,7 +54,7 @@ def miniprogram_login_get(js_code):
         db_session.commit()
     except Exception:
         db_session.remove()
-    response = {'token': resultjson['session_key'], 'unionid': learner.unionid if learner else '', 'learnerFullName': learner.familyName + learner.givenName if learner else '', "isAdmin": learner.isAdmin if learner else ''}
+    response = {'token': resultjson['session_key'], 'unionid': learner.unionid if learner else '', 'learnerFullName': learner.familyName + learner.givenName if learner else '', "isAdmin": learner.isAdmin if learner else '', "learnerId": learner.id if learner else ''}
     db_session.remove()
     return response, 200
 
