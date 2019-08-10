@@ -257,6 +257,29 @@ paths:
             WWW_Authenticate:
               type: "string"
       x-swagger-router-controller: "swagger_server.controllers.miniprogram_event_controller"
+    delete:
+      tags:
+      - "Event"
+      - "MiniProgram"
+      summary: "根据eventId删除event和相关的pushMessage"
+      description: "根据eventId删除event和相关的pushMessage"
+      parameters:
+        - name: eventId
+          in: path
+          type: number
+          required: true
+      operationId: "miniprogram_event_eventId_delete"
+      responses:
+        204:
+          description: "成功删除"
+          schema:
+            type: "object"
+        401:
+          description: "API key is missing or invalid"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+      x-swagger-router-controller: "swagger_server.controllers.miniprogram_event_controller"
     patch:
       tags:
       - "Event"

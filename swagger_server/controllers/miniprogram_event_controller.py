@@ -169,6 +169,35 @@ def miniprogram_event_eventId_get(eventId):
         return {'error': str(e)}, 400
 
 
+def miniprogram_event_eventId_delete(eventId):
+    # 根据eventId删除event和相关的pushMessage
+    db_session = None
+    if "DEVMODE" in os.environ:
+        if os.environ["DEVMODE"] == "True":
+            db_session = orm.init_db(os.environ["DEV_DATABASEURI"])
+        else:
+            db_session = orm.init_db(os.environ["DATABASEURI"])
+    else:
+        db_session = orm.init_db(os.environ["DATABASEURI"])
+    sessionKey = connexion.request.headers['token']
+    learner = db_session.query(orm.Learner_db).filter(orm.Learner_db.sessionKey == sessionKey).one_or_none()
+    if not learner:
+        db_session.remove()
+        return {"message": "learner not found"}, 401
+    event = db_session.query(orm.Event_db).filter(orm.Event_db.id == eventId).one_or_none()
+    pushMessage = db_session.query(orm.PushMessage_db).filter(orm.PushMessage_db.id == event.pushMessageId).one_or_none()
+    try:
+        if event.initiatorId == learner.id or learner.isAdmin:
+            pushMessage.delete()
+            event.delete()
+        db_session.commit()
+        db_session.remove()
+        return {"message": "successfully deleted"}, 204
+    except Exception as e:
+        db_session.remove()
+        return {'error': str(e)}, 400
+
+
 def miniprogram_event_get():
     # 获取活动列表，目前暂时默认为返回全部条目
     db_session = None
