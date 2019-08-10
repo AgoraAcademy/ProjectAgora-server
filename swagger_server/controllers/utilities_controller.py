@@ -32,8 +32,8 @@ def connectToMicrosoft(connectToMicrosoftBody):
         return {"error": "Learner not validated"}, 401
     try:
         tokenPostBody = {
-            "client_id": MICROSOFT_CLIENT_ID, 
-            "scope": "offline_access openid profile https://graph.microsoft.com/calendars.readwrite https://graph.microsoft.com/user.readwrite", 
+            "client_id": MICROSOFT_CLIENT_ID,
+            "scope": "offline_access openid profile https://graph.microsoft.com/calendars.readwrite https://graph.microsoft.com/user.readwrite",
             "code": connectToMicrosoftBody_dict["code"],
             "redirect_uri": "http://localhost:8000/connectToMicrosoft",  # TODO: 此处redirect_uri应当存入config
             "grant_type": "authorization_code",

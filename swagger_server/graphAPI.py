@@ -33,7 +33,7 @@ def getValidMicrosoftToken(learner, db_session):
     if meResponse.status_code == 401:
         refreshPostBody = {
             "client_id": MICROSOFT_CLIENT_ID,
-            "scope": "offline_access openid profile https://graph.microsoft.com/calendars.readwrite https://graph.microsoft.com/user.readwrite", 
+            "scope": "offline_access openid profile https://graph.microsoft.com/calendars.readwrite https://graph.microsoft.com/user.readwrite",
             "refresh_token": learner.microsoftRefreshToken,
             "grant_type": "refresh_token",
             "client_secret": MICROSOFT_CLIENT_SECRET

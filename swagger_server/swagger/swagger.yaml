@@ -196,6 +196,32 @@ paths:
                 type: "string"
             content:
               type: "object"
+              properties: 
+                title:
+                  type: "string"
+                timeInfo:
+                  description: "人类可读的和时间相关的信息"
+                  type: string
+                tagInfo:
+                  description: "可选的tag信息，需要限制长度"
+                  type: string
+                operationInfo:
+                  description: "和按钮操作相关的信息，暂未确定使用方法"
+                  type: object
+                  properties:
+                    operationType:
+                      type: string
+                    operationValue:
+                      type: string
+                logoInfo:
+                  description: "logo相关信息"
+                  type: object
+                  properties: 
+                    type:
+                      description: "logo类型, avatar为微信头像, picture为借口提供的图片"
+                      type: string
+                    url:
+                      type: string
       responses:
         201:
           description: "成功"
@@ -245,6 +271,64 @@ paths:
       - name: "eventPatchBody"
         schema:
           type: "object"
+          properties: 
+            rsvp: 
+              type: string
+              enum: ["参加", "不参加", "待定"]
+              description: "提交rsvp信息用的字段，可选择填写参加、不参加、待定"
+            thumbnail:
+              type: array
+              items:
+                type: string
+            title:
+              type: string
+            description:
+              type: string
+            fee:
+              type: string
+            location:
+              type: array
+              items:
+                type: object
+            expireDateTime:
+              type: string
+            endDateTime: 
+              type: string
+            startDateTime:
+              type: string
+            content:
+              type: object
+              properties: 
+                title:
+                  type: "string"
+                timeInfo:
+                  description: "人类可读的和时间相关的信息"
+                  type: string
+                tagInfo:
+                  description: "可选的tag信息，需要限制长度"
+                  type: string
+                operationInfo:
+                  description: "和按钮操作相关的信息，暂未确定使用方法"
+                  type: object
+                  properties:
+                    operationType:
+                      type: string
+                    operationValue:
+                      type: string
+                logoInfo:
+                  description: "logo相关信息"
+                  type: object
+                  properties: 
+                    type:
+                      description: "logo类型, avatar为微信头像, picture为借口提供的图片"
+                      type: string
+                    url:
+                      type: string
+            invitee:
+              type: "array"
+              items:
+                type: object
+                description: "此处根据选择器Rule的类型会有不同的数据结构，详见https://github.com/AgoraAcademy/ProjectAgora-mobile/issues/8"
         in: "body"
         required: true
       responses:

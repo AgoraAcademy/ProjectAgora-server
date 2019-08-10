@@ -102,10 +102,10 @@ def miniprogram_event_patch(eventId):
         db_session.remove()
         return {"message": "learner not found"}, 401
     event = db_session.query(orm.Event_db).filter(orm.Event_db.id == eventId).one_or_none()
+    pushMessage = db_session.query(orm.PushMessage_db).filter(orm.PushMessage_db.id == event.pushMessageId).one_or_none()
     try:
         if event.initiatoriaId != learner.id:
             try:
-                pushMessage = db_session.query(orm.PushMessage_db).filter(orm.PushMessage_db.id == event.pushMessageId).one_or_none()
                 pushMessage.rsvp[learner.id] = eventPatchBody_dict["rsvp"]
                 db_session.commit()
             except Exception as e:
@@ -121,8 +121,12 @@ def miniprogram_event_patch(eventId):
                     event.invitee = eventPatchBody_dict[itemKey]
                 if itemKey == "thumbnail":
                     event.thumbnail = eventPatchBody_dict[itemKey]
-                if itemKey == "thumbnail":
-                    event.thumbnail = eventPatchBody_dict[itemKey]
+                if itemKey == "content":
+                    pushMessage.content = eventPatchBody_dict[itemKey]
+                if itemKey in ["title", "description", "fee", "location", "expireDateTime", "endDateTime", "startDateTime"]:
+                    newEventInfo = event.eventInfo
+                    newEventInfo[itemKey] = eventPatchBody_dict[itemKey]
+                    event.eventInfo = newEventInfo
             db_session.commit()
             db_session.remove()
             return {"message": "event updated"}, 200
