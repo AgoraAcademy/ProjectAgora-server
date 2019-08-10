@@ -67,8 +67,8 @@ def miniprogram_event_post(eventPostBody):
             senderDisplayName=initiatorDisplayName,
             recipients=eventPostBody_dict["invitee"],
             rsvp={},
-            sentTime=account.default_timezone.localize(EWSDateTime.now()),
-            modifiedTime=account.default_timezone.localize(EWSDateTime.now()),
+            sentDateTime=account.default_timezone.localize(EWSDateTime.now()),
+            modifiedDateTime=account.default_timezone.localize(EWSDateTime.now()),
             expireDateTime=EWSDateTime.from_string(eventPostBody_dict["eventInfo"]["expireDateTime"]),
             content=eventPostBody_dict["content"]
         )
