@@ -2,6 +2,7 @@ import connexion
 import six
 import os
 import requests
+import json
 from tzlocal import get_localzone
 from flask import Flask, send_from_directory
 from exchangelib import Credentials, Account, Configuration, DELEGATE, RoomList, CalendarItem, EWSDateTime
@@ -66,7 +67,7 @@ def miniprogram_event_post(eventPostBody):
             senderId=learner.id,
             senderDisplayName=initiatorDisplayName,
             recipients=eventPostBody_dict["invitee"],
-            rsvp={},
+            rsvp={"accept": [], "decline": [], "tentative": []},
             sentDateTime=util.EWSDateTimeToDateTime(account.default_timezone.localize(EWSDateTime.now())),
             modifiedDateTime=util.EWSDateTimeToDateTime(account.default_timezone.localize(EWSDateTime.now())),
             expireDateTime=util.EWSDateTimeToDateTime(EWSDateTime.from_string(eventPostBody_dict["eventInfo"]["expireDateTime"])),
@@ -106,9 +107,26 @@ def miniprogram_event_patch(eventId):
     try:
         if event.initiatorId != learner.id:
             try:
-                newRsvp = pushMessage.rsvp
-                newRsvp[learner.id] = eventPatchBody_dict["rsvp"]
-                pushMessage.rsvp = newRsvp
+                newRsvp = json.loads(pushMessage.rsvp) if pushMessage.rsvp else {'accept': [], 'decline': [], 'tentative': []}
+                if eventPatchBody_dict["rsvp"] == "参加":
+                    newRsvp["accept"].append(learner.id)
+                    newRsvp["accept"] = list(set(newRsvp["accept"]))
+                    for responseType in ["decline", "tentative"]:
+                        if learner.id in newRsvp[responseType]:
+                            newRsvp[responseType].remove(learner.id)
+                if eventPatchBody_dict["rsvp"] == "拒绝":
+                    newRsvp["decline"].append(learner.id)
+                    newRsvp = list(set(newRsvp))
+                    for responseType in ["accept", "tentative"]:
+                        if learner.id in newRsvp[responseType]:
+                            newRsvp[responseType].remove(learner.id)
+                if eventPatchBody_dict["rsvp"] == "可能参加":
+                    newRsvp["tentative"].append(learner.id)
+                    newRsvp = list(set(newRsvp))
+                    for responseType in ["decline", "accept"]:
+                        if learner.id in newRsvp[responseType]:
+                            newRsvp[responseType].remove(learner.id)
+                setattr(pushMessage, "rsvp", json.dumps(newRsvp))
                 db_session.commit()
             except Exception as e:
                 db_session.remove()
