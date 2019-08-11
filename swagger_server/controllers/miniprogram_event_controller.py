@@ -106,7 +106,9 @@ def miniprogram_event_patch(eventId):
     try:
         if event.initiatorId != learner.id:
             try:
-                pushMessage.rsvp[learner.id] = eventPatchBody_dict["rsvp"]
+                newRsvp = pushMessage.rsvp
+                rsvp[learner.id] = eventPatchBody_dict["rsvp"]
+                pushMessage.rsvp = newRsvp
                 db_session.commit()
             except Exception as e:
                 db_session.remove()
