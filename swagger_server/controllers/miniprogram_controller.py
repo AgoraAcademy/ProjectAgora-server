@@ -136,6 +136,7 @@ def miniprogram_learner_post(learnerPostBody):
             openidWeApp=decryptedData['openId'],
             isAdmin=False,
             status="",
+            role=learnerPostBody_dict['role'],
             isMentor=learnerPostBody_dict['isMentor'],
             givenName=learnerPostBody_dict['givenName'],
             familyName=learnerPostBody_dict['familyName'],
