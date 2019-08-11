@@ -104,7 +104,7 @@ def miniprogram_event_patch(eventId):
     event = db_session.query(orm.Event_db).filter(orm.Event_db.id == eventId).one_or_none()
     pushMessage = db_session.query(orm.PushMessage_db).filter(orm.PushMessage_db.id == event.pushMessageId).one_or_none()
     try:
-        if event.initiatoriaId != learner.id:
+        if event.initiatorId != learner.id:
             try:
                 pushMessage.rsvp[learner.id] = eventPatchBody_dict["rsvp"]
                 db_session.commit()

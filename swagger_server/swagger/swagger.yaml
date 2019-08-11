@@ -266,7 +266,7 @@ paths:
       parameters:
         - name: eventId
           in: path
-          type: number
+          type: integer
           required: true
       operationId: "miniprogram_event_eventId_delete"
       responses:
@@ -289,7 +289,7 @@ paths:
       operationId: "miniprogram_event_patch"
       parameters:
       - name: "eventId"
-        type: "number"
+        type: integer
         in: "path"
         required: true
       - name: "eventPatchBody"
