@@ -67,7 +67,7 @@ def miniprogram_event_post(eventPostBody):
             senderId=learner.id,
             senderDisplayName=initiatorDisplayName,
             recipients=eventPostBody_dict["invitee"],
-            rsvp={"accept": [], "decline": [], "tentative": []},
+            rsvp=json.dumps({"accept": [], "decline": [], "tentative": []}),
             sentDateTime=util.EWSDateTimeToDateTime(account.default_timezone.localize(EWSDateTime.now())),
             modifiedDateTime=util.EWSDateTimeToDateTime(account.default_timezone.localize(EWSDateTime.now())),
             expireDateTime=util.EWSDateTimeToDateTime(EWSDateTime.from_string(eventPostBody_dict["eventInfo"]["expireDateTime"])),
