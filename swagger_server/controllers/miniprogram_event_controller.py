@@ -188,7 +188,7 @@ def miniprogram_event_eventId_get(eventId):
             "eventInfo": event.eventInfo,
             "invitee": event.invitee,
             "thumbnail": event.thumbnail,
-            "rsvp": pushMessage.rsvp
+            "rsvp": json.loads(pushMessage.rsvp)
         }
         db_session.remove()
         return response, 200
