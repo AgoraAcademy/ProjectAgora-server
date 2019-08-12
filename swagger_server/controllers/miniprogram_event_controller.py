@@ -108,24 +108,25 @@ def miniprogram_event_patch(eventId):
         if event.initiatorId != learner.id:
             try:
                 newRsvp = json.loads(pushMessage.rsvp) if pushMessage.rsvp else {'accept': [], 'decline': [], 'tentative': []}
+                newEntry = {'id': learner.id, 'fullname': learner.familyName + learner.givenName}
                 if eventPatchBody_dict["rsvp"] == "参加":
-                    newRsvp["accept"].append(learner.id)
-                    newRsvp["accept"] = list(set(newRsvp["accept"]))
+                    if newEntry not in newRsvp['accept']:
+                        newRsvp["accept"].append(newEntry)
                     for responseType in ["decline", "tentative"]:
-                        if learner.id in newRsvp[responseType]:
-                            newRsvp[responseType].remove(learner.id)
+                        if newEntry in newRsvp[responseType]:
+                            newRsvp[responseType].remove(newEntry)
                 if eventPatchBody_dict["rsvp"] == "拒绝":
-                    newRsvp["decline"].append(learner.id)
-                    newRsvp = list(set(newRsvp))
+                    if newEntry not in newRsvp['decline']:
+                        newRsvp["decline"].append(newEntry)
                     for responseType in ["accept", "tentative"]:
-                        if learner.id in newRsvp[responseType]:
-                            newRsvp[responseType].remove(learner.id)
+                        if newEntry in newRsvp[responseType]:
+                            newRsvp[responseType].remove(newEntry)
                 if eventPatchBody_dict["rsvp"] == "可能参加":
-                    newRsvp["tentative"].append(learner.id)
-                    newRsvp = list(set(newRsvp))
+                    if newEntry not in newRsvp['tentative']:
+                        newRsvp["tentative"].append(newEntry)
                     for responseType in ["decline", "accept"]:
-                        if learner.id in newRsvp[responseType]:
-                            newRsvp[responseType].remove(learner.id)
+                        if newEntry in newRsvp[responseType]:
+                            newRsvp[responseType].remove(newEntry)
                 setattr(pushMessage, "rsvp", json.dumps(newRsvp))
                 db_session.commit()
             except Exception as e:
