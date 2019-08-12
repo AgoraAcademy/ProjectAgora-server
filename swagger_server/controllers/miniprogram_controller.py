@@ -365,7 +365,7 @@ def miniprogram_booking_roomCode_delete(roomCode, monthToLoad, deleteInfo):  # n
             if item.changekey == changekey:
                 notes = db_session.query(orm.BookingNotes_db).filter(orm.BookingNotes_db.changekey == item.changekey).one_or_none()
                 if notes.bookedByID == learner.id:
-                    item.delete()
+                    db_session.delete(notes)
     except Exception as e:
         db_session.remove()
         return {'error': str(e)}, 400
