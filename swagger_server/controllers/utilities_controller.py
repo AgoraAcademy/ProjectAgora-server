@@ -7,7 +7,52 @@ import random
 import base64
 
 from swagger_server.models.inline_response200 import InlineResponse200  # noqa: E501
-from swagger_server import util, orm, wxLogin
+from swagger_server import util, orm, wxLogin, weapp, graphAPI
+
+
+def connectToMicrosoft(connectToMicrosoftBody):
+    MICROSOFT_CLIENT_ID: str = os.environ['MICROSOFT_CLIENT_ID']
+    MICROSOFT_CLIENT_SECRET: str = os.environ['MICROSOFT_CLIENT_SECRET']
+    db_session = None
+    if "DEVMODE" in os.environ:
+        if os.environ["DEVMODE"] == "True":
+            db_session = orm.init_db(os.environ["DEV_DATABASEURI"])
+        else:
+            db_session = orm.init_db(os.environ["DATABASEURI"])
+    else:
+        db_session = orm.init_db(os.environ["DATABASEURI"])
+    connectToMicrosoftBody_dict = connexion.request.get_json()
+    validation_result = wxLogin.validateUser()
+    if not validation_result["result"]:
+        db_session.remove()
+        return {"error": "Failed to validate access token"}, 401
+    learner = db_session.query(orm.Learner_db).filter(orm.Learner_db.openid == validation_result["openid"]).one_or_none()
+    if not learner.validated:
+        db_session.remove()
+        return {"error": "Learner not validated"}, 401
+    try:
+        tokenPostBody = {
+            "client_id": MICROSOFT_CLIENT_ID,
+            "scope": "offline_access openid profile https://graph.microsoft.com/calendars.readwrite https://graph.microsoft.com/user.readwrite",
+            "code": connectToMicrosoftBody_dict["code"],
+            "redirect_uri": "http://localhost:8000/connectToMicrosoft",  # TODO: 此处redirect_uri应当存入config
+            "grant_type": "authorization_code",
+            "client_secret": MICROSOFT_CLIENT_SECRET
+        }
+        tokenResponse = requests.post("https://login.microsoftonline.com/common/oauth2/v2.0/token", data=tokenPostBody)
+        microsoftAccessToken = tokenResponse.json()["access_token"]
+        microsoftRefreshToken = tokenResponse.json()["refresh_token"]
+        learner.microsoftAccessToken = microsoftAccessToken
+        learner.microsoftRefreshToken = microsoftRefreshToken
+        me = graphAPI.getMe(microsoftAccessToken)
+        learner.microsoftId = me['id']
+        learner.microsoftUserPrincipalName = me['userPrincipalName']
+        db_session.commit()
+    except Exception as e:
+        db_session.remove()
+        return {'error': str(e)}, 400
+    db_session.remove()
+    return {"message": "成功写入Microsoft账号相关信息", "microsoftId": me['id']}, 200
 
 
 def project_cover_post():  # noqa: E501

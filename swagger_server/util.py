@@ -1,4 +1,6 @@
-import datetime
+from datetime import datetime
+from exchangelib import EWSDateTime
+import pytz
 
 import six
 import typing
@@ -139,3 +141,27 @@ def _deserialize_dict(data, boxed_type):
     """
     return {k: _deserialize(v, boxed_type)
             for k, v in six.iteritems(data)}
+
+
+def isRecipient(learner, rules: dict) -> bool:
+    for rule in rules:
+        if rule["type"] == "list":
+            if learner.id in rule.content:
+                return True
+        if rule["type"] == "filters":
+            for filter in rule["content"]:
+                if filter["scope"] == "校区":
+                    if learner.branch != filter["value"]:
+                        return False
+                if filter["scope"] == "角色":
+                    if learner.role != filter["value"]:
+                        return False
+            return True
+    return False
+
+
+def EWSDateTimeToDateTime(EWSDateTime: EWSDateTime) -> datetime:
+    tzinfo = pytz.timezone('Asia/Shanghai')
+    naiveDateTime = datetime(EWSDateTime.year, EWSDateTime.month, EWSDateTime.day, EWSDateTime.hour, EWSDateTime.minute, EWSDateTime.second)
+    responseDateTime = tzinfo.localize(naiveDateTime)
+    return responseDateTime

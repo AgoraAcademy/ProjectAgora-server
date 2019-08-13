@@ -8,6 +8,7 @@ Base = declarative_base()
 class Learner_db(Base):
     __tablename__ = 'learner'
     id = Column(Integer, primary_key=True)
+    branch = Column(String(45), nullable=True)
     openid = Column(String(120), nullable=False)
     unionid = Column(String(120), nullable=True)
     openidWeApp = Column(String(120), nullable=True)
@@ -16,6 +17,7 @@ class Learner_db(Base):
     isAdmin = Column(Boolean, nullable=False)
     givenName = Column(String(120), nullable=False)
     familyName = Column(String(120), nullable=False)
+    role = Column(String(120), nullable=False)
     nickname = Column(String(120), nullable=True)
     isMentor = Column(Boolean, nullable=False)
     gender = Column(String(120), nullable=False)
@@ -37,6 +39,10 @@ class Learner_db(Base):
     contactInfo = Column(JSON, nullable=False)
     medicalInfo = Column(JSON, nullable=False)
     notes = Column(JSON, nullable=True)
+    microsoftAccessToken = Column(String(2000), nullable=True)
+    microsoftRefreshToken = Column(String(2000), nullable=True)
+    microsoftId = Column(String(120), nullable=True)
+    microsoftUserPrincipalName = Column(String(120), nullable=True)
 
     def __repr__(self):
         return '<Learner %r %r >' % (self.familyName, self.givenName)
@@ -97,6 +103,46 @@ class BookingNotes_db(Base):
     changekey = Column(String(100), nullable=False)
     bookedByID = Column(Integer, nullable=False)
     bookedByName = Column(String(120), nullable=False)
+
+
+class PushMessage_db(Base):
+    __tablename__ = 'pushMessage'
+    id = Column(Integer, primary_key=True)
+    messageType = Column(String(10), nullable=False)
+    entityId = Column(Integer, nullable=True, comment='信息相关记录id（只记录id数值，不作表关联')
+    senderId = Column(Integer, ForeignKey("learner.id"), nullable=False)
+    senderDisplayName = Column(String(20), nullable=True)
+    recipients = Column(JSON, nullable=True)
+    rsvp = Column(String(2000), nullable=True)
+    sentDateTime = Column(DateTime)
+    modifiedDateTime = Column(DateTime)
+    expireDateTime = Column(DateTime)
+    content = Column(JSON, nullable=True)
+
+
+class Event_db(Base):
+    __tablename__ = 'event'
+    id = Column(Integer, primary_key=True)
+    pushMessageId = Column(Integer, ForeignKey("pushMessage.id"), nullable=True)
+    initiatorId = Column(Integer, ForeignKey("learner.id"), nullable=False)
+    initiatorDisplayName = Column(String(20), nullable=True)
+    eventInfo = Column(JSON, nullable=True)
+    invitee = Column(JSON, nullable=True)
+    thumbnail = Column(JSON, nullable=True)
+
+
+class Announcement_db(Base):
+    __tablename__ = 'announcement'
+    id = Column(Integer, primary_key=True)
+    pushMessageId = Column(Integer, ForeignKey("pushMessage.id"), nullable=True)
+    initiatorId = Column(Integer, ForeignKey("learner.id"), nullable=False)
+    initiatorDisplayName = Column(String(20), nullable=True)
+    recipients = Column(JSON, nullable=True)
+    sentDateTime = Column(DateTime)
+    modifiedDateTime = Column(DateTime)
+    expireDateTime = Column(DateTime)
+    thumbnail = Column(JSON, nullable=True)
+    body = Column(JSON, nullable=True)
 
 
 def init_db(uri):

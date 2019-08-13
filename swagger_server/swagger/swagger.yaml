@@ -17,6 +17,392 @@ produces:
 - "image/gif"
 - "image/jpeg"
 paths:
+  # /miniprogram/utilities/mySchedule:
+  #   get:
+  #     tags:
+  #     - "Utilities"
+  #     summary: "获取用户自己的schedule"
+  #     operationId: "mySchedule_get"
+  #     parameters:
+  #       - name: "dateToLoad"
+  #         in: query
+  #         type: "string"
+  #     responses:
+  #       200:
+  #         description: "成功"
+  #         schema:
+  #           type: "array"
+  #           items:
+  #             type: "object"
+  #     x-swagger-router-controller: "swagger_server.controllers.miniprogram_utilities_controller"
+  /utilities/connectToMicrosoft:
+    post:
+      tags:
+      - "Utilities"
+      summary: "Microsoft账户授权与绑定"
+      operationId: "connectToMicrosoft"
+      parameters:
+        - name: "connectToMicrosoftBody"
+          in: "body"
+          required: true
+          schema:
+            type: "object"
+            properties:
+              code:
+                type: string
+      responses:
+        200:
+          description: "成功"
+          schema: 
+            type: "object"
+      x-swagger-router-controller: "swagger_server.controllers.utilities_controller"
+  /miniprogram/pushMessage:
+    get:
+      tags:
+      - "PushMessage"
+      summary: "获取推送信息列表"
+      operationId: "miniprogram_pushMessage_get"
+      responses:
+        200:
+          description: "成功获取推送信息列表"
+          schema:
+            type: "array"
+            items:
+              type: "object"
+      x-swagger-router-controller: "swagger_server.controllers.miniprogram_controller"
+  /miniprogram/utilities/picture:
+    get:
+      tags:
+      - "Utilities"
+      - "PushMessage"
+      summary: "小程序统一获取图片接口"
+      operationId: "miniprogram_picture_get"
+      parameters:
+      - name: "uid"
+        in: "query"
+        description: "图片的UID"
+        required: true
+        type: "string"
+      - name: "pictureType"
+        in: "query"
+        description: "类别"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "小程序统一获取图片接口"
+          schema:
+            type: "object"
+            properties: 
+              picture:
+                type: "string"
+                format: "byte"
+      x-swagger-router-controller: "swagger_server.controllers.miniprogram_utilities_controller"
+    post:
+      tags:
+      - "Utilities"
+      - "PushMessage"
+      summary: "小程序统一上传图片接口"
+      operationId: "miniprogram_picture_post"
+      consumes:
+        - multipart/form-data
+      parameters:
+        - name: picture
+          in: formData
+          type: file
+          required: true
+          description: 上传的图片
+        - name: "pictureType"
+          in: "query"
+          description: "类别"
+          required: true
+          type: "string"
+      responses:
+        201:
+          description: "创建成功"
+          schema:
+            type: "object"
+            properties:
+              url:
+                type: "string"
+            description: "访问用的url"
+        401:
+          description: "API key is missing or invalid"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+      x-swagger-router-controller: "swagger_server.controllers.miniprogram_utilities_controller"
+  /miniprogram/event:
+    get:
+      tags:
+      - "Event"
+      - "MiniProgram"
+      summary: "小程序端获取活动列表"
+      operationId: "miniprogram_event_get"
+      responses:
+        200:
+          description: "成功"
+          schema:
+            type: "array"
+            items: 
+              type: "object"
+      x-swagger-router-controller: "swagger_server.controllers.miniprogram_event_controller"
+    post:
+      tags:
+      - "Event"
+      - "MiniProgram"
+      summary: "小程序端发起活动"
+      operationId: "miniprogram_event_post"
+      parameters:
+      - name: "eventPostBody"
+        in: "body"
+        required: true
+        schema:
+          type: "object"
+          properties: 
+            initiatorDisplayName:
+              type: "string"
+            eventInfo:
+              type: "object"
+              properties: 
+                title:
+                  type: "string"
+                description:
+                  type: "string"
+                startDateTime:
+                  type: "string"
+                endDateTime:
+                  type: "string"
+                location:
+                  type: "array"
+                  items:
+                    type: "object"
+                fee:
+                  type: "string"
+                expireDateTime:
+                  type: "string"
+            invitee:
+              type: "array"
+              items:
+                type: "object"
+                properties: 
+                  type: 
+                    type: "string"
+                  content:
+                    type: "string"
+            thumbnail:
+              type: "array"
+              items:
+                type: "string"
+            content:
+              type: "object"
+              properties: 
+                title:
+                  type: "string"
+                timeInfo:
+                  description: "人类可读的和时间相关的信息"
+                  type: string
+                tagInfo:
+                  description: "可选的tag信息，需要限制长度"
+                  type: string
+                operationInfo:
+                  description: "和按钮操作相关的信息，暂未确定使用方法"
+                  type: object
+                  properties:
+                    operationType:
+                      type: string
+                    operationValue:
+                      type: string
+                logoInfo:
+                  description: "logo相关信息"
+                  type: object
+                  properties: 
+                    type:
+                      description: "logo类型, avatar为微信头像, picture为借口提供的图片"
+                      type: string
+                    url:
+                      type: string
+      responses:
+        201:
+          description: "成功"
+          schema:
+            type: "object"
+            properties: 
+              pushMessage_id:
+                type: "number"
+              event_id:
+                type: "number"
+      x-swagger-router-controller: "swagger_server.controllers.miniprogram_event_controller"
+  /miniprogram/event/{eventId}:
+    get:
+      tags:
+      - "Event"
+      - "MiniProgram"
+      summary: "获得一个event的详细信息"
+      description: "获得一个event的详细信息"
+      parameters:
+        - name: eventId
+          in: path
+          type: "integer"
+          required: true
+      operationId: "miniprogram_event_eventId_get"
+      responses:
+        200:
+          description: "获得一个event的详细信息"
+          schema:
+            type: "object"
+        401:
+          description: "API key is missing or invalid"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+      x-swagger-router-controller: "swagger_server.controllers.miniprogram_event_controller"
+    delete:
+      tags:
+      - "Event"
+      - "MiniProgram"
+      summary: "根据eventId删除event和相关的pushMessage"
+      description: "根据eventId删除event和相关的pushMessage"
+      parameters:
+        - name: eventId
+          in: path
+          type: integer
+          required: true
+      operationId: "miniprogram_event_eventId_delete"
+      responses:
+        204:
+          description: "成功删除"
+          schema:
+            type: "object"
+        401:
+          description: "API key is missing or invalid"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+      x-swagger-router-controller: "swagger_server.controllers.miniprogram_event_controller"
+  /miniprogram/event/{eventId}/patch:
+    post:
+      tags:
+      - "Event"
+      - "MiniProgram"
+      summary: "小程序端修改活动信息和报名接口"
+      operationId: "miniprogram_event_patch"
+      parameters:
+      - name: "eventId"
+        type: integer
+        in: "path"
+        required: true
+      - name: "eventPatchBody"
+        schema:
+          type: "object"
+          properties: 
+            rsvp: 
+              type: string
+              enum: ["参加", "不参加", "待定"]
+              description: "提交rsvp信息用的字段，可选择填写参加、不参加、待定"
+            thumbnail:
+              type: array
+              items:
+                type: string
+            title:
+              type: string
+            description:
+              type: string
+            fee:
+              type: string
+            location:
+              type: array
+              items:
+                type: object
+            expireDateTime:
+              type: string
+            endDateTime: 
+              type: string
+            startDateTime:
+              type: string
+            content:
+              type: object
+              properties: 
+                title:
+                  type: "string"
+                timeInfo:
+                  description: "人类可读的和时间相关的信息"
+                  type: string
+                tagInfo:
+                  description: "可选的tag信息，需要限制长度"
+                  type: string
+                operationInfo:
+                  description: "和按钮操作相关的信息，暂未确定使用方法"
+                  type: object
+                  properties:
+                    operationType:
+                      type: string
+                    operationValue:
+                      type: string
+                logoInfo:
+                  description: "logo相关信息"
+                  type: object
+                  properties: 
+                    type:
+                      description: "logo类型, avatar为微信头像, picture为借口提供的图片"
+                      type: string
+                    url:
+                      type: string
+            invitee:
+              type: "array"
+              items:
+                type: object
+                description: "此处根据选择器Rule的类型会有不同的数据结构，详见https://github.com/AgoraAcademy/ProjectAgora-mobile/issues/8"
+        in: "body"
+        required: true
+      responses:
+        200:
+          description: "成功"
+          schema:
+            type: "object"
+            properties: 
+              message:
+                type: "string"
+      x-swagger-router-controller: "swagger_server.controllers.miniprogram_event_controller"  
+  /miniprogram/learner:
+    post:
+      tags:
+      - "Learner"
+      - "MiniProgram"
+      summary: "小程序端注册账户"
+      operationId:  "miniprogram_learner_post"
+      parameters:
+      - name: "learnerPostBody"
+        in: "body"
+        required: true
+        schema:
+          type: "object"
+          properties:
+            sessionKey:
+              type: "string"
+            encryptedData: 
+              type: "string"
+            iv:
+              type: "string"
+            branch:
+              type: "string"
+            isMentor:
+              type: "number"
+            givenName:
+              type: "string"
+            familyName:
+              type: "string"
+            birthday:
+              type: "string"
+      responses:
+        201:
+          description: "成功"
+          schema:
+            type: "object"
+            properties: 
+              unionid:
+                type: "string"
+      x-swagger-router-controller: "swagger_server.controllers.miniprogram_controller"
   /miniprogram/booking/{roomCode}:
     get:
       tags:

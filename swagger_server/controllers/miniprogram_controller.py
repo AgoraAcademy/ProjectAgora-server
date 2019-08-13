@@ -54,7 +54,7 @@ def miniprogram_login_get(js_code):
         db_session.commit()
     except Exception:
         db_session.remove()
-    response = {'token': resultjson['session_key'], 'unionid': learner.unionid if learner else '', 'learnerFullName': learner.familyName + learner.givenName if learner else '', "isAdmin": learner.isAdmin if learner else ''}
+    response = {'token': resultjson['session_key'], 'unionid': learner.unionid if learner else '', 'learnerFullName': learner.familyName + learner.givenName if learner else '', "isAdmin": learner.isAdmin if learner else '', "learnerId": learner.id if learner else ''}
     db_session.remove()
     return response, 200
 
@@ -72,9 +72,9 @@ def miniprogram_login_post(loginPostBody):
     MINIPROGRAM_APPID: str = os.environ['MINIPROGRAM_APPID']
     loginPostBody_dict = connexion.request.get_json()
     sessionKey = connexion.request.headers['token']
-    decrypter = weapp.WXBizDataCrypt(MINIPROGRAM_APPID, sessionKey)
-    decryptedData = decrypter.decrypt(loginPostBody_dict['encryptedData'], loginPostBody_dict['iv'])
     try:
+        decrypter = weapp.WXBizDataCrypt(MINIPROGRAM_APPID, sessionKey)
+        decryptedData = decrypter.decrypt(loginPostBody_dict['encryptedData'], loginPostBody_dict['iv'])
         unionid = decryptedData['unionId']
     except Exception as e:
         print(e)
@@ -95,6 +95,70 @@ def miniprogram_login_post(loginPostBody):
     response = {"unionid": unionid, "learnerFullName": learner.familyName + learner.givenName, "isAdmin": learner.isAdmin}
     db_session.remove()
     return response, 200
+
+
+def miniprogram_learner_post(learnerPostBody):
+    db_session = None
+    if "DEVMODE" in os.environ:
+        if os.environ["DEVMODE"] == "True":
+            db_session = orm.init_db(os.environ["DEV_DATABASEURI"])
+        else:
+            db_session = orm.init_db(os.environ["DATABASEURI"])
+    else:
+        db_session = orm.init_db(os.environ["DATABASEURI"])
+    MINIPROGRAM_APPID: str = os.environ['MINIPROGRAM_APPID']
+    learnerPostBody_dict = connexion.request.get_json()
+    sessionKey = connexion.request.headers['token']
+    try:
+        decrypter = weapp.WXBizDataCrypt(MINIPROGRAM_APPID, sessionKey)
+        decryptedData = decrypter.decrypt(learnerPostBody_dict['encryptedData'], learnerPostBody_dict['iv'])
+        unionid = decryptedData['unionId']
+    except Exception as e:
+        print(e)
+        db_session.remove()
+        return {"error": str(e)}, 403
+    try:
+        learner = db_session.query(orm.Learner_db).filter(orm.Learner_db.unionid == unionid).one_or_none()
+        if learner:
+            db_session.remove()
+            return {"error": "用户已存在注册记录"}, 403
+    except Exception as e:
+        print(e)
+        db_session.remove()
+        return {"error": str(e)}, 403
+    try:
+        db_session.add(orm.Learner_db(
+            validated=False,
+            branch=learnerPostBody_dict['branch'],
+            openid="",
+            unionid=unionid,
+            sessionKey=sessionKey,
+            openidWeApp=decryptedData['openId'],
+            isAdmin=False,
+            status="",
+            role=learnerPostBody_dict['role'],
+            isMentor=learnerPostBody_dict['isMentor'],
+            givenName=learnerPostBody_dict['givenName'],
+            familyName=learnerPostBody_dict['familyName'],
+            gender="",
+            ethnicity="",
+            birthday=learnerPostBody_dict['birthday'],
+            mainPersonalIdType="",
+            mainPersonalId="",
+            dateOfRegistration="",
+            reasonOfRegistration="",
+            previousStatus="",
+            emergentContact=[],
+            contactInfo=[],
+            medicalInfo=[],
+        ))
+        db_session.commit()
+    except Exception as e:
+        db_session.remove()
+        return {"error": str(e)}, 401
+    response = {"unionid": unionid}
+    db_session.remove()
+    return response, 201
 
 
 def miniprogram_ping():
@@ -301,9 +365,42 @@ def miniprogram_booking_roomCode_delete(roomCode, monthToLoad, deleteInfo):  # n
             if item.changekey == changekey:
                 notes = db_session.query(orm.BookingNotes_db).filter(orm.BookingNotes_db.changekey == item.changekey).one_or_none()
                 if notes.bookedByID == learner.id:
-                    item.delete()
+                    db_session.delete(notes)
     except Exception as e:
         db_session.remove()
         return {'error': str(e)}, 400
     db_session.remove()
     return {'message': 'success'}, 201
+
+
+def miniprogram_pushMessage_get():
+    db_session = None
+    if "DEVMODE" in os.environ:
+        if os.environ["DEVMODE"] == "True":
+            db_session = orm.init_db(os.environ["DEV_DATABASEURI"])
+        else:
+            db_session = orm.init_db(os.environ["DATABASEURI"])
+    else:
+        db_session = orm.init_db(os.environ["DATABASEURI"])
+    learner = weapp.getLearner()
+    if not learner:
+        db_session.remove()
+        return {"message": "unionid not found"}, 401
+    response = []
+    pushMessageList = db_session.query(orm.PushMessage_db).all()
+    for pushMessage in pushMessageList:
+        if util.isRecipient(learner, pushMessage.recipients):
+            response.append({
+                "id": pushMessage.id,
+                "messageType": pushMessage.messageType,
+                "entityId": pushMessage.entityId,
+                "senderId": pushMessage.senderId,
+                "recipients": pushMessage.recipients,
+                "rsvp": pushMessage.rsvp,
+                "sentDateTime": EWSDateTime.from_datetime(pushMessage.sentDateTime).ewsformat(),
+                "modifiedDateTime": EWSDateTime.from_datetime(pushMessage.modifiedDateTime).ewsformat(),
+                "expireDateTime": EWSDateTime.from_datetime(pushMessage.expireDateTime).ewsformat(),
+                "content": pushMessage.content
+            })
+    db_session.remove()
+    return response, 200
