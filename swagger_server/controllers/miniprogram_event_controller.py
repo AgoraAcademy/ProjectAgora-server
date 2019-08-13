@@ -217,9 +217,9 @@ def miniprogram_event_eventId_delete(eventId):
     pushMessage = db_session.query(orm.PushMessage_db).filter(orm.PushMessage_db.id == event.pushMessageId).one_or_none()
     try:
         if event.initiatorId == learner.id or learner.isAdmin:
+            db_session.delete(event)
             if pushMessage:
                 db_session.delete(pushMessage)
-            db_session.delete(event)
         db_session.commit()
         db_session.remove()
         return {"message": "successfully deleted"}, 200
