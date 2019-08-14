@@ -139,19 +139,19 @@ def miniprogram_event_patch(eventId):
                 if itemKey == "initiatorDisplayName":
                     event.initiatorDisplayName = eventPatchBody_dict[itemKey]
                 if itemKey == "invitee":
-                    event.invitee = eventPatchBody_dict[itemKey]
+                    event.invitee = json.dumps(eventPatchBody_dict[itemKey])
                 if itemKey == "thumbnail":
                     event.thumbnail = eventPatchBody_dict[itemKey]
                 if itemKey == "content":
                     pushMessage.content = eventPatchBody_dict[itemKey]
                 if itemKey in ["title", "description", "fee", "location"]:
-                    newEventInfo = event.eventInfo
+                    newEventInfo = json.loads(event.eventInfo)
                     newEventInfo[itemKey] = eventPatchBody_dict[itemKey]
-                    event.eventInfo = newEventInfo
+                    event.eventInfo = json.dumps(newEventInfo)
                 if itemKey in ["expireDateTime", "endDateTime", "startDateTime"]:
-                    newEventInfo = event.eventInfo
+                    newEventInfo = json.loads(event.eventInfo)
                     newEventInfo[itemKey] = eventPatchBody_dict[itemKey]
-                    event.eventInfo = newEventInfo
+                    event.eventInfo = json.dumps(newEventInfo)
                     newPatchDateTime = util.EWSDateTimeToDateTime(EWSDateTime.from_string(eventPatchBody_dict[itemKey])),
                     setattr(pushMessage, itemKey, newPatchDateTime)
             newModifiedDateTime = util.EWSDateTimeToDateTime(account.default_timezone.localize(EWSDateTime.now())),
