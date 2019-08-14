@@ -2,6 +2,7 @@ import connexion
 import six
 import os
 import requests
+import json
 from tzlocal import get_localzone
 from flask import Flask, send_from_directory
 from exchangelib import Credentials, Account, Configuration, DELEGATE, RoomList, CalendarItem, EWSDateTime
@@ -148,9 +149,9 @@ def miniprogram_learner_post(learnerPostBody):
             dateOfRegistration="",
             reasonOfRegistration="",
             previousStatus="",
-            emergentContact=[],
-            contactInfo=[],
-            medicalInfo=[],
+            emergentContact="[]",
+            contactInfo="[]",
+            medicalInfo="[]",
         ))
         db_session.commit()
     except Exception as e:
@@ -395,12 +396,12 @@ def miniprogram_pushMessage_get():
                 "messageType": pushMessage.messageType,
                 "entityId": pushMessage.entityId,
                 "senderId": pushMessage.senderId,
-                "recipients": pushMessage.recipients,
-                "rsvp": pushMessage.rsvp,
+                "recipients": json.dumps(pushMessage.recipients),
+                "rsvp": json.dumps(pushMessage.rsvp),
                 "sentDateTime": EWSDateTime.from_datetime(pushMessage.sentDateTime).ewsformat(),
                 "modifiedDateTime": EWSDateTime.from_datetime(pushMessage.modifiedDateTime).ewsformat(),
                 "expireDateTime": EWSDateTime.from_datetime(pushMessage.expireDateTime).ewsformat(),
-                "content": pushMessage.content
+                "content": json.dumps(pushMessage.content)
             })
     db_session.remove()
     return response, 200

@@ -55,9 +55,9 @@ def miniprogram_event_post(eventPostBody):
         newEvent = orm.Event_db(
             initiatorId=learner.id,
             initiatorDisplayName=initiatorDisplayName,
-            eventInfo=eventPostBody_dict["eventInfo"],
-            invitee=eventPostBody_dict["invitee"],
-            thumbnail=eventPostBody_dict["thumbnail"]
+            eventInfo=json.dumps(eventPostBody_dict["eventInfo"]),
+            invitee=json.dumps(eventPostBody_dict["invitee"]),
+            thumbnail=json.dumps(eventPostBody_dict["thumbnail"])
         )
         db_session.add(newEvent)
         db_session.commit()
@@ -66,12 +66,12 @@ def miniprogram_event_post(eventPostBody):
             entityId=newEvent.id,
             senderId=learner.id,
             senderDisplayName=initiatorDisplayName,
-            recipients=eventPostBody_dict["invitee"],
+            recipients=json.dumps(eventPostBody_dict["invitee"]),
             rsvp=json.dumps({"accept": [], "decline": [], "tentative": []}),
             sentDateTime=util.EWSDateTimeToDateTime(account.default_timezone.localize(EWSDateTime.now())),
             modifiedDateTime=util.EWSDateTimeToDateTime(account.default_timezone.localize(EWSDateTime.now())),
             expireDateTime=util.EWSDateTimeToDateTime(EWSDateTime.from_string(eventPostBody_dict["eventInfo"]["expireDateTime"])),
-            content=eventPostBody_dict["content"]
+            content=json.dumps(eventPostBody_dict["content"])
         )
         db_session.add(newPushMessage)
         db_session.commit()
@@ -186,9 +186,9 @@ def miniprogram_event_eventId_get(eventId):
             "id": event.id,
             "initiatorId": event.initiatorId,
             "initiatorDisplayName": event.initiatorDisplayName,
-            "eventInfo": event.eventInfo,
-            "invitee": event.invitee,
-            "thumbnail": event.thumbnail,
+            "eventInfo": json.loads(event.eventInfo),
+            "invitee": json.loads(event.invitee),
+            "thumbnail": json.loads(event.thumbnail),
             "rsvp": json.loads(pushMessage.rsvp)
         }
         db_session.remove()
@@ -251,8 +251,8 @@ def miniprogram_event_get():
                 "id": event.id,
                 "initiatorId": event.initiatorId,
                 "initiatorDisplayName": event.initiatorDisplayName,
-                "eventInfo": event.eventInfo,
-                "invitee": event.invitee
+                "eventInfo": json.loads(event.eventInfo),
+                "invitee": json.loads(event.invitee)
             })
         db_session.remove()
     except Exception as e:

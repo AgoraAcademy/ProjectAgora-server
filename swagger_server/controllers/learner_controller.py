@@ -150,11 +150,11 @@ def learner_post(learner):  # noqa: E501
             dateOfRegistration=learner.date_of_registration,
             reasonOfRegistration=learner.reason_of_registration,
             previousStatus=learner.previous_status,
-            custodianInfo=learner_dict["custodianInfo"],
-            emergentContact=learner_dict["emergentContact"],
-            contactInfo=learner_dict["contactInfo"],
-            medicalInfo=learner_dict["medicalInfo"],
-            notes=learner_dict["notes"],
+            custodianInfo=json.dumps(learner_dict["custodianInfo"]),
+            emergentContact=json.dumps(learner_dict["emergentContact"]),
+            contactInfo=json.dumps(learner_dict["contactInfo"]),
+            medicalInfo=json.dumps(learner_dict["medicalInfo"]),
+            notes=json.dumps(learner_dict["notes"]),
         ))
         db_session.commit()
     except Exception as e:
