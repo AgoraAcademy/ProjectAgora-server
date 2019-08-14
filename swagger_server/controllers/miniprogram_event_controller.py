@@ -141,9 +141,9 @@ def miniprogram_event_patch(eventId):
                 if itemKey == "invitee":
                     event.invitee = json.dumps(eventPatchBody_dict[itemKey])
                 if itemKey == "thumbnail":
-                    event.thumbnail = eventPatchBody_dict[itemKey]
+                    event.thumbnail = json.dumps(eventPatchBody_dict[itemKey])
                 if itemKey == "content":
-                    pushMessage.content = eventPatchBody_dict[itemKey]
+                    pushMessage.content = json.dumps(eventPatchBody_dict[itemKey])
                 if itemKey in ["title", "description", "fee", "location"]:
                     newEventInfo = json.loads(event.eventInfo)
                     newEventInfo[itemKey] = eventPatchBody_dict[itemKey]
