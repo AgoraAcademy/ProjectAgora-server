@@ -560,28 +560,28 @@ paths:
                 type: "string"
                 format: "byte"
       x-swagger-router-controller: "swagger_server.controllers.miniprogram_controller"
-  /miniprogram_qr/{qrtype}:
-    get:
-      tags:
-      - "MiniProgram"
-      summary: "处理微信小程序扫码操作"
-      operationId: "miniprogram_qr_get"
-      parameters:
-      - name: "qrtype"
-        in: "path"
-        description: "二维码类型"
-        required: true
-        type: "string"
-      responses:
-        200:
-          description: "成功"
-          schema:
-            type: "object"
-            properties: 
-              projectCover:
-                type: "string"
-                format: "byte"
-      x-swagger-router-controller: "swagger_server.controllers.miniprogram_controller"
+  # /miniprogram_qr/{qrtype}:
+  #   get:
+  #     tags:
+  #     - "MiniProgram"
+  #     summary: "处理微信小程序扫码操作"
+  #     operationId: "miniprogram_qr_get"
+  #     parameters:
+  #     - name: "qrtype"
+  #       in: "path"
+  #       description: "二维码类型"
+  #       required: true
+  #       type: "string"
+  #     responses:
+  #       200:
+  #         description: "成功"
+  #         schema:
+  #           type: "object"
+  #           properties: 
+  #             projectCover:
+  #               type: "string"
+  #               format: "byte"
+  #     x-swagger-router-controller: "swagger_server.controllers.miniprogram_controller"
   /oauth2:
     get:
       tags:

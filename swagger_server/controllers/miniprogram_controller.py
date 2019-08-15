@@ -27,11 +27,6 @@ account = Account(
 )
 
 
-def miniprogram_qr_get(qrtype):  # noqa: E501
-    if qrtype == "dMGsnKEKLe.txt":
-        return send_from_directory(os.path.dirname(os.environ["MINIPROGRAM_QR_VERIFICATION_FILE"]), 'dMGsnKEKLe.txt')
-
-
 def miniprogram_login_get(js_code):
     db_session = None
     if "DEVMODE" in os.environ:
