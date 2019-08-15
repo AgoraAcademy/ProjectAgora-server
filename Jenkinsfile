@@ -28,18 +28,11 @@ pipeline {
                 sh 'pip3 install --no-cache-dir -r /var/jenkins_home/workspace/ProjectAgora-server/requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple'
             }
         }
-        stage('Initialize') {
+        stage('Serve') {
             steps {
                 sh 'gunicorn --chdir ./swagger_server --certfile $SSL_CERT_CRT_PROD --keyfile $SSL_CERT_KEY_PROD app:app -b :80'
             }
         }
-        // stage('Deliver'){
-        //     steps {
-        //         input message: 'Start nginx? Click "proceed" to continue)'
-        //         sh 'service nginx start'
-        //         input message: 'Finished using the website? Click "proceed" to continue)'
-        //     }
-        // }
     }
     post {
         always{
