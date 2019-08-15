@@ -30,7 +30,7 @@ pipeline {
         }
         stage('Serve') {
             steps {
-                sh 'gunicorn --chdir ./swagger_server --certfile $SSL_CERT_CRT_DEV --keyfile $SSL_CERT_KEY_DEV app:app -b :80'
+                sh 'gunicorn --chdir ./swagger_server --certfile $SSL_CERT_CRT_DEV --keyfile $SSL_CERT_KEY_DEV app:app -b :80 --log-level=warning'
             }
         }
     }
