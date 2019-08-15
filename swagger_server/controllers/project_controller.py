@@ -108,10 +108,10 @@ def project_post(project):  # noqa: E501
             projectMentorID=project.project_mentor_id,
             projectMentor=project.project_mentor,
             averageGuidingHourPerWeek=project.average_guiding_hour_per_week,
-            projectMeta=project_dict["projectMeta"],
-            projectApprovalInfo=project_dict["projectApprovalInfo"],
-            conclusionInfo=project_dict["conclusionInfo"],
-            content=[],
+            projectMeta=json.dumps(project_dict["projectMeta"]),
+            projectApprovalInfo=json.dumps(project_dict["projectApprovalInfo"]),
+            conclusionInfo=json.dumps(project_dict["conclusionInfo"]),
+            content='[]',
             coverImageURL=project_dict["coverImageURL"]
         ))
         db_session.commit()
@@ -167,10 +167,10 @@ def project_project_id_get(projectId):  # noqa: E501
         "projectMentorID": project.projectMentorID,
         "projectMentor": project.projectMentor,
         "averageGuidingHourPerWeek": project.averageGuidingHourPerWeek,
-        "projectMeta": project.projectMeta,
-        "projectApprovalInfo": project.projectApprovalInfo,
-        "content": project.content,
-        "conclusionInfo": project.conclusionInfo,
+        "projectMeta": json.loads(project.projectMeta),
+        "projectApprovalInfo": json.loads(project.projectApprovalInfo),
+        "content": json.loads(project.content),
+        "conclusionInfo": json.loads(project.conclusionInfo),
         "lastUpdatedTime": project.lastUpdatedTime,
         "coverImageURL": project.coverImageURL
     }
@@ -219,10 +219,10 @@ def project_project_id_patch(projectId):  # noqa: E501
         "projectMentorID": patch.project_mentor_id,
         "projectMentor": patch.project_mentor,
         "averageGuidingHourPerWeek": patch.average_guiding_hour_per_week,
-        "projectMeta": connexion.request.get_json()["projectMeta"] if patch.project_meta is not None else None,
-        "projectApprovalInfo": connexion.request.get_json()["projectApprovalInfo"] if patch.project_approval_info is not None else None,
-        "content": connexion.request.get_json()["content"] if patch.content is not None else None,
-        "conclusionInfo": connexion.request.get_json()["conclusionInfo"] if patch.conclusion_info is not None else None,
+        "projectMeta": json.dumps(connexion.request.get_json()["projectMeta"] if patch.project_meta is not None else None),
+        "projectApprovalInfo": json.dumps(connexion.request.get_json()["projectApprovalInfo"] if patch.project_approval_info is not None else None),
+        "content": json.dumps(connexion.request.get_json()["content"] if patch.content is not None else None),
+        "conclusionInfo": json.dumps(connexion.request.get_json()["conclusionInfo"] if patch.conclusion_info is not None else None),
         "coverImageURL": connexion.request.get_json().get("coverImageURL", ""),
     }
     patchDict = {k: v for k, v in patchDict.items() if v is not None}

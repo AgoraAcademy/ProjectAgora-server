@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, DateTime, String, Integer, Boolean, DECIMAL, JSON, ForeignKey
+from sqlalchemy import create_engine, Column, DateTime, String, Integer, Boolean, DECIMAL, UnicodeText, ForeignKey
 from sqlalchemy.orm import scoped_session, sessionmaker, relationship
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -34,11 +34,11 @@ class Learner_db(Base):
     destinationOfLeave = Column(String(120), nullable=True)
     mentorship = Column(String(1000), nullable=True)
     salaryCard = Column(String(120), nullable=True)
-    custodianInfo = Column(JSON, nullable=True)
-    emergentContact = Column(JSON, nullable=False)
-    contactInfo = Column(JSON, nullable=False)
-    medicalInfo = Column(JSON, nullable=False)
-    notes = Column(JSON, nullable=True)
+    custodianInfo = Column(UnicodeText, nullable=True)
+    emergentContact = Column(UnicodeText, nullable=False)
+    contactInfo = Column(UnicodeText, nullable=False)
+    medicalInfo = Column(UnicodeText, nullable=False)
+    notes = Column(UnicodeText, nullable=True)
     microsoftAccessToken = Column(String(2000), nullable=True)
     microsoftRefreshToken = Column(String(2000), nullable=True)
     microsoftId = Column(String(120), nullable=True)
@@ -66,10 +66,10 @@ class Project_db(Base):
     projectMentorID = Column(Integer)
     projectMentor = Column(String(120), nullable=True)
     averageGuidingHourPerWeek = Column(DECIMAL(5, 2))
-    projectMeta = Column(JSON, nullable=True)
-    projectApprovalInfo = Column(JSON, nullable=True)
-    content = Column(JSON, nullable=True)
-    conclusionInfo = Column(JSON, nullable=True)
+    projectMeta = Column(UnicodeText, nullable=True)
+    projectApprovalInfo = Column(UnicodeText, nullable=True)
+    content = Column(UnicodeText, nullable=True)
+    conclusionInfo = Column(UnicodeText, nullable=True)
     lastUpdatedTime = Column(String(120), nullable=True)
     coverImageURL = Column(String(120), nullable=True)
 
@@ -83,10 +83,10 @@ class Course_db(Base):
     createdByID = Column(Integer)
     createdBy = Column(String(120), nullable=False)
     creditHourPerWeek = Column(DECIMAL(5, 2))
-    courseTimeShift = Column(JSON, nullable=True)
+    courseTimeShift = Column(UnicodeText, nullable=True)
     courseLengthInWeeks = Column(Integer)
-    courseMeta = Column(JSON, nullable=True)
-    content = Column(JSON, nullable=True)
+    courseMeta = Column(UnicodeText, nullable=True)
+    content = Column(UnicodeText, nullable=True)
     coverImageURL = Column(String(120), nullable=True)
 
 
@@ -94,7 +94,7 @@ class Config_db(Base):
     __tablename__ = 'config'
     id = Column(Integer, primary_key=True)
     name = Column(String(120), nullable=False)
-    value = Column(JSON, nullable=True)
+    value = Column(UnicodeText, nullable=True)
 
 
 class BookingNotes_db(Base):
@@ -112,12 +112,12 @@ class PushMessage_db(Base):
     entityId = Column(Integer, nullable=True, comment='信息相关记录id（只记录id数值，不作表关联')
     senderId = Column(Integer, ForeignKey("learner.id"), nullable=False)
     senderDisplayName = Column(String(20), nullable=True)
-    recipients = Column(JSON, nullable=True)
+    recipients = Column(UnicodeText, nullable=True)
     rsvp = Column(String(2000), nullable=True)
     sentDateTime = Column(DateTime)
     modifiedDateTime = Column(DateTime)
     expireDateTime = Column(DateTime)
-    content = Column(JSON, nullable=True)
+    content = Column(UnicodeText, nullable=True)
 
 
 class Event_db(Base):
@@ -126,9 +126,9 @@ class Event_db(Base):
     pushMessageId = Column(Integer, ForeignKey("pushMessage.id"), nullable=True)
     initiatorId = Column(Integer, ForeignKey("learner.id"), nullable=False)
     initiatorDisplayName = Column(String(20), nullable=True)
-    eventInfo = Column(JSON, nullable=True)
-    invitee = Column(JSON, nullable=True)
-    thumbnail = Column(JSON, nullable=True)
+    eventInfo = Column(UnicodeText, nullable=True)
+    invitee = Column(UnicodeText, nullable=True)
+    thumbnail = Column(UnicodeText, nullable=True)
 
 
 class Announcement_db(Base):
@@ -137,12 +137,12 @@ class Announcement_db(Base):
     pushMessageId = Column(Integer, ForeignKey("pushMessage.id"), nullable=True)
     initiatorId = Column(Integer, ForeignKey("learner.id"), nullable=False)
     initiatorDisplayName = Column(String(20), nullable=True)
-    recipients = Column(JSON, nullable=True)
+    recipients = Column(UnicodeText, nullable=True)
     sentDateTime = Column(DateTime)
     modifiedDateTime = Column(DateTime)
     expireDateTime = Column(DateTime)
-    thumbnail = Column(JSON, nullable=True)
-    body = Column(JSON, nullable=True)
+    thumbnail = Column(UnicodeText, nullable=True)
+    body = Column(UnicodeText, nullable=True)
 
 
 def init_db(uri):

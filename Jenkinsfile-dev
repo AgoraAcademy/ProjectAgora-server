@@ -14,9 +14,8 @@ pipeline {
         STORAGEURL = credentials('STORAGEURL')
         EWS_admin_password = credentials('EWS_admin_password')
         EWS_admin_email = credentials('EWS_admin_email')
-        SSL_CERT_KEY = credentials('SSL_CERT_KEY')
-        SSL_CERT_PEM = credentials('SSL_CERT_PEM')
-        MINIPROGRAM_QR_VERIFICATION_FILE = credentials('MINIPROGRAM_QR_VERIFICATION_FILE')
+        SSL_CERT_KEY_DEV = credentials('SSL_CERT_KEY_DEV')
+        SSL_CERT_CRT_DEV = credentials('SSL_CERT_CRT_DEV')
         MINIPROGRAM_APPID = credentials('MINIPROGRAM_APPID')
         MINIPROGRAM_APPSECRET = credentials('MINIPROGRAM_APPSECRET')
         MICROSOFT_CLIENT_ID = credentials('MICROSOFT_CLIENT_ID')
@@ -29,18 +28,11 @@ pipeline {
                 sh 'pip3 install --no-cache-dir -r /var/jenkins_home/workspace/ProjectAgora-server-dev/requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple'
             }
         }
-        stage('Initialize') {
+        stage('Serve') {
             steps {
-                sh 'gunicorn --chdir ./swagger_server --certfile $SSL_CERT_PEM --keyfile $SSL_CERT_KEY app:app -b :80'
+                sh 'gunicorn --chdir ./swagger_server --certfile $SSL_CERT_CRT_DEV --keyfile $SSL_CERT_KEY_DEV app:app -b :80'
             }
         }
-        // stage('Deliver'){
-        //     steps {
-        //         input message: 'Start nginx? Click "proceed" to continue)'
-        //         sh 'service nginx start'
-        //         input message: 'Finished using the website? Click "proceed" to continue)'
-        //     }
-        // }
     }
     post {
         always{
