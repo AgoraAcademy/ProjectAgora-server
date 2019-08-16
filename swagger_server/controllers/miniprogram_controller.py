@@ -114,16 +114,16 @@ def miniprogram_learner_post(learnerPostBody):
     except Exception as e:
         print(e)
         db_session.remove()
-        return {"error": str(e)}, 403
+        return {'code': -1004, 'message': '解析微信认证加密信息失败', 'log': str(e)}, 403
     try:
         learner = db_session.query(orm.Learner_db).filter(orm.Learner_db.unionid == unionid).one_or_none()
         if learner:
             db_session.remove()
-            return {"error": "用户已存在注册记录"}, 403
+            return {'code': -1003, 'message': "用户已存在注册记录"}, 403
     except Exception as e:
         print(e)
         db_session.remove()
-        return {"error": str(e)}, 403
+        return {'code': -1001, 'message': '没有找到对应的Learner', 'log': str(e)}, 403
     try:
         db_session.add(orm.Learner_db(
             validated=False,
@@ -153,10 +153,10 @@ def miniprogram_learner_post(learnerPostBody):
         db_session.commit()
     except Exception as e:
         db_session.remove()
-        return {"error": str(e)}, 401
+        return {'code': -1002, 'message': '数据有误，创建成员失败', 'log': str(e)}, 401
     response = {"unionid": unionid}
     db_session.remove()
-    return response, 201
+    return {'code': 0, 'data': response, 'message': '成功创建'}, 201
 
 
 def miniprogram_learner_get():
