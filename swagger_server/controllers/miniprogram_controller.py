@@ -159,6 +159,32 @@ def miniprogram_learner_post(learnerPostBody):
     return response, 201
 
 
+def miniprogram_learner_get():
+    db_session = None
+    if "DEVMODE" in os.environ:
+        if os.environ["DEVMODE"] == "True":
+            db_session = orm.init_db(os.environ["DEV_DATABASEURI"])
+        else:
+            db_session = orm.init_db(os.environ["DATABASEURI"])
+    else:
+        db_session = orm.init_db(os.environ["DATABASEURI"])
+    learner = weapp.getLearner()
+    if not learner:
+        db_session.remove()
+        return {'code': -1001, 'message': '没有找到对应的Learner'}, 401
+    result_list = []
+    query = db_session.query(orm.Learner_db).filter(orm.Learner_db.validated == True).all()
+    for learner in query:
+        result_list.append({
+            "id": learner.id,
+            "givenName": learner.givenName,
+            "familyName": learner.familyName,
+            "isMentor": learner.isMentor
+        })
+    db_session.remove()
+    return {'code': 0, 'data': result_list, 'message': '成功'}, 200
+
+
 def miniprogram_ping():
     return {'message': 'pinged!'}, 200
 

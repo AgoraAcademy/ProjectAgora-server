@@ -365,6 +365,30 @@ paths:
                 type: "string"
       x-swagger-router-controller: "swagger_server.controllers.miniprogram_event_controller"  
   /miniprogram/learner:
+    get:
+      tags:
+      - "Learner"
+      - "MiniProgram"
+      summary: "小程序端获取成员列表"
+      operationId: "miniprogram_learner_get"
+      responses:
+        200:
+          description: "成功"
+          schema:
+            type: "array"
+            items: 
+              type: "object"
+              properties: 
+                id:
+                  type: integer
+                givenName:
+                  type: string
+                familyName:
+                  type: string
+                isMentor:
+                  type: boolean
+      x-swagger-router-controller: "swagger_server.controllers.miniprogram_controller"
+      
     post:
       tags:
       - "Learner"
