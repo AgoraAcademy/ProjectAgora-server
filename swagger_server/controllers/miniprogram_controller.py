@@ -3,6 +3,7 @@ import six
 import os
 import requests
 import json
+import pytz
 from tzlocal import get_localzone
 from flask import Flask, send_from_directory
 from exchangelib import Credentials, Account, Configuration, DELEGATE, RoomList, CalendarItem, EWSDateTime
@@ -25,6 +26,7 @@ account = Account(
     config=config,
     access_type=DELEGATE
 )
+tzinfo = pytz.timezone('Asia/Shanghai')
 
 
 def miniprogram_login_get(js_code):
@@ -385,18 +387,18 @@ def miniprogram_pushMessage_get():
     response = []
     pushMessageList = db_session.query(orm.PushMessage_db).all()
     for pushMessage in pushMessageList:
-        if util.isRecipient(learner, pushMessage.recipients):
+        if util.isRecipient(learner, json.loads(pushMessage.recipients)):
             response.append({
                 "id": pushMessage.id,
                 "messageType": pushMessage.messageType,
                 "entityId": pushMessage.entityId,
                 "senderId": pushMessage.senderId,
-                "recipients": json.dumps(pushMessage.recipients),
-                "rsvp": json.dumps(pushMessage.rsvp),
-                "sentDateTime": EWSDateTime.from_datetime(pushMessage.sentDateTime).ewsformat(),
-                "modifiedDateTime": EWSDateTime.from_datetime(pushMessage.modifiedDateTime).ewsformat(),
-                "expireDateTime": EWSDateTime.from_datetime(pushMessage.expireDateTime).ewsformat(),
-                "content": json.dumps(pushMessage.content)
+                "recipients": json.loads(pushMessage.recipients),
+                "rsvp": json.loads(pushMessage.rsvp),
+                "sentDateTime": EWSDateTime.from_datetime(tzinfo.localize(pushMessage.sentDateTime)).ewsformat(),
+                "modifiedDateTime": EWSDateTime.from_datetime(tzinfo.localize(pushMessage.modifiedDateTime)).ewsformat(),
+                "expireDateTime": EWSDateTime.from_datetime(tzinfo.localize(pushMessage.expireDateTime)).ewsformat(),
+                "content": json.loads(pushMessage.content)
             })
     db_session.remove()
     return response, 200

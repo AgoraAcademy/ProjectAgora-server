@@ -2,6 +2,7 @@ import base64
 import json
 import os
 import connexion
+from flask import current_app
 from Crypto.Cipher import AES
 from swagger_server import util, wxLogin, orm
 
@@ -41,8 +42,9 @@ def getLearner() -> str:
     try:
         sessionKey = headers['token']
     except Exception as e:
+        current_app.logger.error(str(e))
         db_session.remove()
-        return {"error": e}
+        return None
     learner = db_session.query(orm.Learner_db).filter(orm.Learner_db.sessionKey == sessionKey).one_or_none()
     db_session.remove()
     return learner

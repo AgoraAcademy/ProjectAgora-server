@@ -146,7 +146,7 @@ def _deserialize_dict(data, boxed_type):
 def isRecipient(learner, rules: dict) -> bool:
     for rule in rules:
         if rule["type"] == "list":
-            if learner.id in rule.content:
+            if learner.id in rule['content']:
                 return True
         if rule["type"] == "filters":
             for filter in rule["content"]:
