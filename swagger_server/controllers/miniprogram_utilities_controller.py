@@ -37,7 +37,7 @@ def miniprogram_picture_post(pictureType: str):  # noqa: E501
     learner = weapp.getLearner()
     if not learner:
         db_session.remove()
-        return {'code': -1001, 'message': '没有找到对应的Learner'}, 401
+        return {'code': -1001, 'message': '没有找到对应的Learner'}, 200
     if pictureType not in ["event", "announcement", "project", "course", "club"]:
         return {'code': -4001, "message": "图片类别不支持"}, 403
     img = connexion.request.files.get('picture')
@@ -72,7 +72,7 @@ def miniprogram_picture_get(uid, pictureType):  # noqa: E501
     learner = weapp.getLearner()
     if not learner:
         db_session.remove()
-        return {'code': -1001, 'message': '没有找到对应的Learner'}, 401
+        return {'code': -1001, 'message': '没有找到对应的Learner'}, 200
     if pictureType not in ["event", "announcement", "project", "course", "club"]:
         return {'code': -4001, "message": "图片类别不支持"}, 403
     img_local_path = os.path.join(os.environ["STORAGEURL"], pictureType, uid)

@@ -45,14 +45,14 @@ def miniprogram_login_get(js_code):
         resultjson = result.json()
     except Exception as e:
         db_session.remove()
-        return {'code': -1005, 'message': 'Code换取SessionKey失败', "log": str(e)}, 401
+        return {'code': -1005, 'message': 'Code换取SessionKey失败', "log": str(e)}, 200
     learner = db_session.query(orm.Learner_db).filter(orm.Learner_db.openidWeApp == resultjson['openid']).one_or_none()
     try:
         learner.sessionKey = resultjson['session_key']
         db_session.commit()
     except Exception as e:
         db_session.remove()
-        return {'code': -1006, 'message': 'SessionKey写入失败', "log": str(e)}, 401
+        return {'code': -1006, 'message': 'SessionKey写入失败', "log": str(e)}, 200
     response = {'token': resultjson['session_key'], 'unionid': learner.unionid if learner else '', 'learnerFullName': learner.familyName + learner.givenName if learner else '', "isAdmin": learner.isAdmin if learner else '', "learnerId": learner.id if learner else ''}
     db_session.remove()
     return {'code': 0, 'data': response, 'message': '成功'}, 200
@@ -82,7 +82,7 @@ def miniprogram_login_post(loginPostBody):
     learner = db_session.query(orm.Learner_db).filter(orm.Learner_db.unionid == unionid).one_or_none()
     if not learner:
         db_session.remove()
-        return {'code': -1001, 'message': '没有找到对应的Learner'}, 401
+        return {'code': -1001, 'message': '没有找到对应的Learner'}, 200
     learner.openidWeApp = decryptedData['openId']
     learner.sessionKey = sessionKey
     db_session.commit()
@@ -144,7 +144,7 @@ def miniprogram_learner_post(learnerPostBody):
         db_session.commit()
     except Exception as e:
         db_session.remove()
-        return {'code': -1002, 'message': '数据有误，创建成员失败', 'log': str(e)}, 401
+        return {'code': -1002, 'message': '数据有误，创建成员失败', 'log': str(e)}, 200
     response = {"unionid": unionid}
     db_session.remove()
     return {'code': 0, 'data': response, 'message': '成功创建'}, 201
@@ -162,7 +162,7 @@ def miniprogram_learner_get():
     learner = weapp.getLearner()
     if not learner:
         db_session.remove()
-        return {'code': -1001, 'message': '没有找到对应的Learner'}, 401
+        return {'code': -1001, 'message': '没有找到对应的Learner'}, 200
     result_list = []
     query = db_session.query(orm.Learner_db).filter(orm.Learner_db.validated == True).all()
     for learner in query:
@@ -191,7 +191,7 @@ def miniprogram_booking_get():
         db_session = orm.init_db(os.environ["DATABASEURI"])
     if not weapp.getLearner():
         db_session.remove()
-        return {'code': -1001, 'message': '没有找到对应的Learner'}, 401
+        return {'code': -1001, 'message': '没有找到对应的Learner'}, 200
     response = []
     roomLists = db_session.query(orm.Config_db).filter(orm.Config_db.name == 'roomLists').one_or_none().value
     roomDescriptions = db_session.query(orm.Config_db).filter(orm.Config_db.name == 'roomDescriptions').one_or_none().value
@@ -236,7 +236,7 @@ def miniprogram_booking_roomCode_get(roomCode, monthToLoad):  # noqa: E501
     learner = weapp.getLearner()
     if not learner:
         db_session.remove()
-        return {'code': -1001, 'message': '没有找到对应的Learner'}, 401
+        return {'code': -1001, 'message': '没有找到对应的Learner'}, 200
     try:
         room_account = Account(
             primary_smtp_address=('%s@agoraacademy.cn' % roomCode),
@@ -297,7 +297,7 @@ def miniprogram_booking_roomCode_post(roomCode, appointment):  # noqa: E501
     learner = weapp.getLearner()
     if not learner:
         db_session.remove()
-        return {'code': -1001, 'message': '没有找到对应的Learner'}, 401
+        return {'code': -1001, 'message': '没有找到对应的Learner'}, 200
     room_account = Account(
         primary_smtp_address=('%s@agoraacademy.cn' % roomCode),
         credentials=credentials,
@@ -353,7 +353,7 @@ def miniprogram_booking_roomCode_delete(roomCode, monthToLoad, deleteInfo):  # n
     learner = weapp.getLearner()
     if not learner:
         db_session.remove()
-        return {'code': -1001, 'message': '没有找到对应的Learner'}, 401
+        return {'code': -1001, 'message': '没有找到对应的Learner'}, 200
     changekey = deleteInfo['changekey']
     try:
         room_account = Account(
@@ -396,7 +396,7 @@ def miniprogram_pushMessage_get():
     learner = weapp.getLearner()
     if not learner:
         db_session.remove()
-        return {'code': -1001, 'message': '没有找到对应的Learner'}, 401
+        return {'code': -1001, 'message': '没有找到对应的Learner'}, 200
     response = []
     pushMessageList = db_session.query(orm.PushMessage_db).all()
     for pushMessage in pushMessageList:

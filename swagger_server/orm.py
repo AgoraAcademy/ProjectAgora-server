@@ -140,9 +140,11 @@ class Announcement_db(Base):
     recipients = Column(UnicodeText, nullable=True)
     sentDateTime = Column(DateTime)
     modifiedDateTime = Column(DateTime)
-    expireDateTime = Column(DateTime)
     thumbnail = Column(UnicodeText, nullable=True)
+    title = Column(UnicodeText, nullable=False)
+    description = Column(UnicodeText, nullable=True)
     body = Column(UnicodeText, nullable=True)
+    attachment = Column(UnicodeText, nullable=True)
 
 
 def init_db(uri):

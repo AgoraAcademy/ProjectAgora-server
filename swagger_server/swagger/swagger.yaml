@@ -64,11 +64,21 @@ paths:
       operationId: "miniprogram_pushMessage_get"
       responses:
         200:
-          description: "成功获取推送信息列表"
+          description: "小程序统一使用200状态码，具体信息参照返回码"
           schema:
-            type: "array"
-            items:
-              type: "object"
+            type: "object"
+            properties: 
+              code:
+                type: integer
+                description: "返回码"
+              data:
+                description: "数据"
+              message:
+                description: "信息"
+              log:
+                description: "错误日志"
+              detail:
+                description: "更详细的信息"
       x-swagger-router-controller: "swagger_server.controllers.miniprogram_controller"
   /miniprogram/utilities/picture:
     get:
@@ -90,13 +100,21 @@ paths:
         type: "string"
       responses:
         200:
-          description: "小程序统一获取图片接口"
+          description: "小程序统一使用200状态码，具体信息参照返回码"
           schema:
             type: "object"
             properties: 
-              picture:
-                type: "string"
-                format: "byte"
+              code:
+                type: integer
+                description: "返回码"
+              data:
+                description: "数据"
+              message:
+                description: "信息"
+              log:
+                description: "错误日志"
+              detail:
+                description: "更详细的信息"
       x-swagger-router-controller: "swagger_server.controllers.miniprogram_utilities_controller"
     post:
       tags:
@@ -118,19 +136,22 @@ paths:
           required: true
           type: "string"
       responses:
-        201:
-          description: "创建成功"
+        200:
+          description: "小程序统一使用200状态码，具体信息参照返回码"
           schema:
             type: "object"
-            properties:
-              url:
-                type: "string"
-            description: "访问用的url"
-        401:
-          description: "API key is missing or invalid"
-          headers:
-            WWW_Authenticate:
-              type: "string"
+            properties: 
+              code:
+                type: integer
+                description: "返回码"
+              data:
+                description: "数据"
+              message:
+                description: "信息"
+              log:
+                description: "错误日志"
+              detail:
+                description: "更详细的信息"
       x-swagger-router-controller: "swagger_server.controllers.miniprogram_utilities_controller"
   /miniprogram/event:
     get:
@@ -141,11 +162,21 @@ paths:
       operationId: "miniprogram_event_get"
       responses:
         200:
-          description: "成功"
+          description: "小程序统一使用200状态码，具体信息参照返回码"
           schema:
-            type: "array"
-            items: 
-              type: "object"
+            type: "object"
+            properties: 
+              code:
+                type: integer
+                description: "返回码"
+              data:
+                description: "数据"
+              message:
+                description: "信息"
+              log:
+                description: "错误日志"
+              detail:
+                description: "更详细的信息"
       x-swagger-router-controller: "swagger_server.controllers.miniprogram_event_controller"
     post:
       tags:
@@ -223,15 +254,22 @@ paths:
                     url:
                       type: string
       responses:
-        201:
-          description: "成功"
+        200:
+          description: "小程序统一使用200状态码，具体信息参照返回码"
           schema:
             type: "object"
             properties: 
-              pushMessage_id:
-                type: "number"
-              event_id:
-                type: "number"
+              code:
+                type: integer
+                description: "返回码"
+              data:
+                description: "数据"
+              message:
+                description: "信息"
+              log:
+                description: "错误日志"
+              detail:
+                description: "更详细的信息"
       x-swagger-router-controller: "swagger_server.controllers.miniprogram_event_controller"
   /miniprogram/event/{eventId}:
     get:
@@ -248,14 +286,21 @@ paths:
       operationId: "miniprogram_event_eventId_get"
       responses:
         200:
-          description: "获得一个event的详细信息"
+          description: "小程序统一使用200状态码，具体信息参照返回码"
           schema:
             type: "object"
-        401:
-          description: "API key is missing or invalid"
-          headers:
-            WWW_Authenticate:
-              type: "string"
+            properties: 
+              code:
+                type: integer
+                description: "返回码"
+              data:
+                description: "数据"
+              message:
+                description: "信息"
+              log:
+                description: "错误日志"
+              detail:
+                description: "更详细的信息"
       x-swagger-router-controller: "swagger_server.controllers.miniprogram_event_controller"
     delete:
       tags:
@@ -270,15 +315,22 @@ paths:
           required: true
       operationId: "miniprogram_event_eventId_delete"
       responses:
-        204:
-          description: "成功删除"
+        200:
+          description: "小程序统一使用200状态码，具体信息参照返回码"
           schema:
             type: "object"
-        401:
-          description: "API key is missing or invalid"
-          headers:
-            WWW_Authenticate:
-              type: "string"
+            properties: 
+              code:
+                type: integer
+                description: "返回码"
+              data:
+                description: "数据"
+              message:
+                description: "信息"
+              log:
+                description: "错误日志"
+              detail:
+                description: "更详细的信息"
       x-swagger-router-controller: "swagger_server.controllers.miniprogram_event_controller"
   /miniprogram/event/{eventId}/patch:
     post:
@@ -357,12 +409,21 @@ paths:
         required: true
       responses:
         200:
-          description: "成功"
+          description: "小程序统一使用200状态码，具体信息参照返回码"
           schema:
             type: "object"
             properties: 
+              code:
+                type: integer
+                description: "返回码"
+              data:
+                description: "数据"
               message:
-                type: "string"
+                description: "信息"
+              log:
+                description: "错误日志"
+              detail:
+                description: "更详细的信息"
       x-swagger-router-controller: "swagger_server.controllers.miniprogram_event_controller"  
   /miniprogram/learner:
     get:
@@ -373,22 +434,22 @@ paths:
       operationId: "miniprogram_learner_get"
       responses:
         200:
-          description: "成功"
+          description: "小程序统一使用200状态码，具体信息参照返回码"
           schema:
-            type: "array"
-            items: 
-              type: "object"
-              properties: 
-                id:
-                  type: integer
-                givenName:
-                  type: string
-                familyName:
-                  type: string
-                isMentor:
-                  type: boolean
+            type: "object"
+            properties: 
+              code:
+                type: integer
+                description: "返回码"
+              data:
+                description: "数据"
+              message:
+                description: "信息"
+              log:
+                description: "错误日志"
+              detail:
+                description: "更详细的信息"
       x-swagger-router-controller: "swagger_server.controllers.miniprogram_controller"
-      
     post:
       tags:
       - "Learner"
@@ -419,13 +480,22 @@ paths:
             birthday:
               type: "string"
       responses:
-        201:
-          description: "成功"
+        200:
+          description: "小程序统一使用200状态码，具体信息参照返回码"
           schema:
             type: "object"
             properties: 
-              unionid:
-                type: "string"
+              code:
+                type: integer
+                description: "返回码"
+              data:
+                description: "数据"
+              message:
+                description: "信息"
+              log:
+                description: "错误日志"
+              detail:
+                description: "更详细的信息"
       x-swagger-router-controller: "swagger_server.controllers.miniprogram_controller"
   /miniprogram/booking/{roomCode}:
     get:
@@ -445,14 +515,21 @@ paths:
         type: string
       responses:
         200:
-          description: "OK"
+          description: "小程序统一使用200状态码，具体信息参照返回码"
           schema:
-            $ref: "#/definitions/Learner"
-        401:
-          description: "API key is missing or invalid"
-          headers:
-            WWW_Authenticate:
-              type: "string"
+            type: "object"
+            properties: 
+              code:
+                type: integer
+                description: "返回码"
+              data:
+                description: "数据"
+              message:
+                description: "信息"
+              log:
+                description: "错误日志"
+              detail:
+                description: "更详细的信息"
       x-swagger-router-controller: "swagger_server.controllers.miniprogram_controller"
     post:
       tags:
@@ -470,15 +547,22 @@ paths:
         schema:
           type: object
       responses:
-        201:
-          description: "OK"
+        200:
+          description: "小程序统一使用200状态码，具体信息参照返回码"
           schema:
-            $ref: "#/definitions/Learner"
-        401:
-          description: "API key is missing or invalid"
-          headers:
-            WWW_Authenticate:
-              type: "string"
+            type: "object"
+            properties: 
+              code:
+                type: integer
+                description: "返回码"
+              data:
+                description: "数据"
+              message:
+                description: "信息"
+              log:
+                description: "错误日志"
+              detail:
+                description: "更详细的信息"
       x-swagger-router-controller: "swagger_server.controllers.miniprogram_controller"
     delete:
       tags:
@@ -501,14 +585,21 @@ paths:
           type: object
       responses:
         200:
-          description: "OK"
+          description: "小程序统一使用200状态码，具体信息参照返回码"
           schema:
-            $ref: "#/definitions/Learner"
-        401:
-          description: "API key is missing or invalid"
-          headers:
-            WWW_Authenticate:
-              type: "string"
+            type: "object"
+            properties: 
+              code:
+                type: integer
+                description: "返回码"
+              data:
+                description: "数据"
+              message:
+                description: "信息"
+              log:
+                description: "错误日志"
+              detail:
+                description: "更详细的信息"
       x-swagger-router-controller: "swagger_server.controllers.miniprogram_controller"
   /miniprogram/booking:
     get:
@@ -518,9 +609,21 @@ paths:
       operationId: "miniprogram_booking_get"
       responses:
         200:
-          description: "成功"
+          description: "小程序统一使用200状态码，具体信息参照返回码"
           schema:
             type: "object"
+            properties: 
+              code:
+                type: integer
+                description: "返回码"
+              data:
+                description: "数据"
+              message:
+                description: "信息"
+              log:
+                description: "错误日志"
+              detail:
+                description: "更详细的信息"
       x-swagger-router-controller: "swagger_server.controllers.miniprogram_controller"
   /miniprogram/ping:
     get:
@@ -530,9 +633,21 @@ paths:
       operationId: "miniprogram_ping"
       responses:
         200:
-          description: "成功"
+          description: "小程序统一使用200状态码，具体信息参照返回码"
           schema:
             type: "object"
+            properties: 
+              code:
+                type: integer
+                description: "返回码"
+              data:
+                description: "数据"
+              message:
+                description: "信息"
+              log:
+                description: "错误日志"
+              detail:
+                description: "更详细的信息"
       x-swagger-router-controller: "swagger_server.controllers.miniprogram_controller"
   /miniprogram/login:
     get:
@@ -548,13 +663,21 @@ paths:
         type: "string"
       responses:
         200:
-          description: "成功"
+          description: "小程序统一使用200状态码，具体信息参照返回码"
           schema:
             type: "object"
             properties: 
-              projectCover:
-                type: "string"
-                format: "byte"
+              code:
+                type: integer
+                description: "返回码"
+              data:
+                description: "数据"
+              message:
+                description: "信息"
+              log:
+                description: "错误日志"
+              detail:
+                description: "更详细的信息"
       x-swagger-router-controller: "swagger_server.controllers.miniprogram_controller"
     post:
       tags:
@@ -575,14 +698,22 @@ paths:
             iv:
               type: "string"
       responses:
-        201:
-          description: "成功"
+        200:
+          description: "小程序统一使用200状态码，具体信息参照返回码"
           schema:
             type: "object"
             properties: 
-              projectCover:
-                type: "string"
-                format: "byte"
+              code:
+                type: integer
+                description: "返回码"
+              data:
+                description: "数据"
+              message:
+                description: "信息"
+              log:
+                description: "错误日志"
+              detail:
+                description: "更详细的信息"
       x-swagger-router-controller: "swagger_server.controllers.miniprogram_controller"
   # /miniprogram_qr/{qrtype}:
   #   get:
@@ -598,13 +729,21 @@ paths:
   #       type: "string"
   #     responses:
   #       200:
-  #         description: "成功"
+  #         description: "小程序统一使用200状态码，具体信息参照返回码"
   #         schema:
   #           type: "object"
   #           properties: 
-  #             projectCover:
-  #               type: "string"
-  #               format: "byte"
+  #             code:
+  #               type: integer
+  #               description: "返回码"
+  #             data:
+  #               description: "数据"
+  #             message:
+  #               description: "信息"
+  #             log:
+  #               description: "错误日志"
+  #             detail:
+  #               description: "更详细的信息"
   #     x-swagger-router-controller: "swagger_server.controllers.miniprogram_controller"
   /oauth2:
     get:

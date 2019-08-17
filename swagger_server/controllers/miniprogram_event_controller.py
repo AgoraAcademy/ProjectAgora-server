@@ -41,12 +41,12 @@ def miniprogram_event_post(eventPostBody):
     learner = weapp.getLearner()
     if not learner:
         db_session.remove()
-        return {'code': -1001, 'message': '没有找到对应的Learner'}, 401
+        return {'code': -1001, 'message': '没有找到对应的Learner'}, 200
     # 自定义鉴权
     if not learner.isAdmin:
         if "initiatorDisplayName" in eventPostBody:
             db_session.remove()
-            return {'code': -1007, 'message': '需要管理员权限', "detail": "非管理员不可自定义发起者名称"}, 403
+            return {'code': -1007, 'message': '需要管理员权限', "detail": "非管理员不可自定义发起者名称"}, 200
         initiatorDisplayName = learner.familyName + learner.givenName
     else:
         initiatorDisplayName = eventPostBody_dict["initiatorDisplayName"] if "initiatorDisplayName" in eventPostBody_dict else learner.familyName + learner.givenName
@@ -80,7 +80,7 @@ def miniprogram_event_post(eventPostBody):
     except Exception as e:
         db_session.remove()
         return {'code': -3001, 'message': '活动创建失败', 'log': str(e)}, 400
-    response = {"pushMessage_id": newPushMessage.id, "event_id": newEvent.id}
+    response = {"pushMessageId": newPushMessage.id, "id": newEvent.id}
     db_session.remove()
     return {'code': 0, 'data': response, 'message': '成功'}, 201
 
@@ -99,7 +99,7 @@ def miniprogram_event_patch(eventId):
     learner = weapp.getLearner()
     if not learner:
         db_session.remove()
-        return {'code': -1001, 'message': '没有找到对应的Learner'}, 401
+        return {'code': -1001, 'message': '没有找到对应的Learner'}, 200
     event = db_session.query(orm.Event_db).filter(orm.Event_db.id == eventId).one_or_none()
     pushMessage = db_session.query(orm.PushMessage_db).filter(orm.PushMessage_db.id == event.pushMessageId).one_or_none()
     if event.initiatorId != learner.id:
@@ -159,7 +159,7 @@ def miniprogram_event_patch(eventId):
             return {'code': 0, 'message': '成功'}, 200
         except Exception as e:
             db_session.remove()
-            return {'code': -3003, 'message': '更新活动失败', 'log': str(e)}, 400
+            return {'code': -3003, 'message': '更新活动失败', 'log': str(e)}, 200
 
 
 def miniprogram_event_eventId_get(eventId):
@@ -175,7 +175,7 @@ def miniprogram_event_eventId_get(eventId):
     learner = weapp.getLearner()
     if not learner:
         db_session.remove()
-        return {'code': -1001, 'message': '没有找到对应的Learner'}, 401
+        return {'code': -1001, 'message': '没有找到对应的Learner'}, 200
     event = db_session.query(orm.Event_db).filter(orm.Event_db.id == eventId).one_or_none()
     pushMessage = db_session.query(orm.PushMessage_db).filter(orm.PushMessage_db.id == event.pushMessageId).one_or_none()
     try:
@@ -192,7 +192,7 @@ def miniprogram_event_eventId_get(eventId):
         return {'code': 0, 'data': response, 'message': '成功'}, 200
     except Exception as e:
         db_session.remove()
-        return {'code': -3004, 'message': '获取活动详情失败', 'log': str(e)}, 400
+        return {'code': -3004, 'message': '获取活动详情失败', 'log': str(e)}, 200
 
 
 def miniprogram_event_eventId_delete(eventId):
@@ -208,7 +208,7 @@ def miniprogram_event_eventId_delete(eventId):
     learner = weapp.getLearner()
     if not learner:
         db_session.remove()
-        return {'code': -1001, 'message': '没有找到对应的Learner'}, 401
+        return {'code': -1001, 'message': '没有找到对应的Learner'}, 200
     event = db_session.query(orm.Event_db).filter(orm.Event_db.id == eventId).one_or_none()
     pushMessage = db_session.query(orm.PushMessage_db).filter(orm.PushMessage_db.id == event.pushMessageId).one_or_none()
     try:
@@ -217,7 +217,7 @@ def miniprogram_event_eventId_delete(eventId):
             if pushMessage:
                 db_session.delete(pushMessage)
         else:
-            return {'code': -1007, 'message': '需要管理员权限', 'detail': '只有管理员或该活动创建人可以删除该活动'}, 401
+            return {'code': -1007, 'message': '需要管理员权限', 'detail': '只有管理员或该活动创建人可以删除该活动'}, 200
         db_session.commit()
         db_session.remove()
         return {'code': 0, 'message': '成功'}, 200
@@ -239,17 +239,19 @@ def miniprogram_event_get():
     learner = weapp.getLearner()
     if not learner:
         db_session.remove()
-        return {'code': -1001, 'message': '没有找到对应的Learner'}, 401
+        return {'code': -1001, 'message': '没有找到对应的Learner'}, 200
     try:
         eventList = db_session.query(orm.Event_db).all()
         response = []
         for event in eventList:
             response.append({
                 "id": event.id,
+                "pushMessageId": event.pushMessageId,
                 "initiatorId": event.initiatorId,
                 "initiatorDisplayName": event.initiatorDisplayName,
                 "eventInfo": json.loads(event.eventInfo),
-                "invitee": json.loads(event.invitee)
+                "invitee": json.loads(event.invitee),
+                "thumbnail": json.loads(event.thumbnail)
             })
         db_session.remove()
     except Exception as e:
