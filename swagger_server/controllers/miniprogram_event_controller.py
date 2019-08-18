@@ -214,6 +214,7 @@ def miniprogram_event_eventId_delete(eventId):
     try:
         if event.initiatorId == learner.id or learner.isAdmin:
             db_session.delete(event)
+            db_session.commit()
             if pushMessage:
                 db_session.delete(pushMessage)
         else:

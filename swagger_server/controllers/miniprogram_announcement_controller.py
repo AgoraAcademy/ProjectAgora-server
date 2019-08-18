@@ -228,6 +228,7 @@ def miniprogram_announcement_announcementId_delete(announcementId):
     try:
         if announcement.initiatorId == learner.id or learner.isAdmin:
             db_session.delete(announcement)
+            db_session.commit()
             if pushMessage:
                 db_session.delete(pushMessage)
         else:
