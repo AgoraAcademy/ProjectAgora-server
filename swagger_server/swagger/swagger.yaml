@@ -232,6 +232,9 @@ paths:
               properties: 
                 title:
                   type: "string"
+                description:
+                  description: "推送信息使用的描述信息，建议与关联的entity里的描述一致"
+                  type: "string"
                 timeInfo:
                   description: "人类可读的和时间相关的信息"
                   type: string
