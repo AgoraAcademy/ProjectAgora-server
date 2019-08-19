@@ -151,9 +151,13 @@ def isRecipient(learner, rules: dict) -> bool:
         if rule["type"] == "filters":
             for filter in rule["content"]:
                 if filter["scope"] == "校区":
+                    if filter['value'] == "全部校区":
+                        return True
                     if learner.branch != filter["value"]:
                         return False
                 if filter["scope"] == "角色":
+                    if filter['value'] == "所有成员":
+                        return True
                     if learner.role != filter["value"]:
                         return False
             return True
