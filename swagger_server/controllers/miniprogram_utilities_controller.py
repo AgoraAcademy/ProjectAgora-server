@@ -86,4 +86,4 @@ def miniprogram_picture_get(uid, pictureType):  # noqa: E501
         db_session.remove()
         return {'code': -4004, 'message': '图片文件读取失败', 'log': str(e)}, 400
     db_session.remove()
-    return {'code': 0, 'data': response, 'message': '成功'}, 200
+    return response, 200
