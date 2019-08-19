@@ -220,9 +220,7 @@ paths:
                   type: 
                     type: "string"
                   content:
-                    type: "array"
-                    items:
-                      type: "integer"
+                    description: "选择器内容"
             thumbnail:
               type: "array"
               items:
