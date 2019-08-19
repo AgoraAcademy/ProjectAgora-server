@@ -39,13 +39,13 @@ def miniprogram_picture_post(pictureType: str):  # noqa: E501
         db_session.remove()
         return {'code': -1001, 'message': '没有找到对应的Learner'}, 200
     if pictureType not in ["event", "announcement", "project", "course", "club"]:
-        return {'code': -4001, "message": "图片类别不支持"}, 403
+        return {'code': -4001, "message": "图片类别不支持"}, 200
     img = connexion.request.files.get('picture')
     extension = os.path.splitext(img.filename)[-1]
     uid = create_uuid()
     if not allowed_file(img.filename):
         db_session.remove()
-        return {'code': -4002, 'message': '文件类型不支持'}, 400
+        return {'code': -4002, 'message': '文件类型不支持'}, 200
     path = os.path.join(os.environ["STORAGEURL"], pictureType)
     if not os.path.exists(path):
         os.makedirs(path)
@@ -55,7 +55,7 @@ def miniprogram_picture_post(pictureType: str):  # noqa: E501
         img.save(file_path)
     except Exception as e:
         db_session.remove()
-        return {'code': -4003, 'message': '文件储存失败', 'log': str(e)}, 400
+        return {'code': -4003, 'message': '文件储存失败', 'log': str(e)}, 200
     db_session.remove()
     return {'code': 0, 'data': {"url": url}, 'message': '成功'}, 201
 

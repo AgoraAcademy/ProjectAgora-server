@@ -79,7 +79,7 @@ def miniprogram_event_post(eventPostBody):
         # TODO: 这里应当添加Microsoft Graph API为initiator添加appointment并发送至recipients
     except Exception as e:
         db_session.remove()
-        return {'code': -3001, 'message': '活动创建失败', 'log': str(e)}, 400
+        return {'code': -3001, 'message': '活动创建失败', 'log': str(e)}, 200
     response = {"pushMessageId": newPushMessage.id, "id": newEvent.id}
     db_session.remove()
     return {'code': 0, 'data': response, 'message': '成功'}, 201
@@ -128,7 +128,7 @@ def miniprogram_event_patch(eventId):
             db_session.commit()
         except Exception as e:
             db_session.remove()
-            return {'code': -3002, 'message': '更新rsvp信息失败', 'log': str(e)}, 400
+            return {'code': -3002, 'message': '更新rsvp信息失败', 'log': str(e)}, 200
         db_session.remove()
         return {'code': 0, 'message': '成功更新rsvp信息'}, 200
     else:
@@ -224,7 +224,7 @@ def miniprogram_event_eventId_delete(eventId):
         return {'code': 0, 'message': '成功'}, 200
     except Exception as e:
         db_session.remove()
-        return {'code': -3005, 'message': '删除活动失败', 'log': str(e)}, 400
+        return {'code': -3005, 'message': '删除活动失败', 'log': str(e)}, 200
 
 
 def miniprogram_event_get():
@@ -257,5 +257,5 @@ def miniprogram_event_get():
         db_session.remove()
     except Exception as e:
         db_session.remove()
-        return {'code': -3006, 'message': '获取活动列表失败', 'log': str(e)}, 400
+        return {'code': -3006, 'message': '获取活动列表失败', 'log': str(e)}, 200
     return {'code': 0, 'data': response, 'message': '成功'}, 200

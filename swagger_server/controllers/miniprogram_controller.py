@@ -224,7 +224,7 @@ def miniprogram_booking_get():
             response.append(entry)
     except Exception as e:
         db_session.remove()
-        return {'code': -2001, 'message': '获取房间列表失败', "log": str(e)}, 400
+        return {'code': -2001, 'message': '获取房间列表失败', "log": str(e)}, 200
     db_session.remove()
     return {'code': 0, 'data': response, 'message': '成功'}, 200
 
@@ -252,7 +252,7 @@ def miniprogram_booking_roomCode_get(roomCode, monthToLoad):  # noqa: E501
         )
     except Exception as e:
         db_session.remove()
-        return {'code': -2002, 'message': '代理用的Office Account初始化失败', "log": str(e)}, 400
+        return {'code': -2002, 'message': '代理用的Office Account初始化失败', "log": str(e)}, 200
     monthToLoad_year = int(monthToLoad.split("-")[0])
     monthToLoad_month = int(monthToLoad.split("-")[1])
     if monthToLoad_month == 1:
@@ -286,7 +286,7 @@ def miniprogram_booking_roomCode_get(roomCode, monthToLoad):  # noqa: E501
             })
     except Exception as e:
         db_session.remove()
-        return {'code': -2003, 'message': '获取房间事件列表失败', 'log': str(e)}, 400
+        return {'code': -2003, 'message': '获取房间事件列表失败', 'log': str(e)}, 200
     db_session.remove()
     return {'code': 0, 'data': responseList, 'message': '成功'}, 200
 
@@ -342,7 +342,7 @@ def miniprogram_booking_roomCode_post(roomCode, appointment):  # noqa: E501
         db_session.commit()
     except Exception as e:
         db_session.remove()
-        return {'code': -2004, 'message': '房间预约失败', 'log': str(e)}, 400
+        return {'code': -2004, 'message': '房间预约失败', 'log': str(e)}, 200
     db_session.remove()
     return {'code': 0, 'message': 'success'}, 201
 
@@ -370,7 +370,7 @@ def miniprogram_booking_roomCode_delete(roomCode, monthToLoad, deleteInfo):  # n
         )
     except Exception as e:
         db_session.remove()
-        return {'code': -2002, 'message': '代理用的Office Account初始化失败', "log": str(e)}, 400
+        return {'code': -2002, 'message': '代理用的Office Account初始化失败', "log": str(e)}, 200
     start_year = int(monthToLoad.split("-")[0])
     start_month = int(monthToLoad.split("-")[1])
     start = room_account.default_timezone.localize(EWSDateTime(start_year, start_month, 1))
@@ -386,7 +386,7 @@ def miniprogram_booking_roomCode_delete(roomCode, monthToLoad, deleteInfo):  # n
                     db_session.delete(notes)
     except Exception as e:
         db_session.remove()
-        return {'code': -2005, 'message': '房间预约删除失败', 'error': str(e)}, 400
+        return {'code': -2005, 'message': '房间预约删除失败', 'error': str(e)}, 200
     db_session.remove()
     return {'code': 0, 'message': 'success'}, 200
 
