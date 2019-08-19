@@ -54,10 +54,10 @@ def miniprogram_login_get(js_code):
         db_session.remove()
         return {'code': -1006, 'message': 'SessionKey写入失败', "log": str(e)}, 200
     response = {
-        'token': resultjson['session_key'], 
-        'unionid': learner.unionid if learner else '', 
-        'learnerFullName': learner.familyName + learner.givenName if learner else '', 
-        "isAdmin": learner.isAdmin if learner else '', 
+        'token': resultjson['session_key'],
+        'unionid': learner.unionid if learner else '',
+        'learnerFullName': learner.familyName + learner.givenName if learner else '',
+        "isAdmin": learner.isAdmin if learner else '',
         "learnerId": learner.id if learner else '',
         "branch": learner.branch if learner else ''
     }
