@@ -85,7 +85,7 @@ def miniprogram_login_post(loginPostBody):
     except Exception as e:
         print(e)
         db_session.remove()
-        return {'code': -1004, 'message': '解析微信认证加密信息失败', 'log': str(e)}, 403
+        return {'code': -1004, 'message': '解析微信认证加密信息失败', 'log': str(e)}, 200
     learner = db_session.query(orm.Learner_db).filter(orm.Learner_db.unionid == unionid).one_or_none()
     if not learner:
         db_session.remove()
@@ -117,11 +117,11 @@ def miniprogram_learner_post(learnerPostBody):
     except Exception as e:
         print(e)
         db_session.remove()
-        return {'code': -1004, 'message': '解析微信认证加密信息失败', 'log': str(e)}, 403
+        return {'code': -1004, 'message': '解析微信认证加密信息失败', 'log': str(e)}, 200
     learner = db_session.query(orm.Learner_db).filter(orm.Learner_db.unionid == unionid).one_or_none()
     if learner:
         db_session.remove()
-        return {'code': -1003, 'message': "用户已存在注册记录"}, 403
+        return {'code': -1003, 'message': "用户已存在注册记录"}, 200
     try:
         db_session.add(orm.Learner_db(
             validated=False,
@@ -154,7 +154,7 @@ def miniprogram_learner_post(learnerPostBody):
         return {'code': -1002, 'message': '数据有误，创建成员失败', 'log': str(e)}, 200
     response = {"unionid": unionid}
     db_session.remove()
-    return {'code': 0, 'data': response, 'message': '成功创建'}, 201
+    return {'code': 0, 'data': response, 'message': '成功创建'}, 200
 
 
 def miniprogram_learner_get():
@@ -344,7 +344,7 @@ def miniprogram_booking_roomCode_post(roomCode, appointment):  # noqa: E501
         db_session.remove()
         return {'code': -2004, 'message': '房间预约失败', 'log': str(e)}, 200
     db_session.remove()
-    return {'code': 0, 'message': 'success'}, 201
+    return {'code': 0, 'message': 'success'}, 200
 
 
 def miniprogram_booking_roomCode_delete(roomCode, monthToLoad, deleteInfo):  # noqa: E501

@@ -57,7 +57,7 @@ def miniprogram_picture_post(pictureType: str):  # noqa: E501
         db_session.remove()
         return {'code': -4003, 'message': '文件储存失败', 'log': str(e)}, 200
     db_session.remove()
-    return {'code': 0, 'data': {"url": url}, 'message': '成功'}, 201
+    return {'code': 0, 'data': {"url": url}, 'message': '成功'}, 200
 
 
 def miniprogram_picture_get(uid, pictureType):  # noqa: E501
@@ -74,7 +74,7 @@ def miniprogram_picture_get(uid, pictureType):  # noqa: E501
         db_session.remove()
         return {'code': -1001, 'message': '没有找到对应的Learner'}, 200
     if pictureType not in ["event", "announcement", "project", "course", "club"]:
-        return {'code': -4001, "message": "图片类别不支持"}, 403
+        return {'code': -4001, "message": "图片类别不支持"}, 200
     img_local_path = os.path.join(os.environ["STORAGEURL"], pictureType, uid)
     img_stream = ''
     try:
@@ -84,6 +84,6 @@ def miniprogram_picture_get(uid, pictureType):  # noqa: E501
             response.headers['Content-Type'] = 'image'
     except Exception as e:
         db_session.remove()
-        return {'code': -4004, 'message': '图片文件读取失败', 'log': str(e)}, 400
+        return {'code': -4004, 'message': '图片文件读取失败', 'log': str(e)}, 200
     db_session.remove()
     return response, 200

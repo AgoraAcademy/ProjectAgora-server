@@ -82,7 +82,7 @@ def miniprogram_event_post(eventPostBody):
         return {'code': -3001, 'message': '活动创建失败', 'log': str(e)}, 200
     response = {"pushMessageId": newPushMessage.id, "id": newEvent.id}
     db_session.remove()
-    return {'code': 0, 'data': response, 'message': '成功'}, 201
+    return {'code': 0, 'data': response, 'message': '成功'}, 200
 
 
 def miniprogram_event_patch(eventId):
