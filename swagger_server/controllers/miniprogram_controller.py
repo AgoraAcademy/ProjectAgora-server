@@ -200,8 +200,8 @@ def miniprogram_booking_get():
         db_session.remove()
         return {'code': -1001, 'message': '没有找到对应的Learner'}, 200
     response = []
-    roomLists = db_session.query(orm.Config_db).filter(orm.Config_db.name == 'roomLists').one_or_none().value
-    roomDescriptions = db_session.query(orm.Config_db).filter(orm.Config_db.name == 'roomDescriptions').one_or_none().value
+    roomLists = json.loads(db_session.query(orm.Config_db).filter(orm.Config_db.name == 'roomLists').one_or_none().value)
+    roomDescriptions = json.loads(db_session.query(orm.Config_db).filter(orm.Config_db.name == 'roomDescriptions').one_or_none().value)
     try:
         for roomList in roomLists:
             roomsEWS = GetRooms(protocol=account.protocol).call(
