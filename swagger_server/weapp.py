@@ -5,6 +5,7 @@ import connexion
 from flask import current_app
 from Crypto.Cipher import AES
 from swagger_server import util, wxLogin, orm
+from swagger_server.orm import Learner_db
 
 
 class WXBizDataCrypt:
@@ -29,7 +30,7 @@ class WXBizDataCrypt:
         return s[:-ord(s[len(s) - 1:])]
 
 
-def getLearner() -> str:
+def getLearner() -> Learner_db or None:
     db_session = None
     if "DEVMODE" in os.environ:
         if os.environ["DEVMODE"] == "True":
@@ -45,6 +46,6 @@ def getLearner() -> str:
         current_app.logger.error(str(e))
         db_session.remove()
         return None
-    learner = db_session.query(orm.Learner_db).filter(orm.Learner_db.sessionKey == sessionKey).one_or_none()
+    learner: Learner_db = db_session.query(orm.Learner_db).filter(orm.Learner_db.sessionKey == sessionKey).one_or_none()
     db_session.remove()
     return learner

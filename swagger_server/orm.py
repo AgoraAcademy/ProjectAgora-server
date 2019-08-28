@@ -147,6 +147,21 @@ class Announcement_db(Base):
     attachment = Column(UnicodeText, nullable=True)
 
 
+class Notification_db(Base):
+    __tablename__ = 'notification'
+    id = Column(Integer, primary_key=True)
+    learnerId = Column(Integer, ForeignKey("learner.id"), nullable=False)
+    notificationType = Column(String(10), nullable=False, comment='提醒类型，包括活动日程、预约日程、社团日程、选修日程、项目计划、社区日程')
+    entityId = Column(Integer, nullable=True, comment='信息相关记录id（只记录id数值，不作表关联')
+    createdDateTime = Column(DateTime)
+    expireDateTime = Column(DateTime)
+    status = Column(UnicodeText, nullable=True)
+    title = Column(UnicodeText, nullable=False)
+    description = Column(UnicodeText, nullable=True)
+
+# Task, Appointment
+
+
 def init_db(uri):
     # ssl_args = {'ssl': {'ca': './config/amazon-rds-ca-cert.pem'}}
     # engine = create_engine(uri, convert_unicode=True, connect_args=ssl_args)

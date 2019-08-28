@@ -35,6 +35,21 @@ paths:
   #           items:
   #             type: "object"
   #     x-swagger-router-controller: "swagger_server.controllers.miniprogram_utilities_controller"
+  /miniprogram/notification:
+    get:
+      description: "获取提醒的统一接口"
+      operationId: "miniprogram_notification_get"
+      tags:
+        - "MiniProgram"
+      parameters:
+        - name: "isGetAll"
+          in: "query"
+          type: "boolean"
+          required: false
+      responses:
+        '200':
+          description: OK
+      x-swagger-router-controller: "swagger_server.controllers.miniprogram_notification_controller"
   /utilities/connectToMicrosoft:
     post:
       tags:

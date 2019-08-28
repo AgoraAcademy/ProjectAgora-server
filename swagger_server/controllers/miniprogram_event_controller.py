@@ -76,6 +76,17 @@ def miniprogram_event_post(eventPostBody):
         db_session.commit()
         newEvent.pushMessageId = newPushMessage.id
         db_session.commit()
+        newNotification = orm.Notification_db(
+            learnerId=learner.id,
+            notificationType="活动日程",
+            entityId=newEvent.id,
+            createdDateTime=util.EWSDateTimeToDateTime(account.default_timezone.localize(EWSDateTime.now())),
+            expireDateTime=util.EWSDateTimeToDateTime(EWSDateTime.from_string(json.loads(newEvent.eventInfo)["expireDateTime"])),
+            title=json.loads(newEvent.eventInfo["title"]),
+            description=json.loads(newEvent.eventInfo["description"])
+        )
+        db_session.add(newNotification)
+        db_session.commit()
         # TODO: 这里应当添加Microsoft Graph API为initiator添加appointment并发送至recipients
     except Exception as e:
         db_session.remove()
@@ -100,27 +111,66 @@ def miniprogram_event_patch(eventId):
     if not learner:
         db_session.remove()
         return {'code': -1001, 'message': '没有找到对应的Learner'}, 200
-    event = db_session.query(orm.Event_db).filter(orm.Event_db.id == eventId).one_or_none()
+    event: orm.Event_db = db_session.query(orm.Event_db).filter(orm.Event_db.id == eventId).one_or_none()
     pushMessage = db_session.query(orm.PushMessage_db).filter(orm.PushMessage_db.id == event.pushMessageId).one_or_none()
     if event.initiatorId != learner.id:
         try:
             newRsvp = json.loads(pushMessage.rsvp) if pushMessage.rsvp else {'accept': [], 'decline': [], 'tentative': []}
             newEntry = {'id': learner.id, 'fullname': learner.familyName + learner.givenName}
+            # 登记参加的处理逻辑
             if eventPatchBody_dict["rsvp"] == "参加":
                 if newEntry not in newRsvp['accept']:
                     newRsvp["accept"].append(newEntry)
-                for responseType in ["decline", "tentative"]:
+                    existingNotification: orm.Notification_db = db_session.query(orm.Notification_db).filter(orm.Notification_db.learnerId == learner.id).filter(orm.Notification_db.notificationType == "活动日程").filter(orm.Notification_db.entityId == event.id).one_or_none()
+                    if existingNotification:
+                        existingNotification.status = "参加"
+                    else:
+                        newNotification: orm.Notification_db = orm.Notification_db(
+                            learnerId=learner.id,
+                            notificationType="活动日程",
+                            entityId=event.id,
+                            createdDateTime=util.EWSDateTimeToDateTime(account.default_timezone.localize(EWSDateTime.now())),
+                            expireDateTime=util.EWSDateTimeToDateTime(EWSDateTime.from_string(json.loads(event.eventInfo)["expireDateTime"])),
+                            status="参加",
+                            title=json.loads(event.eventInfo)["title"],
+                            description=json.loads(event.eventInfo)["description"],
+                        )
+                        db_session.add(newNotification)
+                for responseType in ["decline"]:
                     if newEntry in newRsvp[responseType]:
                         newRsvp[responseType].remove(newEntry)
-            if eventPatchBody_dict["rsvp"] == "拒绝":
+                for responseType in ["tentative"]:
+                    if newEntry in newRsvp[responseType]:
+                        newRsvp[responseType].remove(newEntry)
+            # 登记不参加的处理逻辑
+            if eventPatchBody_dict["rsvp"] == "不参加":
                 if newEntry not in newRsvp['decline']:
                     newRsvp["decline"].append(newEntry)
                 for responseType in ["accept", "tentative"]:
                     if newEntry in newRsvp[responseType]:
                         newRsvp[responseType].remove(newEntry)
-            if eventPatchBody_dict["rsvp"] == "可能参加":
+                        notificationToDelete = db_session.query(orm.Notification_db).filter(orm.Notification_db.learnerId == learner.id).filter(orm.Notification_db.notificationType == "活动日程").filter(orm.Notification_db.entityId == event.id).one_or_none()
+                        if notificationToDelete:
+                            db_session.delete(notificationToDelete)
+            # 登记待定的处理逻辑
+            if eventPatchBody_dict["rsvp"] == "待定":
                 if newEntry not in newRsvp['tentative']:
                     newRsvp["tentative"].append(newEntry)
+                    existingNotification: orm.Notification_db = db_session.query(orm.Notification_db).filter(orm.Notification_db.learnerId == learner.id).filter(orm.Notification_db.notificationType == "活动日程").filter(orm.Notification_db.entityId == event.id).one_or_none()
+                    if existingNotification:
+                        existingNotification.status = "待定"
+                    else:
+                        newNotification: orm.Notification_db = orm.Notification_db(
+                            learnerId=learner.id,
+                            notificationType="活动日程",
+                            entityId=event.id,
+                            createdDateTime=util.EWSDateTimeToDateTime(account.default_timezone.localize(EWSDateTime.now())),
+                            expireDateTime=util.EWSDateTimeToDateTime(EWSDateTime.from_string(json.loads(event.eventInfo)["expireDateTime"])),
+                            status="参加",
+                            title=json.loads(event.eventInfo)["title"],
+                            description=json.loads(event.eventInfo)["description"],
+                        )
+                        db_session.add(newNotification)
                 for responseType in ["decline", "accept"]:
                     if newEntry in newRsvp[responseType]:
                         newRsvp[responseType].remove(newEntry)
@@ -220,6 +270,10 @@ def miniprogram_event_eventId_delete(eventId):
         else:
             return {'code': -1007, 'message': '需要管理员权限', 'detail': '只有管理员或该活动创建人可以删除该活动'}, 200
         db_session.commit()
+        notificationToDelete = db_session.query(orm.Notification_db).filter(orm.Notification_db.learnerId == learner.id).filter(orm.Notification_db.notificationType == "活动日程").filter(orm.Notification_db.entityId == event.id).one_or_none()
+        if notificationToDelete:
+            db_session.delete(notificationToDelete)
+            db_session.commit()
         db_session.remove()
         return {'code': 0, 'message': '成功'}, 200
     except Exception as e:
