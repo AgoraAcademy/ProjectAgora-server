@@ -4,6 +4,7 @@ import os
 import requests
 import json
 import pytz
+from typing import List
 from tzlocal import get_localzone
 from flask import Flask, send_from_directory
 from exchangelib import Credentials, Account, Configuration, DELEGATE, RoomList, CalendarItem, EWSDateTime
@@ -171,13 +172,15 @@ def miniprogram_learner_get():
         db_session.remove()
         return {'code': -1001, 'message': '没有找到对应的Learner'}, 200
     result_list = []
-    query = db_session.query(orm.Learner_db).filter(orm.Learner_db.validated == True).all()
+    query: List[orm.Learner_db] = db_session.query(orm.Learner_db).filter(orm.Learner_db.validated == True).all()
     for learner in query:
         result_list.append({
             "id": learner.id,
             "givenName": learner.givenName,
             "familyName": learner.familyName,
-            "isMentor": learner.isMentor
+            "isMentor": learner.isMentor,
+            "role": learner.role,
+            "branch": learner.branch
         })
     db_session.remove()
     return {'code': 0, 'data': result_list, 'message': '成功'}, 200
