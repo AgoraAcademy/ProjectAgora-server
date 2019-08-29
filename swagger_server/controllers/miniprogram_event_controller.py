@@ -82,8 +82,8 @@ def miniprogram_event_post(eventPostBody):
             entityId=newEvent.id,
             createdDateTime=util.EWSDateTimeToDateTime(account.default_timezone.localize(EWSDateTime.now())),
             expireDateTime=util.EWSDateTimeToDateTime(EWSDateTime.from_string(json.loads(newEvent.eventInfo)["expireDateTime"])),
-            title=json.loads(newEvent.eventInfo["title"]),
-            description=json.loads(newEvent.eventInfo["description"])
+            title=json.loads(newEvent.eventInfo)["title"],
+            description=json.loads(newEvent.eventInfo)["description"]
         )
         db_session.add(newNotification)
         db_session.commit()
