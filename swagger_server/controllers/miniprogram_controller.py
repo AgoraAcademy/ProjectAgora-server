@@ -55,7 +55,7 @@ def miniprogram_login_get(js_code):
         db_session.commit()
     except Exception as e:
         db_session.remove()
-        return {'code': -1006, 'message': 'SessionKey写入失败', "log": str(e)}, 200
+        return {'code': -1006, 'message': 'SessionKey写入失败', "log": str(e), "code2sessionResult": resultjson}, 200
     response = {
         'token': resultjson['session_key'],
         'unionid': learner.unionid if learner else '',
