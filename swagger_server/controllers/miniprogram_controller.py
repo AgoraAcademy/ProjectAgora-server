@@ -47,6 +47,8 @@ def miniprogram_login_get(js_code):
     except Exception as e:
         db_session.remove()
         return {'code': -1005, 'message': 'Code换取SessionKey失败', "log": str(e)}, 200
+    if "openid" not in resultjson or "session_key" not in resultjson:
+        return {'code': -1005, 'message': 'Code换取SessionKey失败', "log": resultjson['errmsg']}, 200
     learner = db_session.query(orm.Learner_db).filter(orm.Learner_db.openidWeApp == resultjson['openid']).one_or_none()
     try:
         learner.sessionKey = resultjson['session_key']
