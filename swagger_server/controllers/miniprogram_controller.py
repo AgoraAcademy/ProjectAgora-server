@@ -53,7 +53,6 @@ def miniprogram_login_get(js_code):
     if not learner:
         response = {
             'token': resultjson['session_key'],
-            'unionid': learner.unionid if learner else '',
         }
         return {'code': -1001, 'message': '没有找到对应的Learner', 'data': response}, 200
     try:
