@@ -54,7 +54,7 @@ def miniprogram_login_get(js_code):
         response = {
             'token': resultjson['session_key'],
         }
-        return {'code': -1001, 'message': '没有找到对应的Learner', 'data': response}, 200
+        return {'code': -1008, 'message': '在调用login GET后，Code换取SessionKey成功，但没有找到对应的learner', 'data': response}, 200
     try:
         learner.sessionKey = resultjson['session_key']
         db_session.commit()
