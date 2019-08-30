@@ -50,6 +50,12 @@ def miniprogram_login_get(js_code):
     if "openid" not in resultjson or "session_key" not in resultjson:
         return {'code': -1005, 'message': 'Code换取SessionKey失败', "log": resultjson['errmsg']}, 200
     learner = db_session.query(orm.Learner_db).filter(orm.Learner_db.openidWeApp == resultjson['openid']).one_or_none()
+    if not learner:
+        response = {
+            'token': resultjson['session_key'],
+            'unionid': learner.unionid if learner else '',
+        }
+        return {'code': -1001, 'message': '没有找到对应的Learner', 'data': response}, 200
     try:
         learner.sessionKey = resultjson['session_key']
         db_session.commit()
