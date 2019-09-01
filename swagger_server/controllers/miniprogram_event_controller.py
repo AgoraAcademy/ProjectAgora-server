@@ -60,7 +60,8 @@ def miniprogram_event_post(eventPostBody):
             initiatorDisplayName=initiatorDisplayName,
             eventInfo=json.dumps(eventPostBody_dict["eventInfo"]),
             invitee=json.dumps(eventPostBody_dict["invitee"]),
-            thumbnail=json.dumps(eventPostBody_dict["thumbnail"])
+            thumbnail=json.dumps(eventPostBody_dict["thumbnail"]),
+            expireDateTime=util.EWSDateTimeToDateTime(EWSDateTime.from_string(eventPostBody_dict["eventInfo"]["expireDateTime"]))
         )
         db_session.add(newEvent)
         db_session.commit()
