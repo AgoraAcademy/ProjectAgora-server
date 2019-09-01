@@ -3,6 +3,8 @@ import six
 import os
 import requests
 import json
+import datetime
+import pytz
 from tzlocal import get_localzone
 from flask import Flask, send_from_directory
 from exchangelib import Credentials, Account, Configuration, DELEGATE, RoomList, CalendarItem, EWSDateTime
@@ -11,6 +13,8 @@ from exchangelib.items import MeetingRequest, MeetingCancellation, SEND_TO_ALL_A
 
 from swagger_server.models.inline_response200 import InlineResponse200  # noqa: E501
 from swagger_server import util, orm, weapp
+
+tzinfo = pytz.timezone('Asia/Shanghai')
 
 credentials = Credentials(
     os.environ["EWS_admin_email"],
@@ -196,12 +200,16 @@ def miniprogram_event_patch(eventId):
                     newEventInfo = json.loads(event.eventInfo)
                     newEventInfo[itemKey] = eventPatchBody_dict[itemKey]
                     event.eventInfo = json.dumps(newEventInfo)
-                if itemKey in ["expireDateTime", "endDateTime", "startDateTime"]:
+                if itemKey in ["endDateTime", "startDateTime"]:
                     newEventInfo = json.loads(event.eventInfo)
                     newEventInfo[itemKey] = eventPatchBody_dict[itemKey]
                     event.eventInfo = json.dumps(newEventInfo)
                     newPatchDateTime = util.EWSDateTimeToDateTime(EWSDateTime.from_string(eventPatchBody_dict[itemKey])),
                     setattr(pushMessage, itemKey, newPatchDateTime)
+                if itemKey == "expireDateTime":
+                    newPatchExpireDateTime = util.EWSDateTimeToDateTime(EWSDateTime.from_string(eventPatchBody_dict[itemKey])),
+                    setattr(pushMessage, itemKey, newPatchExpireDateTime)
+                    setattr(event, "expireDateTime", newPatchExpireDateTime)
             newModifiedDateTime = util.EWSDateTimeToDateTime(account.default_timezone.localize(EWSDateTime.now())),
             pushMessage.modifiedDateTime = newModifiedDateTime
             db_session.commit()
@@ -236,7 +244,8 @@ def miniprogram_event_eventId_get(eventId):
             "eventInfo": json.loads(event.eventInfo),
             "invitee": json.loads(event.invitee),
             "thumbnail": json.loads(event.thumbnail),
-            "rsvp": json.loads(pushMessage.rsvp)
+            "rsvp": json.loads(pushMessage.rsvp),
+            "expireDatetime": EWSDateTime.from_datetime(tzinfo.localize(event.expireDateTime)).ewsformat()
         }
         db_session.remove()
         return {'code': 0, 'data': response, 'message': '成功'}, 200
@@ -281,7 +290,7 @@ def miniprogram_event_eventId_delete(eventId):
         return {'code': -3005, 'message': '删除活动失败', 'log': str(e)}, 200
 
 
-def miniprogram_event_get():
+def miniprogram_event_get(isGetAll: bool = False):
     # 获取活动列表，目前暂时默认为返回全部条目
     db_session = None
     if "DEVMODE" in os.environ:
@@ -296,7 +305,10 @@ def miniprogram_event_get():
         db_session.remove()
         return {'code': -1001, 'message': '没有找到对应的Learner'}, 200
     try:
-        eventList = db_session.query(orm.Event_db).all()
+        if isGetAll:
+            eventList = db_session.query(orm.Event_db).all()
+        else:
+            eventList = db_session.query(orm.Event_db).filter(orm.Notification_db.expireDateTime > datetime.datetime.utcnow()).all()
         response = []
         for event in eventList:
             response.append({

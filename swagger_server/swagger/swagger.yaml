@@ -76,6 +76,11 @@ paths:
       tags:
       - "PushMessage"
       summary: "获取推送信息列表"
+      parameters:
+        - name: "isGetAll"
+          in: "query"
+          type: "boolean"
+          required: false
       operationId: "miniprogram_pushMessage_get"
       responses:
         200:
@@ -174,6 +179,11 @@ paths:
       - "Event"
       - "MiniProgram"
       summary: "小程序端获取活动列表"
+      parameters:
+        - name: "isGetAll"
+          in: "query"
+          type: "boolean"
+          required: false
       operationId: "miniprogram_event_get"
       responses:
         200:

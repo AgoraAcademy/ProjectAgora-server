@@ -4,6 +4,7 @@ import os
 import requests
 import json
 import pytz
+import datetime
 from typing import List
 from tzlocal import get_localzone
 from flask import Flask, send_from_directory
@@ -401,7 +402,7 @@ def miniprogram_booking_roomCode_delete(roomCode, monthToLoad, deleteInfo):  # n
     return {'code': 0, 'message': 'success'}, 200
 
 
-def miniprogram_pushMessage_get():
+def miniprogram_pushMessage_get(isGetAll: bool = False):
     db_session = None
     if "DEVMODE" in os.environ:
         if os.environ["DEVMODE"] == "True":
@@ -415,7 +416,10 @@ def miniprogram_pushMessage_get():
         db_session.remove()
         return {'code': -1001, 'message': '没有找到对应的Learner'}, 200
     response = []
-    pushMessageList = db_session.query(orm.PushMessage_db).all()
+    if isGetAll:
+        pushMessageList = db_session.query(orm.PushMessage_db).all()
+    else:
+        pushMessageList = db_session.query(orm.PushMessage_db).filter(orm.Notification_db.expireDateTime > datetime.datetime.utcnow()).all()
     for pushMessage in pushMessageList:
         if util.isRecipient(learner, json.loads(pushMessage.recipients)):
             response.append({

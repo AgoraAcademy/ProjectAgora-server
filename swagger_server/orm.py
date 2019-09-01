@@ -129,6 +129,7 @@ class Event_db(Base):
     eventInfo = Column(UnicodeText, nullable=True)
     invitee = Column(UnicodeText, nullable=True)
     thumbnail = Column(UnicodeText, nullable=True)
+    expireDateTime = Column(DateTime, nullable=True)
 
 
 class Announcement_db(Base):
