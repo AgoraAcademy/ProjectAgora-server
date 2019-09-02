@@ -16,7 +16,9 @@ def miniprogram_notification_get(isGetAll: bool = False):
             event: Event_db = db_session.query(orm.Event_db).filter(orm.Event_db.id == notification.entityId).one_or_none()
             return {
                 "startDateTime": json.loads(event.eventInfo)["startDateTime"],
-                "endDateTime": json.loads(event.eventInfo)["endDateTime"]
+                "endDateTime": json.loads(event.eventInfo)["endDateTime"],
+                "initiatorId": event.initiatorId,
+                "initiatorDisplayName": event.initiatorDisplayName
             }
     db_session = None
     if "DEVMODE" in os.environ:
