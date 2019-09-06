@@ -49,12 +49,14 @@ def miniprogram_login_get(js_code):
         db_session.remove()
         return {'code': -1005, 'message': 'Code换取SessionKey失败', "log": str(e)}, 200
     if "openid" not in resultjson or "session_key" not in resultjson:
+        db_session.remove()
         return {'code': -1005, 'message': 'Code换取SessionKey失败', "log": resultjson['errmsg']}, 200
     learner = db_session.query(orm.Learner_db).filter(orm.Learner_db.openidWeApp == resultjson['openid']).one_or_none()
     if not learner:
         response = {
             'token': resultjson['session_key'],
         }
+        db_session.remove()
         return {'code': -1008, 'message': '在调用login GET后，Code换取SessionKey成功，但没有找到对应的learner', 'data': response}, 200
     try:
         learner.sessionKey = resultjson['session_key']
@@ -419,7 +421,7 @@ def miniprogram_pushMessage_get(isGetAll: bool = False):
     if isGetAll:
         pushMessageList = db_session.query(orm.PushMessage_db).all()
     else:
-        pushMessageList = db_session.query(orm.PushMessage_db).filter(orm.Notification_db.expireDateTime > datetime.datetime.utcnow()).all()
+        pushMessageList = db_session.query(orm.PushMessage_db).filter(orm.PushMessage_db.expireDateTime > datetime.datetime.utcnow()).all()
     for pushMessage in pushMessageList:
         if util.isRecipient(learner, json.loads(pushMessage.recipients)):
             response.append({
