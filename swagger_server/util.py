@@ -146,14 +146,18 @@ def _deserialize_dict(data, boxed_type):
 def isRecipient(learner, rules: dict) -> bool:
     for rule in rules:
         if rule["type"] == "list":
-            if learner.id in rule.content:
+            if learner.id in rule['content']:
                 return True
         if rule["type"] == "filters":
             for filter in rule["content"]:
                 if filter["scope"] == "校区":
+                    if filter['value'] == "全部校区":
+                        return True
                     if learner.branch != filter["value"]:
                         return False
                 if filter["scope"] == "角色":
+                    if filter['value'] == "所有成员":
+                        return True
                     if learner.role != filter["value"]:
                         return False
             return True

@@ -8,7 +8,7 @@ import random
 import base64
 
 from swagger_server.models.inline_response200 import InlineResponse200  # noqa: E501
-from swagger_server import util, orm, wxLogin
+from swagger_server import util, orm, wxLogin, weapp
 
 
 def miniprogram_picture_post(pictureType: str):  # noqa: E501
@@ -34,19 +34,18 @@ def miniprogram_picture_post(pictureType: str):  # noqa: E501
             db_session = orm.init_db(os.environ["DATABASEURI"])
     else:
         db_session = orm.init_db(os.environ["DATABASEURI"])
-    sessionKey = connexion.request.headers['token']
-    learner = db_session.query(orm.Learner_db).filter(orm.Learner_db.sessionKey == sessionKey).one_or_none()
+    learner = weapp.getLearner()
     if not learner:
         db_session.remove()
-        return {"message": "learner not found"}, 401
+        return {'code': -1001, 'message': '没有找到对应的Learner'}, 200
     if pictureType not in ["event", "announcement", "project", "course", "club"]:
-        return {"message": "图片类别不支持"}, 403
+        return {'code': -4001, "message": "图片类别不支持"}, 200
     img = connexion.request.files.get('picture')
     extension = os.path.splitext(img.filename)[-1]
     uid = create_uuid()
     if not allowed_file(img.filename):
         db_session.remove()
-        return {"error": "文件类型错误"}, 400
+        return {'code': -4002, 'message': '文件类型不支持'}, 200
     path = os.path.join(os.environ["STORAGEURL"], pictureType)
     if not os.path.exists(path):
         os.makedirs(path)
@@ -56,9 +55,9 @@ def miniprogram_picture_post(pictureType: str):  # noqa: E501
         img.save(file_path)
     except Exception as e:
         db_session.remove()
-        return {'error': str(e)}, 400
+        return {'code': -4003, 'message': '文件储存失败', 'log': str(e)}, 200
     db_session.remove()
-    return {"url": url}, 201
+    return {'code': 0, 'data': {"url": url}, 'message': '成功'}, 200
 
 
 def miniprogram_picture_get(uid, pictureType):  # noqa: E501
@@ -70,13 +69,12 @@ def miniprogram_picture_get(uid, pictureType):  # noqa: E501
             db_session = orm.init_db(os.environ["DATABASEURI"])
     else:
         db_session = orm.init_db(os.environ["DATABASEURI"])
-    sessionKey = connexion.request.headers['token']
-    learner = db_session.query(orm.Learner_db).filter(orm.Learner_db.sessionKey == sessionKey).one_or_none()
+    learner = weapp.getLearner()
     if not learner:
         db_session.remove()
-        return {"message": "learner not found"}, 401
+        return {'code': -1001, 'message': '没有找到对应的Learner'}, 200
     if pictureType not in ["event", "announcement", "project", "course", "club"]:
-        return {"message": "图片类别不支持"}, 403
+        return {'code': -4001, "message": "图片类别不支持"}, 200
     img_local_path = os.path.join(os.environ["STORAGEURL"], pictureType, uid)
     img_stream = ''
     try:
@@ -86,6 +84,6 @@ def miniprogram_picture_get(uid, pictureType):  # noqa: E501
             response.headers['Content-Type'] = 'image'
     except Exception as e:
         db_session.remove()
-        return {'error': str(e)}, 400
+        return {'code': -4004, 'message': '图片文件读取失败', 'log': str(e)}, 200
     db_session.remove()
     return response, 200

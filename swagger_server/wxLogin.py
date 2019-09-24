@@ -1,6 +1,7 @@
 import requests
 import os
 import connexion
+from flask import current_app
 from swagger_server import util, wxLogin, orm
 
 db_session = None
@@ -18,7 +19,7 @@ def validateAccessToken(openid, access_token) -> bool:
         result = requests.get("https://api.weixin.qq.com/sns/auth?access_token=%s&openid=%s" % (access_token, openid)).json()
         errcode = result["errcode"]
     except Exception as e:
-        print(str(e))
+        current_app.logger.error(str(e))
         return False
     if errcode == 0:
         return True
@@ -33,7 +34,7 @@ def refreshToken(refresh_token) -> dict:
         access_token = refresh_result["access_token"]
         refresh_token = refresh_result["refresh_token"]
     except Exception as e:
-        print(str(e))
+        current_app.logger.error(str(e))
         return {"error": e, "refresh_result": refresh_result}
     return {"access_token": access_token, "refresh_token": refresh_token}
 
@@ -45,6 +46,7 @@ def getWeChatInfo(openid, access_token) -> dict:
         sex = result["sex"]
         unionid = result["unionid"]
     except Exception as e:
+        current_app.logger.error(str(e))
         return {"error": e, "result": result}
     return {"nickname": nickname, "sex": sex, "unionid": unionid}
 
@@ -61,9 +63,9 @@ def validateUser() -> dict:
                 access_token = refresh_result["access_token"]
                 refresh_token = refresh_result["refresh_token"]
             except Exception as e:
-                print(str(e))
+                current_app.logger.error(str(e))
                 return {"result": False}
     except Exception as e:
-        print(str(e))
+        current_app.logger.error(str(e))
         return {"result": False}
     return {"result": True, "access_token": access_token, "refresh_token": refresh_token, "openid": openid}

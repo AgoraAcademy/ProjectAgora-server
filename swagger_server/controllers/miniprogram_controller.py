@@ -3,6 +3,9 @@ import six
 import os
 import requests
 import json
+import pytz
+import datetime
+from typing import List
 from tzlocal import get_localzone
 from flask import Flask, send_from_directory
 from exchangelib import Credentials, Account, Configuration, DELEGATE, RoomList, CalendarItem, EWSDateTime
@@ -25,6 +28,7 @@ account = Account(
     config=config,
     access_type=DELEGATE
 )
+tzinfo = pytz.timezone('Asia/Shanghai')
 
 
 def miniprogram_login_get(js_code):
@@ -43,16 +47,33 @@ def miniprogram_login_get(js_code):
         resultjson = result.json()
     except Exception as e:
         db_session.remove()
-        return {"error": str(e)}, 401
+        return {'code': -1005, 'message': 'Code换取SessionKey失败', "log": str(e)}, 200
+    if "openid" not in resultjson or "session_key" not in resultjson:
+        db_session.remove()
+        return {'code': -1005, 'message': 'Code换取SessionKey失败', "log": resultjson['errmsg']}, 200
     learner = db_session.query(orm.Learner_db).filter(orm.Learner_db.openidWeApp == resultjson['openid']).one_or_none()
+    if not learner:
+        response = {
+            'token': resultjson['session_key'],
+        }
+        db_session.remove()
+        return {'code': -1008, 'message': '在调用login GET后，Code换取SessionKey成功，但没有找到对应的learner', 'data': response}, 200
     try:
         learner.sessionKey = resultjson['session_key']
         db_session.commit()
-    except Exception:
+    except Exception as e:
         db_session.remove()
-    response = {'token': resultjson['session_key'], 'unionid': learner.unionid if learner else '', 'learnerFullName': learner.familyName + learner.givenName if learner else '', "isAdmin": learner.isAdmin if learner else '', "learnerId": learner.id if learner else ''}
+        return {'code': -1006, 'message': 'SessionKey写入失败', "log": str(e), "code2sessionResult": resultjson}, 200
+    response = {
+        'token': resultjson['session_key'],
+        'unionid': learner.unionid if learner else '',
+        'learnerFullName': learner.familyName + learner.givenName if learner else '',
+        "isAdmin": learner.isAdmin if learner else '',
+        "learnerId": learner.id if learner else '',
+        "branch": learner.branch if learner else ''
+    }
     db_session.remove()
-    return response, 200
+    return {'code': 0, 'data': response, 'message': '成功'}, 200
 
 
 def miniprogram_login_post(loginPostBody):
@@ -75,22 +96,17 @@ def miniprogram_login_post(loginPostBody):
     except Exception as e:
         print(e)
         db_session.remove()
-        return {"error": str(e)}, 403
+        return {'code': -1004, 'message': '解析微信认证加密信息失败', 'log': str(e)}, 200
     learner = db_session.query(orm.Learner_db).filter(orm.Learner_db.unionid == unionid).one_or_none()
     if not learner:
         db_session.remove()
-        return {"message": "unionid not found"}, 401
-    try:
-        learner.openidWeApp = decryptedData['openId']
-        learner.sessionKey = sessionKey
-    except Exception as e:
-        print(e)
-        db_session.remove()
-        return {"error": str(e)}, 403
+        return {'code': -1001, 'message': '没有找到对应的Learner'}, 200
+    learner.openidWeApp = decryptedData['openId']
+    learner.sessionKey = sessionKey
     db_session.commit()
     response = {"unionid": unionid, "learnerFullName": learner.familyName + learner.givenName, "isAdmin": learner.isAdmin}
     db_session.remove()
-    return response, 200
+    return {'code': 0, 'data': response, 'message': '成功'}, 200
 
 
 def miniprogram_learner_post(learnerPostBody):
@@ -112,16 +128,11 @@ def miniprogram_learner_post(learnerPostBody):
     except Exception as e:
         print(e)
         db_session.remove()
-        return {"error": str(e)}, 403
-    try:
-        learner = db_session.query(orm.Learner_db).filter(orm.Learner_db.unionid == unionid).one_or_none()
-        if learner:
-            db_session.remove()
-            return {"error": "用户已存在注册记录"}, 403
-    except Exception as e:
-        print(e)
+        return {'code': -1004, 'message': '解析微信认证加密信息失败', 'log': str(e)}, 200
+    learner = db_session.query(orm.Learner_db).filter(orm.Learner_db.unionid == unionid).one_or_none()
+    if learner:
         db_session.remove()
-        return {"error": str(e)}, 403
+        return {'code': -1003, 'message': "用户已存在注册记录"}, 200
     try:
         db_session.add(orm.Learner_db(
             validated=False,
@@ -151,14 +162,42 @@ def miniprogram_learner_post(learnerPostBody):
         db_session.commit()
     except Exception as e:
         db_session.remove()
-        return {"error": str(e)}, 401
+        return {'code': -1002, 'message': '数据有误，创建成员失败', 'log': str(e)}, 200
     response = {"unionid": unionid}
     db_session.remove()
-    return response, 201
+    return {'code': 0, 'data': response, 'message': '成功创建'}, 200
+
+
+def miniprogram_learner_get():
+    db_session = None
+    if "DEVMODE" in os.environ:
+        if os.environ["DEVMODE"] == "True":
+            db_session = orm.init_db(os.environ["DEV_DATABASEURI"])
+        else:
+            db_session = orm.init_db(os.environ["DATABASEURI"])
+    else:
+        db_session = orm.init_db(os.environ["DATABASEURI"])
+    learner = weapp.getLearner()
+    if not learner:
+        db_session.remove()
+        return {'code': -1001, 'message': '没有找到对应的Learner'}, 200
+    result_list = []
+    query: List[orm.Learner_db] = db_session.query(orm.Learner_db).filter(orm.Learner_db.validated == True).all()
+    for learner in query:
+        result_list.append({
+            "id": learner.id,
+            "givenName": learner.givenName,
+            "familyName": learner.familyName,
+            "isMentor": learner.isMentor,
+            "role": learner.role,
+            "branch": learner.branch
+        })
+    db_session.remove()
+    return {'code': 0, 'data': result_list, 'message': '成功'}, 200
 
 
 def miniprogram_ping():
-    return {'message': 'pinged!'}, 200
+    return {'code': 0, 'message': 'pinged!'}, 200
 
 
 def miniprogram_booking_get():
@@ -172,10 +211,10 @@ def miniprogram_booking_get():
         db_session = orm.init_db(os.environ["DATABASEURI"])
     if not weapp.getLearner():
         db_session.remove()
-        return {"message": "unionid not found"}, 401
+        return {'code': -1001, 'message': '没有找到对应的Learner'}, 200
     response = []
-    roomLists = db_session.query(orm.Config_db).filter(orm.Config_db.name == 'roomLists').one_or_none().value
-    roomDescriptions = db_session.query(orm.Config_db).filter(orm.Config_db.name == 'roomDescriptions').one_or_none().value
+    roomLists = json.loads(db_session.query(orm.Config_db).filter(orm.Config_db.name == 'roomLists').one_or_none().value)
+    roomDescriptions = json.loads(db_session.query(orm.Config_db).filter(orm.Config_db.name == 'roomDescriptions').one_or_none().value)
     try:
         for roomList in roomLists:
             roomsEWS = GetRooms(protocol=account.protocol).call(
@@ -198,9 +237,9 @@ def miniprogram_booking_get():
             response.append(entry)
     except Exception as e:
         db_session.remove()
-        return {"error": str(e)}, 400
+        return {'code': -2001, 'message': '获取房间列表失败', "log": str(e)}, 200
     db_session.remove()
-    return response, 200
+    return {'code': 0, 'data': response, 'message': '成功'}, 200
 
 
 def miniprogram_booking_roomCode_get(roomCode, monthToLoad):  # noqa: E501
@@ -214,9 +253,10 @@ def miniprogram_booking_roomCode_get(roomCode, monthToLoad):  # noqa: E501
     else:
         db_session = orm.init_db(os.environ["DATABASEURI"])
     responseList = []
-    if not weapp.getLearner():
+    learner = weapp.getLearner()
+    if not learner:
         db_session.remove()
-        return {"message": "unionid not found"}, 401
+        return {'code': -1001, 'message': '没有找到对应的Learner'}, 200
     try:
         room_account = Account(
             primary_smtp_address=('%s@agoraacademy.cn' % roomCode),
@@ -225,7 +265,7 @@ def miniprogram_booking_roomCode_get(roomCode, monthToLoad):  # noqa: E501
         )
     except Exception as e:
         db_session.remove()
-        return {"error": str(e)}, 400
+        return {'code': -2002, 'message': '代理用的Office Account初始化失败', "log": str(e)}, 200
     monthToLoad_year = int(monthToLoad.split("-")[0])
     monthToLoad_month = int(monthToLoad.split("-")[1])
     if monthToLoad_month == 1:
@@ -259,9 +299,9 @@ def miniprogram_booking_roomCode_get(roomCode, monthToLoad):  # noqa: E501
             })
     except Exception as e:
         db_session.remove()
-        return {'error': str(e)}, 400
+        return {'code': -2003, 'message': '获取房间事件列表失败', 'log': str(e)}, 200
     db_session.remove()
-    return responseList, 200
+    return {'code': 0, 'data': responseList, 'message': '成功'}, 200
 
 
 def miniprogram_booking_roomCode_post(roomCode, appointment):  # noqa: E501
@@ -274,14 +314,10 @@ def miniprogram_booking_roomCode_post(roomCode, appointment):  # noqa: E501
             db_session = orm.init_db(os.environ["DATABASEURI"])
     else:
         db_session = orm.init_db(os.environ["DATABASEURI"])
-    if not weapp.getLearner():
+    learner = weapp.getLearner()
+    if not learner:
         db_session.remove()
-        return {"message": "unionid not found"}, 401
-    sessionKey = connexion.request.headers['token']
-    learner = db_session.query(orm.Learner_db).filter(orm.Learner_db.sessionKey == sessionKey).one_or_none()
-    if not learner.validated:
-        db_session.remove()
-        return {"error": "Learner not validated"}, 401
+        return {'code': -1001, 'message': '没有找到对应的Learner'}, 200
     room_account = Account(
         primary_smtp_address=('%s@agoraacademy.cn' % roomCode),
         credentials=credentials,
@@ -319,9 +355,9 @@ def miniprogram_booking_roomCode_post(roomCode, appointment):  # noqa: E501
         db_session.commit()
     except Exception as e:
         db_session.remove()
-        return {'error': str(e)}, 400
+        return {'code': -2004, 'message': '房间预约失败', 'log': str(e)}, 200
     db_session.remove()
-    return {'message': 'success'}, 201
+    return {'code': 0, 'message': 'success'}, 200
 
 
 def miniprogram_booking_roomCode_delete(roomCode, monthToLoad, deleteInfo):  # noqa: E501
@@ -334,12 +370,11 @@ def miniprogram_booking_roomCode_delete(roomCode, monthToLoad, deleteInfo):  # n
             db_session = orm.init_db(os.environ["DATABASEURI"])
     else:
         db_session = orm.init_db(os.environ["DATABASEURI"])
-    if not weapp.getLearner():
+    learner = weapp.getLearner()
+    if not learner:
         db_session.remove()
-        return {"message": "unionid not found"}, 401
+        return {'code': -1001, 'message': '没有找到对应的Learner'}, 200
     changekey = deleteInfo['changekey']
-    sessionKey = connexion.request.headers['token']
-    learner = db_session.query(orm.Learner_db).filter(orm.Learner_db.sessionKey == sessionKey).one_or_none()
     try:
         room_account = Account(
             primary_smtp_address=('%s@agoraacademy.cn' % roomCode),
@@ -348,7 +383,7 @@ def miniprogram_booking_roomCode_delete(roomCode, monthToLoad, deleteInfo):  # n
         )
     except Exception as e:
         db_session.remove()
-        return {'error': str(e)}, 400
+        return {'code': -2002, 'message': '代理用的Office Account初始化失败', "log": str(e)}, 200
     start_year = int(monthToLoad.split("-")[0])
     start_month = int(monthToLoad.split("-")[1])
     start = room_account.default_timezone.localize(EWSDateTime(start_year, start_month, 1))
@@ -364,12 +399,12 @@ def miniprogram_booking_roomCode_delete(roomCode, monthToLoad, deleteInfo):  # n
                     db_session.delete(notes)
     except Exception as e:
         db_session.remove()
-        return {'error': str(e)}, 400
+        return {'code': -2005, 'message': '房间预约删除失败', 'error': str(e)}, 200
     db_session.remove()
-    return {'message': 'success'}, 201
+    return {'code': 0, 'message': 'success'}, 200
 
 
-def miniprogram_pushMessage_get():
+def miniprogram_pushMessage_get(isGetAll: bool = False):
     db_session = None
     if "DEVMODE" in os.environ:
         if os.environ["DEVMODE"] == "True":
@@ -381,22 +416,25 @@ def miniprogram_pushMessage_get():
     learner = weapp.getLearner()
     if not learner:
         db_session.remove()
-        return {"message": "unionid not found"}, 401
+        return {'code': -1001, 'message': '没有找到对应的Learner'}, 200
     response = []
-    pushMessageList = db_session.query(orm.PushMessage_db).all()
+    if isGetAll:
+        pushMessageList = db_session.query(orm.PushMessage_db).all()
+    else:
+        pushMessageList = db_session.query(orm.PushMessage_db).filter(orm.PushMessage_db.expireDateTime > datetime.datetime.utcnow()).all()
     for pushMessage in pushMessageList:
-        if util.isRecipient(learner, pushMessage.recipients):
+        if util.isRecipient(learner, json.loads(pushMessage.recipients)):
             response.append({
                 "id": pushMessage.id,
                 "messageType": pushMessage.messageType,
                 "entityId": pushMessage.entityId,
                 "senderId": pushMessage.senderId,
-                "recipients": json.dumps(pushMessage.recipients),
-                "rsvp": json.dumps(pushMessage.rsvp),
-                "sentDateTime": EWSDateTime.from_datetime(pushMessage.sentDateTime).ewsformat(),
-                "modifiedDateTime": EWSDateTime.from_datetime(pushMessage.modifiedDateTime).ewsformat(),
-                "expireDateTime": EWSDateTime.from_datetime(pushMessage.expireDateTime).ewsformat(),
-                "content": json.dumps(pushMessage.content)
+                "recipients": json.loads(pushMessage.recipients),
+                "rsvp": json.loads(pushMessage.rsvp),
+                "sentDateTime": EWSDateTime.from_datetime(tzinfo.localize(pushMessage.sentDateTime)).ewsformat(),
+                "modifiedDateTime": EWSDateTime.from_datetime(tzinfo.localize(pushMessage.modifiedDateTime)).ewsformat(),
+                "expireDateTime": EWSDateTime.from_datetime(tzinfo.localize(pushMessage.expireDateTime)).ewsformat(),
+                "content": json.loads(pushMessage.content)
             })
     db_session.remove()
-    return response, 200
+    return {'code': 0, 'data': response, 'message': '成功'}, 200

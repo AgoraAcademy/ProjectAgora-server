@@ -3,6 +3,8 @@ import six
 import os
 import requests
 import json
+import datetime
+import pytz
 from tzlocal import get_localzone
 from flask import Flask, send_from_directory
 from exchangelib import Credentials, Account, Configuration, DELEGATE, RoomList, CalendarItem, EWSDateTime
@@ -11,6 +13,8 @@ from exchangelib.items import MeetingRequest, MeetingCancellation, SEND_TO_ALL_A
 
 from swagger_server.models.inline_response200 import InlineResponse200  # noqa: E501
 from swagger_server import util, orm, weapp
+
+tzinfo = pytz.timezone('Asia/Shanghai')
 
 credentials = Credentials(
     os.environ["EWS_admin_email"],
@@ -38,16 +42,15 @@ def miniprogram_event_post(eventPostBody):
     else:
         db_session = orm.init_db(os.environ["DATABASEURI"])
     eventPostBody_dict = connexion.request.get_json()
-    sessionKey = connexion.request.headers['token']
-    learner = db_session.query(orm.Learner_db).filter(orm.Learner_db.sessionKey == sessionKey).one_or_none()
+    learner = weapp.getLearner()
     if not learner:
         db_session.remove()
-        return {"message": "learner not found"}, 401
+        return {'code': -1001, 'message': '没有找到对应的Learner'}, 200
     # 自定义鉴权
     if not learner.isAdmin:
         if "initiatorDisplayName" in eventPostBody:
             db_session.remove()
-            return {"message": "非管理员不可自定义发起者名称"}, 403
+            return {'code': -1007, 'message': '需要管理员权限', "detail": "非管理员不可自定义发起者名称"}, 200
         initiatorDisplayName = learner.familyName + learner.givenName
     else:
         initiatorDisplayName = eventPostBody_dict["initiatorDisplayName"] if "initiatorDisplayName" in eventPostBody_dict else learner.familyName + learner.givenName
@@ -57,7 +60,8 @@ def miniprogram_event_post(eventPostBody):
             initiatorDisplayName=initiatorDisplayName,
             eventInfo=json.dumps(eventPostBody_dict["eventInfo"]),
             invitee=json.dumps(eventPostBody_dict["invitee"]),
-            thumbnail=json.dumps(eventPostBody_dict["thumbnail"])
+            thumbnail=json.dumps(eventPostBody_dict["thumbnail"]),
+            expireDateTime=util.EWSDateTimeToDateTime(EWSDateTime.from_string(eventPostBody_dict["eventInfo"]["expireDateTime"]))
         )
         db_session.add(newEvent)
         db_session.commit()
@@ -77,13 +81,24 @@ def miniprogram_event_post(eventPostBody):
         db_session.commit()
         newEvent.pushMessageId = newPushMessage.id
         db_session.commit()
+        newNotification = orm.Notification_db(
+            learnerId=learner.id,
+            notificationType="活动日程",
+            entityId=newEvent.id,
+            createdDateTime=util.EWSDateTimeToDateTime(account.default_timezone.localize(EWSDateTime.now())),
+            expireDateTime=util.EWSDateTimeToDateTime(EWSDateTime.from_string(json.loads(newEvent.eventInfo)["expireDateTime"])),
+            title=json.loads(newEvent.eventInfo)["title"],
+            description=json.loads(newEvent.eventInfo)["description"]
+        )
+        db_session.add(newNotification)
+        db_session.commit()
         # TODO: 这里应当添加Microsoft Graph API为initiator添加appointment并发送至recipients
     except Exception as e:
         db_session.remove()
-        return {'error': str(e)}, 400
-    response = {"pushMessage_id": newPushMessage.id, "event_id": newEvent.id}
+        return {'code': -3001, 'message': '活动创建失败', 'log': str(e)}, 200
+    response = {"pushMessageId": newPushMessage.id, "id": newEvent.id}
     db_session.remove()
-    return response, 201
+    return {'code': 0, 'data': response, 'message': '成功'}, 200
 
 
 def miniprogram_event_patch(eventId):
@@ -97,44 +112,82 @@ def miniprogram_event_patch(eventId):
     else:
         db_session = orm.init_db(os.environ["DATABASEURI"])
     eventPatchBody_dict = connexion.request.get_json()
-    sessionKey = connexion.request.headers['token']
-    learner = db_session.query(orm.Learner_db).filter(orm.Learner_db.sessionKey == sessionKey).one_or_none()
+    learner = weapp.getLearner()
     if not learner:
         db_session.remove()
-        return {"message": "learner not found"}, 401
-    event = db_session.query(orm.Event_db).filter(orm.Event_db.id == eventId).one_or_none()
+        return {'code': -1001, 'message': '没有找到对应的Learner'}, 200
+    event: orm.Event_db = db_session.query(orm.Event_db).filter(orm.Event_db.id == eventId).one_or_none()
     pushMessage = db_session.query(orm.PushMessage_db).filter(orm.PushMessage_db.id == event.pushMessageId).one_or_none()
-    try:
-        if event.initiatorId != learner.id:
-            try:
-                newRsvp = json.loads(pushMessage.rsvp) if pushMessage.rsvp else {'accept': [], 'decline': [], 'tentative': []}
-                newEntry = {'id': learner.id, 'fullname': learner.familyName + learner.givenName}
-                if eventPatchBody_dict["rsvp"] == "参加":
-                    if newEntry not in newRsvp['accept']:
-                        newRsvp["accept"].append(newEntry)
-                    for responseType in ["decline", "tentative"]:
-                        if newEntry in newRsvp[responseType]:
-                            newRsvp[responseType].remove(newEntry)
-                if eventPatchBody_dict["rsvp"] == "拒绝":
-                    if newEntry not in newRsvp['decline']:
-                        newRsvp["decline"].append(newEntry)
-                    for responseType in ["accept", "tentative"]:
-                        if newEntry in newRsvp[responseType]:
-                            newRsvp[responseType].remove(newEntry)
-                if eventPatchBody_dict["rsvp"] == "可能参加":
-                    if newEntry not in newRsvp['tentative']:
-                        newRsvp["tentative"].append(newEntry)
-                    for responseType in ["decline", "accept"]:
-                        if newEntry in newRsvp[responseType]:
-                            newRsvp[responseType].remove(newEntry)
-                setattr(pushMessage, "rsvp", json.dumps(newRsvp))
-                db_session.commit()
-            except Exception as e:
-                db_session.remove()
-                return {'error': str(e)}, 400
+    if event.initiatorId != learner.id:
+        try:
+            newRsvp = json.loads(pushMessage.rsvp) if pushMessage.rsvp else {'accept': [], 'decline': [], 'tentative': []}
+            newEntry = {'id': learner.id, 'fullname': learner.familyName + learner.givenName}
+            # 登记参加的处理逻辑
+            if eventPatchBody_dict["rsvp"] == "参加":
+                if newEntry not in newRsvp['accept']:
+                    newRsvp["accept"].append(newEntry)
+                    existingNotification: orm.Notification_db = db_session.query(orm.Notification_db).filter(orm.Notification_db.learnerId == learner.id).filter(orm.Notification_db.notificationType == "活动日程").filter(orm.Notification_db.entityId == event.id).one_or_none()
+                    if existingNotification:
+                        existingNotification.status = "参加"
+                    else:
+                        newNotification: orm.Notification_db = orm.Notification_db(
+                            learnerId=learner.id,
+                            notificationType="活动日程",
+                            entityId=event.id,
+                            createdDateTime=util.EWSDateTimeToDateTime(account.default_timezone.localize(EWSDateTime.now())),
+                            expireDateTime=util.EWSDateTimeToDateTime(EWSDateTime.from_string(json.loads(event.eventInfo)["expireDateTime"])),
+                            status="参加",
+                            title=json.loads(event.eventInfo)["title"],
+                            description=json.loads(event.eventInfo)["description"],
+                        )
+                        db_session.add(newNotification)
+                for responseType in ["decline"]:
+                    if newEntry in newRsvp[responseType]:
+                        newRsvp[responseType].remove(newEntry)
+                for responseType in ["tentative"]:
+                    if newEntry in newRsvp[responseType]:
+                        newRsvp[responseType].remove(newEntry)
+            # 登记不参加的处理逻辑
+            if eventPatchBody_dict["rsvp"] == "不参加":
+                if newEntry not in newRsvp['decline']:
+                    newRsvp["decline"].append(newEntry)
+                for responseType in ["accept", "tentative"]:
+                    if newEntry in newRsvp[responseType]:
+                        newRsvp[responseType].remove(newEntry)
+                        notificationToDelete = db_session.query(orm.Notification_db).filter(orm.Notification_db.learnerId == learner.id).filter(orm.Notification_db.notificationType == "活动日程").filter(orm.Notification_db.entityId == event.id).one_or_none()
+                        if notificationToDelete:
+                            db_session.delete(notificationToDelete)
+            # 登记待定的处理逻辑
+            if eventPatchBody_dict["rsvp"] == "待定":
+                if newEntry not in newRsvp['tentative']:
+                    newRsvp["tentative"].append(newEntry)
+                    existingNotification: orm.Notification_db = db_session.query(orm.Notification_db).filter(orm.Notification_db.learnerId == learner.id).filter(orm.Notification_db.notificationType == "活动日程").filter(orm.Notification_db.entityId == event.id).one_or_none()
+                    if existingNotification:
+                        existingNotification.status = "待定"
+                    else:
+                        newNotification: orm.Notification_db = orm.Notification_db(
+                            learnerId=learner.id,
+                            notificationType="活动日程",
+                            entityId=event.id,
+                            createdDateTime=util.EWSDateTimeToDateTime(account.default_timezone.localize(EWSDateTime.now())),
+                            expireDateTime=util.EWSDateTimeToDateTime(EWSDateTime.from_string(json.loads(event.eventInfo)["expireDateTime"])),
+                            status="参加",
+                            title=json.loads(event.eventInfo)["title"],
+                            description=json.loads(event.eventInfo)["description"],
+                        )
+                        db_session.add(newNotification)
+                for responseType in ["decline", "accept"]:
+                    if newEntry in newRsvp[responseType]:
+                        newRsvp[responseType].remove(newEntry)
+            setattr(pushMessage, "rsvp", json.dumps(newRsvp))
+            db_session.commit()
+        except Exception as e:
             db_session.remove()
-            return {"message": "event rsvp updated"}, 200
-        else:
+            return {'code': -3002, 'message': '更新rsvp信息失败', 'log': str(e)}, 200
+        db_session.remove()
+        return {'code': 0, 'message': '成功更新rsvp信息'}, 200
+    else:
+        try:
             for itemKey in eventPatchBody_dict:
                 if itemKey == "initiatorDisplayName":
                     event.initiatorDisplayName = eventPatchBody_dict[itemKey]
@@ -148,20 +201,24 @@ def miniprogram_event_patch(eventId):
                     newEventInfo = json.loads(event.eventInfo)
                     newEventInfo[itemKey] = eventPatchBody_dict[itemKey]
                     event.eventInfo = json.dumps(newEventInfo)
-                if itemKey in ["expireDateTime", "endDateTime", "startDateTime"]:
+                if itemKey in ["endDateTime", "startDateTime"]:
                     newEventInfo = json.loads(event.eventInfo)
                     newEventInfo[itemKey] = eventPatchBody_dict[itemKey]
                     event.eventInfo = json.dumps(newEventInfo)
                     newPatchDateTime = util.EWSDateTimeToDateTime(EWSDateTime.from_string(eventPatchBody_dict[itemKey])),
                     setattr(pushMessage, itemKey, newPatchDateTime)
+                if itemKey == "expireDateTime":
+                    newPatchExpireDateTime = util.EWSDateTimeToDateTime(EWSDateTime.from_string(eventPatchBody_dict[itemKey])),
+                    setattr(pushMessage, itemKey, newPatchExpireDateTime)
+                    setattr(event, "expireDateTime", newPatchExpireDateTime)
             newModifiedDateTime = util.EWSDateTimeToDateTime(account.default_timezone.localize(EWSDateTime.now())),
             pushMessage.modifiedDateTime = newModifiedDateTime
             db_session.commit()
             db_session.remove()
-            return {"message": "event updated"}, 200
-    except Exception as e:
-        db_session.remove()
-        return {'error': str(e)}, 400
+            return {'code': 0, 'message': '成功'}, 200
+        except Exception as e:
+            db_session.remove()
+            return {'code': -3003, 'message': '更新活动失败', 'log': str(e)}, 200
 
 
 def miniprogram_event_eventId_get(eventId):
@@ -174,11 +231,10 @@ def miniprogram_event_eventId_get(eventId):
             db_session = orm.init_db(os.environ["DATABASEURI"])
     else:
         db_session = orm.init_db(os.environ["DATABASEURI"])
-    sessionKey = connexion.request.headers['token']
-    learner = db_session.query(orm.Learner_db).filter(orm.Learner_db.sessionKey == sessionKey).one_or_none()
+    learner = weapp.getLearner()
     if not learner:
         db_session.remove()
-        return {"message": "learner not found"}, 401
+        return {'code': -1001, 'message': '没有找到对应的Learner'}, 200
     event = db_session.query(orm.Event_db).filter(orm.Event_db.id == eventId).one_or_none()
     pushMessage = db_session.query(orm.PushMessage_db).filter(orm.PushMessage_db.id == event.pushMessageId).one_or_none()
     try:
@@ -189,13 +245,14 @@ def miniprogram_event_eventId_get(eventId):
             "eventInfo": json.loads(event.eventInfo),
             "invitee": json.loads(event.invitee),
             "thumbnail": json.loads(event.thumbnail),
-            "rsvp": json.loads(pushMessage.rsvp)
+            "rsvp": json.loads(pushMessage.rsvp),
+            "expireDatetime": EWSDateTime.from_datetime(tzinfo.localize(event.expireDateTime)).ewsformat()
         }
         db_session.remove()
-        return response, 200
+        return {'code': 0, 'data': response, 'message': '成功'}, 200
     except Exception as e:
         db_session.remove()
-        return {'error': str(e)}, 400
+        return {'code': -3004, 'message': '获取活动详情失败', 'log': str(e)}, 200
 
 
 def miniprogram_event_eventId_delete(eventId):
@@ -208,27 +265,33 @@ def miniprogram_event_eventId_delete(eventId):
             db_session = orm.init_db(os.environ["DATABASEURI"])
     else:
         db_session = orm.init_db(os.environ["DATABASEURI"])
-    sessionKey = connexion.request.headers['token']
-    learner = db_session.query(orm.Learner_db).filter(orm.Learner_db.sessionKey == sessionKey).one_or_none()
+    learner = weapp.getLearner()
     if not learner:
         db_session.remove()
-        return {"message": "learner not found"}, 401
+        return {'code': -1001, 'message': '没有找到对应的Learner'}, 200
     event = db_session.query(orm.Event_db).filter(orm.Event_db.id == eventId).one_or_none()
     pushMessage = db_session.query(orm.PushMessage_db).filter(orm.PushMessage_db.id == event.pushMessageId).one_or_none()
     try:
         if event.initiatorId == learner.id or learner.isAdmin:
             db_session.delete(event)
+            db_session.commit()
             if pushMessage:
                 db_session.delete(pushMessage)
+        else:
+            return {'code': -1007, 'message': '需要管理员权限', 'detail': '只有管理员或该活动创建人可以删除该活动'}, 200
         db_session.commit()
+        notificationToDelete = db_session.query(orm.Notification_db).filter(orm.Notification_db.learnerId == learner.id).filter(orm.Notification_db.notificationType == "活动日程").filter(orm.Notification_db.entityId == event.id).one_or_none()
+        if notificationToDelete:
+            db_session.delete(notificationToDelete)
+            db_session.commit()
         db_session.remove()
-        return {"message": "successfully deleted"}, 200
+        return {'code': 0, 'message': '成功'}, 200
     except Exception as e:
         db_session.remove()
-        return {'error': str(e)}, 400
+        return {'code': -3005, 'message': '删除活动失败', 'log': str(e)}, 200
 
 
-def miniprogram_event_get():
+def miniprogram_event_get(isGetAll: bool = False):
     # 获取活动列表，目前暂时默认为返回全部条目
     db_session = None
     if "DEVMODE" in os.environ:
@@ -238,24 +301,28 @@ def miniprogram_event_get():
             db_session = orm.init_db(os.environ["DATABASEURI"])
     else:
         db_session = orm.init_db(os.environ["DATABASEURI"])
-    sessionKey = connexion.request.headers['token']
-    learner = db_session.query(orm.Learner_db).filter(orm.Learner_db.sessionKey == sessionKey).one_or_none()
+    learner = weapp.getLearner()
     if not learner:
         db_session.remove()
-        return {"message": "learner not found"}, 401
+        return {'code': -1001, 'message': '没有找到对应的Learner'}, 200
     try:
-        eventList = db_session.query(orm.Event_db).all()
+        if isGetAll:
+            eventList = db_session.query(orm.Event_db).all()
+        else:
+            eventList = db_session.query(orm.Event_db).filter(orm.Notification_db.expireDateTime > datetime.datetime.utcnow()).all()
         response = []
         for event in eventList:
             response.append({
                 "id": event.id,
+                "pushMessageId": event.pushMessageId,
                 "initiatorId": event.initiatorId,
                 "initiatorDisplayName": event.initiatorDisplayName,
                 "eventInfo": json.loads(event.eventInfo),
-                "invitee": json.loads(event.invitee)
+                "invitee": json.loads(event.invitee),
+                "thumbnail": json.loads(event.thumbnail)
             })
         db_session.remove()
     except Exception as e:
         db_session.remove()
-        return {'error': str(e)}, 400
-    return response, 200
+        return {'code': -3006, 'message': '获取活动列表失败', 'log': str(e)}, 200
+    return {'code': 0, 'data': response, 'message': '成功'}, 200
