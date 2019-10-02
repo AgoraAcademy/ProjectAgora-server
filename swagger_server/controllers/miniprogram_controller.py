@@ -197,7 +197,17 @@ def miniprogram_learner_get():
 
 
 def miniprogram_ping():
-    return {'code': 0, 'message': 'pinged!'}, 200
+    db_session = None
+    if "DEVMODE" in os.environ:
+        if os.environ["DEVMODE"] == "True":
+            db_session = orm.init_db(os.environ["DEV_DATABASEURI"])
+        else:
+            db_session = orm.init_db(os.environ["DATABASEURI"])
+    else:
+        db_session = orm.init_db(os.environ["DATABASEURI"])
+    mode = db_session.query(orm.Config_db).filter(orm.Config_db.name == 'mode').one_or_none().value
+    response = {'mode': mode}
+    return {'code': 0, 'message': 'pinged!', 'data': response}, 200
 
 
 def miniprogram_booking_get():
