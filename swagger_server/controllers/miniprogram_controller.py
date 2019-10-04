@@ -206,7 +206,9 @@ def miniprogram_ping():
     else:
         db_session = orm.init_db(os.environ["DATABASEURI"])
     mode = db_session.query(orm.Config_db).filter(orm.Config_db.name == 'mode').one_or_none().value
-    response = {'mode': mode}
+    prodVer = db_session.query(orm.Config_db).filter(orm.Config_db.name == 'prodVer').one_or_none().value
+    response = {'mode': mode, 'prodVer': prodVer}
+    db_session.remove()
     return {'code': 0, 'message': 'pinged!', 'data': response}, 200
 
 
