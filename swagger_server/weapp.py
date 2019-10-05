@@ -46,6 +46,13 @@ def getLearner() -> Learner_db or None:
         current_app.logger.error(str(e))
         db_session.remove()
         return None
+    if db_session.query(orm.Config_db).filter(orm.Config_db.name == 'mode').one_or_none().value == "audit":
+        auditAccountList = json.loads(db_session.query(orm.Config_db).filter(orm.Config_db.name == 'auditAccountList').one_or_none().value)
+        auditAccount = None
+        for account in auditAccountList:
+            if account['sessionKey'] == sessionKey:
+                auditAccount = db_session.query(orm.Learner_db).filter(orm.Learner_db.id == account['learnerId']).one_or_none()
+                return auditAccount
     learner: Learner_db = db_session.query(orm.Learner_db).filter(orm.Learner_db.sessionKey == sessionKey).one_or_none()
     db_session.remove()
     return learner
